@@ -24,18 +24,18 @@ export default function Home() {
             <CardDescription className="text-lg text-muted-foreground pt-2">Please select your role to get started.</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col md:flex-row gap-4 p-8 bg-secondary/30">
-            <Button asChild variant="outline" size="lg" className="flex-1 w-full h-32 text-xl rounded-xl shadow-lg transition-transform hover:scale-105">
-              <Link href="/patient">
-                <User className="mr-4 h-10 w-10" />
-                I'm a Patient
-              </Link>
-            </Button>
-            <Button asChild size="lg" className="flex-1 w-full h-32 text-xl bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl shadow-lg transition-transform hover:scale-105">
-              <Link href="/caregiver">
-                <Users className="mr-4 h-10 w-10" />
-                I'm a Caregiver
-              </Link>
-            </Button>
+            <Link href="/patient" className="flex-1">
+              <Button variant="outline" size="lg" className="w-full h-32 text-xl rounded-xl shadow-lg transition-transform hover:scale-105">
+                  <User className="mr-4 h-10 w-10" />
+                  I'm a Patient
+              </Button>
+            </Link>
+            <Link href="/caregiver" className="flex-1">
+              <Button size="lg" className="w-full h-32 text-xl bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl shadow-lg transition-transform hover:scale-105">
+                  <Users className="mr-4 h-10 w-10" />
+                  I'm a Caregiver
+              </Button>
+            </Link>
           </CardContent>
         </Card>
       </main>
