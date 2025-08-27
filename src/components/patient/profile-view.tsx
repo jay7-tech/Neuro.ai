@@ -5,24 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { User, Users, MapPin, Droplets, Calendar, Stethoscope, Phone, Settings, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-
-const patient = {
-    name: 'John Doe',
-    id: 'P-12345XYZ',
-    photo: 'https://picsum.photos/200/200',
-    age: 78,
-    bloodGroup: 'O+',
-    address: '123 Memory Lane, Suite 101, Sunnyvale, CA 94086',
-    medicalInfo: 'Mild cognitive impairment. Allergic to penicillin.',
-    caregivers: [
-        { name: 'Jane Smith', relation: 'Primary Caregiver', phone: '555-0101' },
-        { name: 'Dr. Emily White', relation: 'Neurologist', phone: '555-0102' },
-    ],
-    family: [
-        { name: 'Peter Doe', relation: 'Son', phone: '555-0103' },
-        { name: 'Mary Doe', relation: 'Daughter', phone: '555-0104' },
-    ],
-};
+import { patient } from '@/lib/data';
 
 
 export function ProfileView() {

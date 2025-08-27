@@ -5,6 +5,7 @@ import { Brain, Pill, Puzzle, Camera, MessageSquare, Calendar, User, Bell, Sun, 
 import Link from "next/link";
 import Image from "next/image";
 import { AiCompanion } from "./ai-companion";
+import { patient } from "@/lib/data";
 
 const dailyPlan = [
   { time: '08:00 AM', task: 'Wake up and get dressed', icon: <Sun className="h-8 w-8 text-primary" /> },
@@ -21,7 +22,6 @@ const memoryPrompt = {
 };
 
 export function PatientDashboard() {
-  const patientId = "P-12345XYZ";
 
   return (
     <div className="p-4 md:p-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -29,12 +29,12 @@ export function PatientDashboard() {
         <Card>
           <CardHeader>
             <CardTitle className="text-3xl flex items-center gap-3">
-              <User className="h-8 w-8"/> Welcome Back!
+              <User className="h-8 w-8"/> Hi, {patient.name}!
             </CardTitle>
-            <CardDescription className="text-base">Your Patient ID for linking with a caregiver is: <span className="font-bold text-foreground">{patientId}</span></CardDescription>
+            <CardDescription className="text-base">This is your personal dashboard.</CardDescription>
           </CardHeader>
           <CardContent>
-            <Link href="/patient/profile">
+            <Link href="/patient/profile" passHref>
               <Button>View Full Profile <ArrowRight className="ml-2 h-4 w-4" /></Button>
             </Link>
           </CardContent>
@@ -45,13 +45,13 @@ export function PatientDashboard() {
             <CardTitle className="text-2xl">Tools to Help</CardTitle>
           </CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Link href="/patient/games">
+            <Link href="/patient/games" passHref>
               <Button variant="outline" className="flex flex-col h-32 w-full text-center text-lg rounded-lg">
                 <Puzzle className="h-10 w-10 mb-2 mx-auto" />
                 Cognitive Games
               </Button>
             </Link>
-            <Link href="/patient/med-identifier">
+            <Link href="/patient/med-identifier" passHref>
               <Button variant="outline" className="flex flex-col h-32 w-full text-center text-lg rounded-lg">
                 <Camera className="h-10 w-10 mb-2 mx-auto" />
                 Identify Medicine
