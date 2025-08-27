@@ -3,14 +3,14 @@ import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { identifyMedicine } from '@/ai/flows/medicine-identification';
+import { identifyMedicine, IdentifyMedicineOutput } from '@/ai/flows/medicine-identification';
 import Image from 'next/image';
-import { Camera, Pill, FileUp, Loader2 } from 'lucide-react';
+import { Camera, Pill, FileUp, Loader2, Info, Calendar, Users, Target } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export function MedicineIdentifier() {
   const [photo, setPhoto] = useState<string | null>(null);
-  const [result, setResult] = useState<{ medicineName: string; confidenceLevel: number } | null>(null);
+  const [result, setResult] = useState<IdentifyMedicineOutput | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -88,9 +88,26 @@ export function MedicineIdentifier() {
                     <Alert>
                         <Pill className="h-4 w-4" />
                         <AlertTitle className="font-bold">Identification Result</AlertTitle>
-                        <AlertDescription className="text-base mt-2 space-y-1">
-                            <p><strong>Medicine Name:</strong> {result.medicineName}</p>
-                            <p><strong>Confidence:</strong> {Math.round(result.confidenceLevel * 100)}%</p>
+                        <AlertDescription asChild>
+                           <div className="text-base mt-2 space-y-3">
+                                <p><strong>Medicine Name:</strong> {result.medicineName} (Confidence: {Math.round(result.confidenceLevel * 100)}%)</p>
+                                <div className="space-y-2 pt-2 border-t mt-2">
+                                    <p className="flex items-start gap-2">
+                                        <Info className="h-5 w-5 mt-0.5 shrink-0"/> <span><strong>Usage:</strong> {result.usage}</span>
+                                    </p>
+                                    <p className="flex items-start gap-2">
+                                        <Users className="h-5 w-5 mt-0.5 shrink-0"/> <span><strong>Recommended For:</strong> {result.recommendedFor}</span>
+                                    </p>
+                                    <p className="flex items-start gap-2">
+                                        <Target className="h-5 w-5 mt-0.5 shrink-0"/> <span><strong>Patient-related:</strong> {result.isForPatient ? "This medicine is commonly used for conditions related to dementia." : "This medicine is not typically prescribed for dementia-related conditions."}</span>
+                                    </p>
+                                    {result.expiryDate && (
+                                    <p className="flex items-start gap-2">
+                                        <Calendar className="h-5 w-5 mt-0.5 shrink-0"/> <span><strong>Expiry Date:</strong> {result.expiryDate}</span>
+                                    </p>
+                                    )}
+                                </div>
+                           </div>
                         </AlertDescription>
                     </Alert>
                 )}

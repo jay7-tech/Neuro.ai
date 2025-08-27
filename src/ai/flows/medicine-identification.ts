@@ -25,6 +25,10 @@ const IdentifyMedicineOutputSchema = z.object({
   confidenceLevel: z
     .number()
     .describe('The confidence level of the identification (0-1).'),
+  usage: z.string().describe('The typical use or purpose of the medicine.'),
+  recommendedFor: z.string().describe('Who the medicine is generally recommended for.'),
+  isForPatient: z.boolean().describe('Whether this medicine is likely prescribed for a dementia patient.'),
+  expiryDate: z.string().optional().describe('The expiry date found on the tablet pack, if visible (YYYY-MM-DD).')
 });
 export type IdentifyMedicineOutput = z.infer<typeof IdentifyMedicineOutputSchema>;
 
@@ -40,13 +44,13 @@ const prompt = ai.definePrompt({
   output: {schema: IdentifyMedicineOutputSchema},
   prompt: `You are an expert pharmacist specializing in identifying medicine from photos of tablet packs.
 
-You will use this information to identify the medicine in the photo, and provide a confidence level.
+You will use this information to identify the medicine in the photo, and provide a confidence level, its usage, who it's for, its relevance to a dementia patient and the expiry date if visible.
 
 Use the following as the primary source of information about the medicine.
 
 Photo: {{media url=photoDataUri}}
 
-Identify the medicine and provide a confidence level.`,
+Identify the medicine and provide the requested information.`,
 });
 
 const identifyMedicineFlow = ai.defineFlow(
