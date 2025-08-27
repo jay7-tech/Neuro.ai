@@ -85,16 +85,6 @@ export function PatientDashboard() {
         </Card>
       </div>
       <div className="lg:col-span-1 space-y-6">
-       <Card className="shadow-lg rounded-2xl border-destructive/50">
-            <CardContent className="p-4">
-                <Button variant="destructive" size="lg" className="w-full h-24 text-2xl rounded-xl shadow-lg" onClick={handleCallHelp}>
-                    <PhoneCall className="mr-4 h-10 w-10" />
-                    Call for Help
-                </Button>
-            </CardContent>
-        </Card>
-
-
         <Card className="shadow-lg rounded-2xl">
           <CardHeader>
             <CardTitle className="text-2xl flex items-center gap-2">
@@ -196,6 +186,15 @@ export function PatientDashboard() {
             </div>
 
           </CardContent>
+        </Card>
+
+        <Card className="shadow-lg rounded-2xl border-destructive/50">
+            <CardContent className="p-4">
+                <Button variant="destructive" size="lg" className="w-full h-24 text-2xl rounded-xl shadow-lg" onClick={handleCallHelp}>
+                    <PhoneCall className="mr-4 h-10 w-10" />
+                    Call for Help
+                </Button>
+            </CardContent>
         </Card>
       </div>
     </div>
