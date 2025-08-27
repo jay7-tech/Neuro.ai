@@ -1,7 +1,7 @@
 'use client';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Brain, Pill, Puzzle, Camera, MessageSquare, Calendar, User, Bell, Sun, Moon, Utensils } from "lucide-react";
+import { Brain, Pill, Puzzle, Camera, MessageSquare, Calendar, User, Bell, Sun, Moon, Utensils, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { AiCompanion } from "./ai-companion";
@@ -33,6 +33,11 @@ export function PatientDashboard() {
             </CardTitle>
             <CardDescription className="text-base">Your Patient ID for linking with a caregiver is: <span className="font-bold text-foreground">{patientId}</span></CardDescription>
           </CardHeader>
+          <CardContent>
+            <Link href="/patient/profile">
+              <Button>View Full Profile <ArrowRight className="ml-2 h-4 w-4" /></Button>
+            </Link>
+          </CardContent>
         </Card>
 
         <Card>
