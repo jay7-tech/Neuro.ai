@@ -1,7 +1,7 @@
 'use client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Music, Waves, Wind, Leaf, Coffee } from "lucide-react";
+import { Music, Waves, Wind, Leaf, Coffee, Heart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 
@@ -11,6 +11,7 @@ const soundscapes = [
     { name: "Gentle Wind", icon: Wind, id: 'wind' },
     { name: "Forest Leaves", icon: Leaf, id: 'forest' },
     { name: "Cozy Cafe", icon: Coffee, id: 'cafe' },
+    { name: "Family Care", icon: Heart, id: 'family' },
 ]
 
 export function MusicTherapy() {
