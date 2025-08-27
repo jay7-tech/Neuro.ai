@@ -1,11 +1,12 @@
 'use client';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Brain, Pill, Puzzle, Camera, MessageSquare, Calendar, User, Bell, Sun, Moon, Utensils, ArrowRight } from "lucide-react";
+import { Brain, Pill, Puzzle, Camera, MessageSquare, Calendar, User, Bell, Sun, Moon, Utensils, ArrowRight, Heart } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { AiCompanion } from "./ai-companion";
-import { patient } from "@/lib/data";
+import { patient, familyTree } from "@/lib/data";
+import { Separator } from "../ui/separator";
 
 const dailyPlan = [
   { time: '08:00 AM', task: 'Wake up and get dressed', icon: <Sun className="h-8 w-8 text-primary" /> },
@@ -133,6 +134,46 @@ export function PatientDashboard() {
             />
             <p className="text-base">{memoryPrompt.story}</p>
             <p className="font-semibold text-base">{memoryPrompt.prompt}</p>
+
+            <Separator className="my-6" />
+
+            <div className="space-y-4">
+              <h3 className="text-xl font-semibold">Your Family Tree</h3>
+              <div className="flex flex-col items-center gap-4">
+                  {/* Patient */}
+                  <div className="flex flex-col items-center">
+                      <Image src={patient.photo} alt={patient.name} width={100} height={100} className="rounded-full border-4 border-primary" data-ai-hint="person portrait" />
+                      <p className="font-bold mt-2">{patient.name} (Me)</p>
+                  </div>
+                  
+                  {/* Connection Line */}
+                  <div className="w-px h-8 bg-border"></div>
+
+                  {/* Spouse */}
+                   <div className="flex items-center gap-4">
+                       <div className="flex flex-col items-center">
+                          <Image src={familyTree.spouse.photo} alt={familyTree.spouse.name} width={90} height={90} className="rounded-full" data-ai-hint="person portrait" />
+                          <p className="font-bold mt-2 text-sm">{familyTree.spouse.name}</p>
+                          <p className="text-xs text-muted-foreground">{familyTree.spouse.relation}</p>
+                      </div>
+                  </div>
+
+                  {/* Connection Line */}
+                  <div className="w-px h-8 bg-border"></div>
+                  
+                  {/* Children */}
+                  <div className="flex justify-center gap-8">
+                      {familyTree.children.map(child => (
+                           <div key={child.name} className="flex flex-col items-center">
+                              <Image src={child.photo} alt={child.name} width={80} height={80} className="rounded-full" data-ai-hint="person portrait" />
+                              <p className="font-bold mt-2 text-sm">{child.name}</p>
+                              <p className="text-xs text-muted-foreground">{child.relation}</p>
+                          </div>
+                      ))}
+                  </div>
+              </div>
+            </div>
+
           </CardContent>
         </Card>
       </div>

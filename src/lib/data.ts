@@ -2,7 +2,7 @@
 export const patient = {
     name: 'John Doe',
     id: 'P-12345XYZ',
-    photo: 'https://picsum.photos/200/200',
+    photo: 'https://picsum.photos/id/237/200/200',
     age: 78,
     bloodGroup: 'O+',
     address: '123 Memory Lane, Suite 101, Sunnyvale, CA 94086',
@@ -16,3 +16,15 @@ export const patient = {
         { name: 'Mary Doe', relation: 'Daughter', phone: '555-0104' },
     ],
 };
+
+export const familyTree = {
+    spouse: {
+        name: 'Jane Doe',
+        relation: 'Wife',
+        photo: 'https://picsum.photos/id/1027/200/200'
+    },
+    children: [
+        { name: 'Peter Doe', relation: 'Son', photo: 'https://picsum.photos/id/64/200/200' },
+        { name: 'Mary Doe', relation: 'Daughter', photo: 'https://picsum.photos/id/1011/200/200' },
+    ]
+}
