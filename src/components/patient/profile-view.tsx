@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { User, MapPin, Droplets, Calendar, Stethoscope, Phone, Settings, Shield } from 'lucide-react';
+import { User, Users, MapPin, Droplets, Calendar, Stethoscope, Phone, Settings, Shield } from 'lucide-react';
 
 const patient = {
     name: 'John Doe',
