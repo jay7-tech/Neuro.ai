@@ -1,7 +1,7 @@
 'use client';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Brain, Pill, Puzzle, Camera, MessageSquare, Calendar, User, Bell, Sun, Moon, Utensils, ArrowRight, Heart } from "lucide-react";
+import { Brain, Pill, Puzzle, Camera, MessageSquare, Calendar, User, Bell, Sun, Moon, Utensils, ArrowRight, Heart, Music, PhoneCall } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { AiCompanion } from "./ai-companion";
@@ -23,6 +23,11 @@ const memoryPrompt = {
 };
 
 export function PatientDashboard() {
+  const handleCallHelp = () => {
+    // This will attempt to open the phone app on mobile devices
+    window.location.href = `tel:${patient.caregivers[0].phone}`;
+  };
+
 
   return (
     <div className="p-4 md:p-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -45,7 +50,7 @@ export function PatientDashboard() {
           <CardHeader>
             <CardTitle className="text-2xl">Tools to Help</CardTitle>
           </CardHeader>
-          <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Link href="/patient/games" passHref>
               <Button variant="outline" className="flex flex-col h-32 w-full text-center text-lg rounded-xl shadow-md transition-transform hover:scale-105 hover:bg-accent/50">
                 <Puzzle className="h-10 w-10 mb-2 mx-auto text-primary" />
@@ -56,6 +61,12 @@ export function PatientDashboard() {
               <Button variant="outline" className="flex flex-col h-32 w-full text-center text-lg rounded-xl shadow-md transition-transform hover:scale-105 hover:bg-accent/50">
                 <Camera className="h-10 w-10 mb-2 mx-auto text-primary" />
                 Identify Medicine
+              </Button>
+            </Link>
+            <Link href="/patient/music" passHref>
+              <Button variant="outline" className="flex flex-col h-32 w-full text-center text-lg rounded-xl shadow-md transition-transform hover:scale-105 hover:bg-accent/50">
+                <Music className="h-10 w-10 mb-2 mx-auto text-primary" />
+                Music Therapy
               </Button>
             </Link>
           </CardContent>
@@ -74,6 +85,16 @@ export function PatientDashboard() {
         </Card>
       </div>
       <div className="lg:col-span-1 space-y-6">
+       <Card className="shadow-lg rounded-2xl border-destructive/50">
+            <CardContent className="p-4">
+                <Button variant="destructive" size="lg" className="w-full h-24 text-2xl rounded-xl shadow-lg" onClick={handleCallHelp}>
+                    <PhoneCall className="mr-4 h-10 w-10" />
+                    Call for Help
+                </Button>
+            </CardContent>
+        </Card>
+
+
         <Card className="shadow-lg rounded-2xl">
           <CardHeader>
             <CardTitle className="text-2xl flex items-center gap-2">
