@@ -45,13 +45,13 @@ export function PatientDashboard() {
             <CardTitle className="text-2xl">Tools to Help</CardTitle>
           </CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Link href="/patient/games" asChild>
+            <Link href="/patient/games">
               <Button variant="outline" className="flex flex-col h-32 w-full text-center text-lg rounded-lg">
                 <Puzzle className="h-10 w-10 mb-2 mx-auto" />
                 Cognitive Games
               </Button>
             </Link>
-            <Link href="/patient/med-identifier" asChild>
+            <Link href="/patient/med-identifier">
               <Button variant="outline" className="flex flex-col h-32 w-full text-center text-lg rounded-lg">
                 <Camera className="h-10 w-10 mb-2 mx-auto" />
                 Identify Medicine
