@@ -7,12 +7,12 @@ import { cn } from '@/lib/utils';
 import { adjustGameDifficulty } from '@/ai/flows/cognitive-game-difficulty-adjustment';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Anchor, Apple, Bike, Bird, Boat, Book, Car, Cloud, Cat, Dog, Fish, Flag, Star as StarIcon, Smile, Heart, Bell } from 'lucide-react';
+import { Anchor, Apple, Bike, Bird, Sailboat, Book, Car, Cloud, Cat, Dog, Fish, Flag, Star as StarIcon, Smile, Heart, Bell } from 'lucide-react';
 
 const ALL_ICONS = [
     { name: 'Anchor', component: Anchor }, { name: 'Apple', component: Apple },
     { name: 'Bike', component: Bike }, { name: 'Bird', component: Bird },
-    { name: 'Boat', component: Boat }, { name: 'Book', component: Book },
+    { name: 'Sailboat', component: Sailboat }, { name: 'Book', component: Book },
     { name: 'Car', component: Car }, { name: 'Cloud', component: Cloud },
     { name: 'Cat', component: Cat }, { name: 'Dog', component: Dog },
     { name: 'Fish', component: Fish }, { name: 'Flag', component: Flag },
