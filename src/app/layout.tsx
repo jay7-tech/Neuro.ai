@@ -10,8 +10,8 @@ const fontSans = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'Dementia Assistant AI',
-  description: 'An AI-powered assistant for dementia care.',
+  title: 'Neuro-AI',
+  description: 'Your personal AI companion for cognitive wellness.',
 };
 
 export default function RootLayout({
