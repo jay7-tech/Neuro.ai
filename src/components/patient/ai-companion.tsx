@@ -16,11 +16,7 @@ export function AiCompanion() {
   useEffect(() => {
     const viewport = viewportRef.current;
     if (viewport) {
-      const isScrolledToBottom = viewport.scrollHeight - viewport.scrollTop - viewport.clientHeight < 1;
-      
-      if (isScrolledToBottom) {
         viewport.scrollTo({ top: viewport.scrollHeight, behavior: 'smooth' });
-      }
     }
   }, [conversation]);
 
@@ -46,7 +42,7 @@ export function AiCompanion() {
   };
 
   return (
-    <div className="flex flex-col h-full max-h-[400px] min-h-[400px]">
+    <div className="flex flex-col h-[400px]">
       <ScrollArea className="flex-grow p-4 border rounded-lg mb-4" viewportRef={viewportRef}>
         <div className="space-y-4">
           {conversation.length === 0 && (
