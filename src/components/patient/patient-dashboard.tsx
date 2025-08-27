@@ -1,7 +1,8 @@
+
 'use client';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Brain, Pill, Puzzle, Camera, MessageSquare, Calendar, User, Bell, Sun, Moon, Utensils, ArrowRight, Heart, Music, PhoneCall } from "lucide-react";
+import { Brain, Pill, Camera, MessageSquare, Calendar, Sun, Moon, Utensils, ArrowRight, Music, PhoneCall, Palette } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { AiCompanion } from "./ai-companion";
@@ -21,6 +22,24 @@ const memoryPrompt = {
   story: "This photo was taken during our family trip to the beach in 2012. Remember how much fun we had building sandcastles?",
   prompt: "What was your favorite part of that day?"
 };
+
+const tools = [
+  {
+    name: "Cognitive Games",
+    href: "/patient/games",
+    icon: <Brain className="h-10 w-10 mb-2 mx-auto text-primary" />,
+  },
+  {
+    name: "Identify Medicine",
+    href: "/patient/med-identifier",
+    icon: <Camera className="h-10 w-10 mb-2 mx-auto text-primary" />,
+  },
+  {
+    name: "Music Therapy",
+    href: "/patient/music",
+    icon: <Music className="h-10 w-10 mb-2 mx-auto text-primary" />,
+  }
+]
 
 export function PatientDashboard() {
   const handleCallHelp = () => {
@@ -51,24 +70,14 @@ export function PatientDashboard() {
             <CardTitle className="text-2xl">Tools to Help</CardTitle>
           </CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Link href="/patient/games" passHref>
-              <Button variant="outline" className="flex flex-col h-32 w-full text-center text-lg rounded-xl shadow-md transition-transform hover:scale-105 hover:bg-accent/50">
-                <Puzzle className="h-10 w-10 mb-2 mx-auto text-primary" />
-                Cognitive Games
-              </Button>
-            </Link>
-            <Link href="/patient/med-identifier" passHref>
-              <Button variant="outline" className="flex flex-col h-32 w-full text-center text-lg rounded-xl shadow-md transition-transform hover:scale-105 hover:bg-accent/50">
-                <Camera className="h-10 w-10 mb-2 mx-auto text-primary" />
-                Identify Medicine
-              </Button>
-            </Link>
-            <Link href="/patient/music" passHref>
-              <Button variant="outline" className="flex flex-col h-32 w-full text-center text-lg rounded-xl shadow-md transition-transform hover:scale-105 hover:bg-accent/50">
-                <Music className="h-10 w-10 mb-2 mx-auto text-primary" />
-                Music Therapy
-              </Button>
-            </Link>
+            {tools.map((tool) => (
+              <Link href={tool.href} passHref key={tool.name}>
+                <Button variant="outline" className="flex flex-col h-32 w-full text-center text-lg rounded-xl shadow-md transition-transform hover:scale-105 hover:bg-accent/50">
+                  {tool.icon}
+                  {tool.name}
+                </Button>
+              </Link>
+            ))}
           </CardContent>
         </Card>
 
@@ -109,7 +118,7 @@ export function PatientDashboard() {
         <Card className="shadow-lg rounded-2xl">
           <CardHeader>
             <CardTitle className="text-2xl flex items-center gap-2">
-              <Bell /> Medication
+              <Pill /> Medication
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
