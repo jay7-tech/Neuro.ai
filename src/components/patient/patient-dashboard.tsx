@@ -1,8 +1,9 @@
 
+
 'use client';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Brain, Pill, Camera, MessageSquare, Calendar, Sun, Moon, Utensils, ArrowRight, Music, PhoneCall, Palette } from "lucide-react";
+import { Brain, Pill, Camera, MessageSquare, Calendar, Sun, Moon, Utensils, ArrowRight, Music, PhoneCall, HeartPulse } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { AiCompanion } from "./ai-companion";
@@ -38,6 +39,11 @@ const tools = [
     name: "Music Therapy",
     href: "/patient/music",
     icon: <Music className="h-10 w-10 mb-2 mx-auto text-primary" />,
+  },
+  {
+    name: "Gentle Exercises",
+    href: "/patient/exercise",
+    icon: <HeartPulse className="h-10 w-10 mb-2 mx-auto text-primary" />,
   }
 ]
 
@@ -69,12 +75,12 @@ export function PatientDashboard() {
           <CardHeader>
             <CardTitle className="text-2xl">Tools to Help</CardTitle>
           </CardHeader>
-          <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {tools.map((tool) => (
               <Link href={tool.href} passHref key={tool.name}>
-                <Button variant="outline" className="flex flex-col h-32 w-full text-center text-lg rounded-xl shadow-md transition-transform hover:scale-105 hover:bg-accent/50">
+                <Button variant="outline" className="flex flex-col h-32 w-full text-center text-base rounded-xl shadow-md transition-transform hover:scale-105 hover:bg-accent/50 p-2">
                   {tool.icon}
-                  {tool.name}
+                  <span className="mt-2">{tool.name}</span>
                 </Button>
               </Link>
             ))}
