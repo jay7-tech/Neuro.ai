@@ -27,41 +27,41 @@ export function PatientDashboard() {
   return (
     <div className="p-4 md:p-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div className="lg:col-span-2 space-y-6">
-        <Card>
+        <Card className="shadow-lg rounded-2xl">
           <CardHeader>
             <CardTitle className="text-3xl flex items-center gap-3">
-              <User className="h-8 w-8"/> Hi, {patient.name}!
+              Hi, {patient.name}!
             </CardTitle>
-            <CardDescription className="text-base">This is your personal dashboard.</CardDescription>
+            <CardDescription className="text-lg">This is your personal dashboard.</CardDescription>
           </CardHeader>
           <CardContent>
             <Link href="/patient/profile" passHref>
-              <Button>View Full Profile <ArrowRight className="ml-2 h-4 w-4" /></Button>
+              <Button variant="outline" className="shadow-sm">View Full Profile <ArrowRight className="ml-2 h-4 w-4" /></Button>
             </Link>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="shadow-lg rounded-2xl">
           <CardHeader>
             <CardTitle className="text-2xl">Tools to Help</CardTitle>
           </CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Link href="/patient/games" passHref>
-              <Button variant="outline" className="flex flex-col h-32 w-full text-center text-lg rounded-lg">
-                <Puzzle className="h-10 w-10 mb-2 mx-auto" />
+              <Button variant="outline" className="flex flex-col h-32 w-full text-center text-lg rounded-xl shadow-md transition-transform hover:scale-105 hover:bg-accent/50">
+                <Puzzle className="h-10 w-10 mb-2 mx-auto text-primary" />
                 Cognitive Games
               </Button>
             </Link>
             <Link href="/patient/med-identifier" passHref>
-              <Button variant="outline" className="flex flex-col h-32 w-full text-center text-lg rounded-lg">
-                <Camera className="h-10 w-10 mb-2 mx-auto" />
+              <Button variant="outline" className="flex flex-col h-32 w-full text-center text-lg rounded-xl shadow-md transition-transform hover:scale-105 hover:bg-accent/50">
+                <Camera className="h-10 w-10 mb-2 mx-auto text-primary" />
                 Identify Medicine
               </Button>
             </Link>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="shadow-lg rounded-2xl">
             <CardHeader>
                 <CardTitle className="text-2xl flex items-center gap-2">
                     <MessageSquare /> AI Companion
@@ -74,7 +74,7 @@ export function PatientDashboard() {
         </Card>
       </div>
       <div className="lg:col-span-1 space-y-6">
-        <Card>
+        <Card className="shadow-lg rounded-2xl">
           <CardHeader>
             <CardTitle className="text-2xl flex items-center gap-2">
               <Calendar /> Your Day
@@ -95,21 +95,21 @@ export function PatientDashboard() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="shadow-lg rounded-2xl">
           <CardHeader>
             <CardTitle className="text-2xl flex items-center gap-2">
               <Bell /> Medication
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-             <div className="flex items-start gap-4 p-4 rounded-lg bg-accent/50">
+             <div className="flex items-start gap-4 p-4 rounded-xl bg-accent/50">
                 <Pill className="h-8 w-8 text-primary mt-1" />
                 <div>
                     <p className="font-bold text-lg">Morning Pills</p>
                     <p className="text-base text-muted-foreground">Take 1 tablet of Aricept at 9:00 AM</p>
                 </div>
             </div>
-             <div className="flex items-start gap-4 p-4 rounded-lg bg-accent/50">
+             <div className="flex items-start gap-4 p-4 rounded-xl bg-accent/50">
                 <Pill className="h-8 w-8 text-primary mt-1" />
                 <div>
                     <p className="font-bold text-lg">Evening Pills</p>
@@ -119,7 +119,7 @@ export function PatientDashboard() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="shadow-lg rounded-2xl">
           <CardHeader>
             <CardTitle className="text-2xl">A walk down memory lane...</CardTitle>
           </CardHeader>
@@ -129,10 +129,10 @@ export function PatientDashboard() {
               alt="Memory prompt" 
               width={600} 
               height={400} 
-              className="rounded-lg w-full object-cover" 
+              className="rounded-xl w-full object-cover shadow-md" 
               data-ai-hint="family beach"
             />
-            <p className="text-base">{memoryPrompt.story}</p>
+            <p className="text-base pt-2">{memoryPrompt.story}</p>
             <p className="font-semibold text-base">{memoryPrompt.prompt}</p>
 
             <Separator className="my-6" />
@@ -142,7 +142,7 @@ export function PatientDashboard() {
               <div className="flex flex-col items-center gap-4">
                   {/* Patient */}
                   <div className="flex flex-col items-center">
-                      <Image src={patient.photo} alt={patient.name} width={100} height={100} className="rounded-full border-4 border-primary" data-ai-hint="person portrait" />
+                      <Image src={patient.photo} alt={patient.name} width={100} height={100} className="rounded-full border-4 border-primary shadow-lg" data-ai-hint="person portrait" />
                       <p className="font-bold mt-2">{patient.name} (Me)</p>
                   </div>
                   
@@ -152,7 +152,7 @@ export function PatientDashboard() {
                   {/* Spouse */}
                    <div className="flex items-center gap-4">
                        <div className="flex flex-col items-center">
-                          <Image src={familyTree.spouse.photo} alt={familyTree.spouse.name} width={90} height={90} className="rounded-full" data-ai-hint="person portrait" />
+                          <Image src={familyTree.spouse.photo} alt={familyTree.spouse.name} width={90} height={90} className="rounded-full shadow-md" data-ai-hint="person portrait" />
                           <p className="font-bold mt-2 text-sm">{familyTree.spouse.name}</p>
                           <p className="text-xs text-muted-foreground">{familyTree.spouse.relation}</p>
                       </div>
@@ -165,7 +165,7 @@ export function PatientDashboard() {
                   <div className="flex justify-center gap-8">
                       {familyTree.children.map(child => (
                            <div key={child.name} className="flex flex-col items-center">
-                              <Image src={child.photo} alt={child.name} width={80} height={80} className="rounded-full" data-ai-hint="person portrait" />
+                              <Image src={child.photo} alt={child.name} width={80} height={80} className="rounded-full shadow-md" data-ai-hint="person portrait" />
                               <p className="font-bold mt-2 text-sm">{child.name}</p>
                               <p className="text-xs text-muted-foreground">{child.relation}</p>
                           </div>
