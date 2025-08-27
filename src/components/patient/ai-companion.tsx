@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { SendHorizonal } from 'lucide-react';
@@ -11,6 +11,18 @@ export function AiCompanion() {
   const [question, setQuestion] = useState('');
   const [conversation, setConversation] = useState<{ type: 'user' | 'ai'; text: string }[]>([]);
   const [loading, setLoading] = useState(false);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    if (scrollAreaRef.current) {
+      scrollAreaRef.current.scrollTo({ top: scrollAreaRef.current.scrollHeight, behavior: 'smooth' });
+    }
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [conversation]);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,7 +46,7 @@ export function AiCompanion() {
 
   return (
     <div className="flex flex-col h-full max-h-[400px] min-h-[400px]">
-      <ScrollArea className="flex-grow p-4 border rounded-lg mb-4">
+      <ScrollArea className="flex-grow p-4 border rounded-lg mb-4" ref={scrollAreaRef}>
         <div className="space-y-4">
           {conversation.length === 0 && (
             <div className="text-center text-muted-foreground p-8">
