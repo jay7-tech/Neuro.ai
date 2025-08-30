@@ -1,8 +1,14 @@
 
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, User } from "lucide-react";
-import Link from "next/link";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from '@/hooks/use-toast';
+import { ArrowRight } from 'lucide-react';
 
 const AppIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-16 w-16 text-primary">
@@ -13,30 +19,74 @@ const AppIcon = () => (
 )
 
 export default function Home() {
+  const router = useRouter();
+  const { toast } = useToast();
+  const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    if (!email) {
+        toast({
+            title: "Email is required",
+            description: "Please enter your email address to continue.",
+            variant: "destructive",
+        });
+        setLoading(false);
+        return;
+    }
+
+    // This is a mock authentication/routing logic.
+    // In a real app, you would have a proper backend authentication.
+    setTimeout(() => {
+        if (email.toLowerCase().includes('patient')) {
+            toast({ title: "Login Successful", description: "Redirecting to patient dashboard..." });
+            router.push('/patient');
+        } else if (email.toLowerCase().includes('caregiver')) {
+            toast({ title: "Login Successful", description: "Redirecting to caregiver dashboard..." });
+            router.push('/caregiver');
+        } else {
+            toast({
+                title: "Account Not Found",
+                description: "Creating a new patient account and redirecting. Use 'caregiver' in email for caregiver access.",
+            });
+            router.push('/patient');
+        }
+    }, 1000);
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-background p-4">
       <main className="container flex items-center justify-center">
-        <Card className="w-full max-w-lg mx-auto shadow-2xl rounded-2xl overflow-hidden border-primary/20">
+        <Card className="w-full max-w-md mx-auto shadow-2xl rounded-2xl overflow-hidden border-primary/20">
           <CardHeader className="text-center p-8 bg-card">
              <div className="flex justify-center items-center mb-4">
                <AppIcon />
              </div>
-            <CardTitle className="text-4xl font-extrabold tracking-tight lg:text-5xl">Neuro-AI</CardTitle>
-            <CardDescription className="text-lg text-muted-foreground pt-2">Please select your role to get started.</CardDescription>
+            <CardTitle className="text-4xl font-extrabold tracking-tight lg:text-5xl">Welcome to Neuro-AI</CardTitle>
+            <CardDescription className="text-lg text-muted-foreground pt-2">Sign in or create an account to continue.</CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-col md:flex-row gap-4 p-8 bg-secondary/30">
-            <Button asChild variant="outline" size="lg" className="w-full h-32 text-xl rounded-xl shadow-lg transition-transform hover:scale-105 flex-1">
-              <Link href="/patient">
-                <User className="mr-4 h-10 w-10" />
-                I'm a Patient
-              </Link>
-            </Button>
-            <Button asChild size="lg" className="w-full h-32 text-xl bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl shadow-lg transition-transform hover:scale-105 flex-1">
-              <Link href="/caregiver">
-                <Users className="mr-4 h-10 w-10" />
-                I'm a Caregiver
-              </Link>
-            </Button>
+          <CardContent className="p-8 bg-secondary/30">
+            <form onSubmit={handleLogin} className="space-y-6">
+                <div className="space-y-2">
+                    <Label htmlFor="email" className="text-base">Email Address</Label>
+                    <Input 
+                        id="email"
+                        type="email"
+                        placeholder="patient@example.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        disabled={loading}
+                        className="h-12 text-base"
+                    />
+                </div>
+                <Button type="submit" size="lg" className="w-full h-12 text-lg" disabled={loading}>
+                    {loading ? 'Signing in...' : 'Continue'}
+                    {!loading && <ArrowRight className="ml-2 h-5 w-5" />}
+                </Button>
+            </form>
           </CardContent>
         </Card>
       </main>
