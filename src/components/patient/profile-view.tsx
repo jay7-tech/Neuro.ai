@@ -4,17 +4,23 @@
 import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { User, Users, MapPin, Droplets, Calendar, Stethoscope, Phone, Settings, Shield, Bell, Languages, Baseline } from 'lucide-react';
+import { User, Users, MapPin, Droplets, Calendar, Stethoscope, Phone, Settings, Shield, Bell, Languages, Baseline, Pencil, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { patient } from '@/lib/data';
+import { patient as initialPatient } from '@/lib/data';
 import { useState, useEffect } from 'react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
+import { Input } from '../ui/input';
+import { Textarea } from '../ui/textarea';
+import { useToast } from '@/hooks/use-toast';
 
 
 export function ProfileView() {
+    const { toast } = useToast();
+    const [patient, setPatient] = useState(initialPatient);
+    const [isEditing, setIsEditing] = useState(false);
     const [isDark, setIsDark] = useState(false);
     const [notifications, setNotifications] = useState(true);
     const [language, setLanguage] = useState('en');
@@ -34,6 +40,18 @@ export function ProfileView() {
         root.style.fontSize = `${textSize}px`;
     }, [textSize]);
 
+    const handleSave = () => {
+        setIsEditing(false);
+        toast({
+            title: "Profile Saved",
+            description: "Your changes have been saved successfully.",
+        });
+    }
+
+    const handleCancel = () => {
+        setPatient(initialPatient);
+        setIsEditing(false);
+    }
 
     return (
         <div className="space-y-6">
@@ -47,9 +65,19 @@ export function ProfileView() {
                         className="rounded-full border-4 border-primary shadow-lg"
                         data-ai-hint="person portrait"
                     />
-                    <div className="text-center md:text-left">
+                    <div className="flex-grow text-center md:text-left">
                         <h1 className="text-4xl font-bold font-headline">{patient.name}</h1>
                         <p className="text-lg text-muted-foreground">Patient ID: {patient.id}</p>
+                    </div>
+                    <div>
+                        {isEditing ? (
+                            <div className="flex gap-2">
+                                <Button onClick={handleSave}><Save className="mr-2 h-4 w-4" /> Save</Button>
+                                <Button onClick={handleCancel} variant="outline">Cancel</Button>
+                            </div>
+                        ) : (
+                            <Button onClick={() => setIsEditing(true)}><Pencil className="mr-2 h-4 w-4" /> Edit Profile</Button>
+                        )}
                     </div>
                 </CardContent>
             </Card>
@@ -68,21 +96,30 @@ export function ProfileView() {
                             <CardTitle>Personal Information</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4 text-lg">
-                            <div className="flex items-start gap-4 p-3 border-b">
+                             <div className="flex items-center gap-4 p-3 border-b">
+                                <User className="h-6 w-6 text-muted-foreground mt-1" />
+                                <Label htmlFor="name" className="w-32 font-bold">Name</Label>
+                                {isEditing ? <Input id="name" value={patient.name} onChange={e => setPatient({...patient, name: e.target.value})}/> : <div>{patient.name}</div>}
+                            </div>
+                            <div className="flex items-center gap-4 p-3 border-b">
                                 <Calendar className="h-6 w-6 text-muted-foreground mt-1" />
-                                <div><strong>Age:</strong> {patient.age}</div>
+                                <Label htmlFor="age" className="w-32 font-bold">Age</Label>
+                                {isEditing ? <Input id="age" type="number" value={patient.age} onChange={e => setPatient({...patient, age: parseInt(e.target.value, 10)})}/> : <div>{patient.age}</div>}
                             </div>
-                            <div className="flex items-start gap-4 p-3 border-b">
+                            <div className="flex items-center gap-4 p-3 border-b">
                                 <Droplets className="h-6 w-6 text-muted-foreground mt-1" />
-                                <div><strong>Blood Group:</strong> {patient.bloodGroup}</div>
+                                <Label htmlFor="bloodGroup" className="w-32 font-bold">Blood Group</Label>
+                                {isEditing ? <Input id="bloodGroup" value={patient.bloodGroup} onChange={e => setPatient({...patient, bloodGroup: e.target.value})}/> : <div>{patient.bloodGroup}</div>}
                             </div>
-                            <div className="flex items-start gap-4 p-3 border-b">
+                            <div className="flex items-center gap-4 p-3 border-b">
                                 <MapPin className="h-6 w-6 text-muted-foreground mt-1" />
-                                <div><strong>Address:</strong> {patient.address}</div>
+                                <Label htmlFor="address" className="w-32 font-bold">Address</Label>
+                                {isEditing ? <Textarea id="address" value={patient.address} onChange={e => setPatient({...patient, address: e.target.value})}/> : <div>{patient.address}</div>}
                             </div>
                             <div className="flex items-start gap-4 p-3">
                                 <Shield className="h-6 w-6 text-muted-foreground mt-1" />
-                                <div><strong>Medical Info:</strong> {patient.medicalInfo}</div>
+                                <Label htmlFor="medicalInfo" className="w-32 font-bold">Medical Info</Label>
+                                {isEditing ? <Textarea id="medicalInfo" value={patient.medicalInfo} onChange={e => setPatient({...patient, medicalInfo: e.target.value})} /> : <div>{patient.medicalInfo}</div>}
                             </div>
                         </CardContent>
                     </Card>
