@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from '@/hooks/use-toast';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Lock } from 'lucide-react';
 
 const AppIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-16 w-16 text-primary">
@@ -22,16 +22,17 @@ export default function Home() {
   const router = useRouter();
   const { toast } = useToast();
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    if (!email) {
+    if (!email || !password) {
         toast({
-            title: "Email is required",
-            description: "Please enter your email address to continue.",
+            title: "All fields are required",
+            description: "Please enter your email and password.",
             variant: "destructive",
         });
         setLoading(false);
@@ -41,19 +42,8 @@ export default function Home() {
     // This is a mock authentication/routing logic.
     // In a real app, you would have a proper backend authentication.
     setTimeout(() => {
-        if (email.toLowerCase().includes('patient')) {
-            toast({ title: "Login Successful", description: "Redirecting to patient dashboard..." });
-            router.push('/patient');
-        } else if (email.toLowerCase().includes('caregiver')) {
-            toast({ title: "Login Successful", description: "Redirecting to caregiver dashboard..." });
-            router.push('/caregiver');
-        } else {
-            toast({
-                title: "Account Not Found",
-                description: "Creating a new patient account and redirecting. Use 'caregiver' in email for caregiver access.",
-            });
-            router.push('/patient');
-        }
+        toast({ title: "Login Successful", description: "Redirecting to role selection..." });
+        router.push('/selection');
     }, 1000);
   };
 
@@ -78,6 +68,18 @@ export default function Home() {
                         placeholder="patient@example.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        disabled={loading}
+                        className="h-12 text-base"
+                    />
+                </div>
+                 <div className="space-y-2">
+                    <Label htmlFor="password" className="text-base">Password</Label>
+                    <Input 
+                        id="password"
+                        type="password"
+                        placeholder="********"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
                         disabled={loading}
                         className="h-12 text-base"
                     />
