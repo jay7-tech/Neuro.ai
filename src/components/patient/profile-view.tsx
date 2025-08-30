@@ -1,3 +1,4 @@
+
 'use client';
 
 import Image from 'next/image';
@@ -18,7 +19,7 @@ export function ProfileView() {
                         alt="Patient photo"
                         width={150}
                         height={150}
-                        className="rounded-full border-4 border-primary"
+                        className="rounded-full border-4 border-primary shadow-lg"
                         data-ai-hint="person portrait"
                     />
                     <div className="text-center md:text-left">
@@ -42,19 +43,19 @@ export function ProfileView() {
                             <CardTitle>Personal Information</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4 text-lg">
-                            <div className="flex items-start gap-4">
+                            <div className="flex items-start gap-4 p-3 border-b">
                                 <Calendar className="h-6 w-6 text-muted-foreground mt-1" />
                                 <div><strong>Age:</strong> {patient.age}</div>
                             </div>
-                            <div className="flex items-start gap-4">
+                            <div className="flex items-start gap-4 p-3 border-b">
                                 <Droplets className="h-6 w-6 text-muted-foreground mt-1" />
                                 <div><strong>Blood Group:</strong> {patient.bloodGroup}</div>
                             </div>
-                            <div className="flex items-start gap-4">
+                            <div className="flex items-start gap-4 p-3 border-b">
                                 <MapPin className="h-6 w-6 text-muted-foreground mt-1" />
                                 <div><strong>Address:</strong> {patient.address}</div>
                             </div>
-                            <div className="flex items-start gap-4">
+                            <div className="flex items-start gap-4 p-3">
                                 <Shield className="h-6 w-6 text-muted-foreground mt-1" />
                                 <div><strong>Medical Info:</strong> {patient.medicalInfo}</div>
                             </div>
@@ -66,10 +67,11 @@ export function ProfileView() {
                     <Card>
                         <CardHeader>
                             <CardTitle>Caregivers Contact</CardTitle>
+                            <CardDescription>Your primary medical and support contacts.</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             {patient.caregivers.map((contact, index) => (
-                                <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
+                                <div key={index} className="flex items-center justify-between p-4 border rounded-lg bg-accent/30">
                                     <div>
                                         <p className="font-bold text-lg">{contact.name}</p>
                                         <p className="text-muted-foreground">{contact.relation}</p>
@@ -85,6 +87,7 @@ export function ProfileView() {
                     <Card>
                         <CardHeader>
                             <CardTitle>Family Members Contact</CardTitle>
+                            <CardDescription>Your personal and emergency contacts.</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
                              {patient.family.map((contact, index) => (
@@ -107,7 +110,7 @@ export function ProfileView() {
                             <CardDescription>Manage your application settings.</CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-muted-foreground">Settings related to the app would be displayed here.</p>
+                            <p className="text-muted-foreground">Settings related to the app, such as notifications, theme, and language, would be displayed here.</p>
                         </CardContent>
                     </Card>
                 </TabsContent>

@@ -13,7 +13,7 @@ import { Separator } from "../ui/separator";
 const dailyPlan = [
   { time: '08:00 AM', task: 'Wake up and get dressed', icon: <Sun className="h-8 w-8 text-primary" /> },
   { time: '09:00 AM', task: 'Eat breakfast & take pills', icon: <Utensils className="h-8 w-8 text-primary" /> },
-  { time: '10:00 AM', task: 'Morning walk', icon: <Calendar className="h-8 w-8 text-primary" /> },
+  { time: '10:00 AM', task: 'Morning walk', icon: <HeartPulse className="h-8 w-8 text-primary" /> },
   { time: '03:00 PM', task: 'Read a book', icon: <Brain className="h-8 w-8 text-primary" /> },
   { time: '08:00 PM', task: 'Prepare for bed', icon: <Moon className="h-8 w-8 text-primary" /> },
 ];
@@ -50,7 +50,9 @@ const tools = [
 export function PatientDashboard() {
   const handleCallHelp = () => {
     // This will attempt to open the phone app on mobile devices
-    window.location.href = `tel:${patient.caregivers[0].phone}`;
+    if(patient.caregivers[0]?.phone) {
+      window.location.href = `tel:${patient.caregivers[0].phone}`;
+    }
   };
 
 
@@ -58,11 +60,14 @@ export function PatientDashboard() {
     <div className="p-4 md:p-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div className="lg:col-span-2 space-y-6">
         <Card className="shadow-lg rounded-2xl">
-          <CardHeader>
-            <CardTitle className="text-3xl flex items-center gap-3">
-              Hi, {patient.name}!
-            </CardTitle>
-            <CardDescription className="text-lg">This is your personal dashboard.</CardDescription>
+          <CardHeader className="flex flex-row items-center gap-4">
+            <Image src={patient.photo} alt={patient.name} width={80} height={80} className="rounded-full border-4 border-primary" data-ai-hint="person portrait" />
+            <div>
+              <CardTitle className="text-3xl flex items-center gap-3">
+                Hi, {patient.name}!
+              </CardTitle>
+              <CardDescription className="text-lg">This is your personal dashboard.</CardDescription>
+            </div>
           </CardHeader>
           <CardContent>
             <Link href="/patient/profile" passHref>
@@ -78,10 +83,10 @@ export function PatientDashboard() {
           <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {tools.map((tool) => (
               <Link href={tool.href} passHref key={tool.name}>
-                <Button variant="outline" className="flex flex-col h-32 w-full text-center text-base rounded-xl shadow-md transition-transform hover:scale-105 hover:bg-accent/50 p-2">
+                <div className="flex flex-col items-center justify-center text-center p-4 rounded-xl shadow-md transition-transform hover:scale-105 hover:bg-accent/50 cursor-pointer h-32 border">
                   {tool.icon}
-                  <span className="mt-2">{tool.name}</span>
-                </Button>
+                  <span className="mt-2 font-semibold">{tool.name}</span>
+                </div>
               </Link>
             ))}
           </CardContent>
