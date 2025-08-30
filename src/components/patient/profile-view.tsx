@@ -4,12 +4,37 @@
 import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { User, Users, MapPin, Droplets, Calendar, Stethoscope, Phone, Settings, Shield } from 'lucide-react';
+import { User, Users, MapPin, Droplets, Calendar, Stethoscope, Phone, Settings, Shield, Bell, Languages, TextSize } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { patient } from '@/lib/data';
+import { useState, useEffect } from 'react';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
 
 
 export function ProfileView() {
+    const [isDark, setIsDark] = useState(false);
+    const [notifications, setNotifications] = useState(true);
+    const [language, setLanguage] = useState('en');
+    const [textSize, setTextSize] = useState(16);
+
+    useEffect(() => {
+        const root = window.document.documentElement;
+        if (isDark) {
+            root.classList.add('dark');
+        } else {
+            root.classList.remove('dark');
+        }
+    }, [isDark]);
+
+    useEffect(() => {
+        const root = window.document.documentElement;
+        root.style.fontSize = `${textSize}px`;
+    }, [textSize]);
+
+
     return (
         <div className="space-y-6">
             <Card>
@@ -107,10 +132,57 @@ export function ProfileView() {
                     <Card>
                         <CardHeader>
                             <CardTitle>Settings</CardTitle>
-                            <CardDescription>Manage your application settings.</CardDescription>
+                            <CardDescription>Manage your application settings and preferences.</CardDescription>
                         </CardHeader>
-                        <CardContent>
-                            <p className="text-muted-foreground">Settings related to the app, such as notifications, theme, and language, would be displayed here.</p>
+                        <CardContent className="space-y-8">
+                            <div className="flex items-center justify-between p-4 border rounded-lg">
+                                <Label htmlFor="dark-mode" className="flex items-center gap-3 text-lg">
+                                    <Settings className="h-6 w-6" />
+                                    Dark Mode
+                                </Label>
+                                <Switch id="dark-mode" checked={isDark} onCheckedChange={setIsDark} />
+                            </div>
+                            <div className="flex items-center justify-between p-4 border rounded-lg">
+                                <Label htmlFor="notifications" className="flex items-center gap-3 text-lg">
+                                    <Bell className="h-6 w-6" />
+                                    Enable Notifications
+                                </Label>
+                                <Switch id="notifications" checked={notifications} onCheckedChange={setNotifications} />
+                            </div>
+                             <div className="flex items-center justify-between p-4 border rounded-lg">
+                                <Label htmlFor="language" className="flex items-center gap-3 text-lg">
+                                    <Languages className="h-6 w-6" />
+                                    Language
+                                </Label>
+                                <Select value={language} onValueChange={setLanguage}>
+                                    <SelectTrigger id="language" className="w-[180px]">
+                                        <SelectValue placeholder="Select language" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="en">English</SelectItem>
+                                        <SelectItem value="es">Español</SelectItem>
+                                        <SelectItem value="fr">Français</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="space-y-4 p-4 border rounded-lg">
+                                 <Label htmlFor="text-size" className="flex items-center gap-3 text-lg">
+                                    <TextSize className="h-6 w-6" />
+                                    Text Size
+                                </Label>
+                                <div className="flex items-center gap-4">
+                                    <span className="text-sm">Small</span>
+                                    <Slider
+                                        id="text-size"
+                                        min={12}
+                                        max={20}
+                                        step={1}
+                                        value={[textSize]}
+                                        onValueChange={(value) => setTextSize(value[0])}
+                                    />
+                                    <span className="text-sm">Large</span>
+                                </div>
+                            </div>
                         </CardContent>
                     </Card>
                 </TabsContent>
