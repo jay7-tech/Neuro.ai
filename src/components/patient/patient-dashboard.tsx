@@ -60,17 +60,21 @@ export function PatientDashboard() {
       {/* Main Content Column */}
       <div className="xl:col-span-2 space-y-6">
         <Card className="shadow-lg rounded-2xl">
-          <CardHeader className="flex flex-row items-center gap-6">
-            <Image src={patient.photo} alt={patient.name} width={80} height={80} className="rounded-full border-4 border-primary" data-ai-hint="person portrait" />
-            <div>
-              <CardTitle className="text-4xl font-bold">
-                Hi, {patient.name}!
-              </CardTitle>
-              <CardDescription className="text-lg">This is your personal dashboard.</CardDescription>
+          <CardHeader>
+            <div className="flex items-center gap-6">
+              <Image src={patient.photo} alt={patient.name} width={80} height={80} className="rounded-full border-4 border-primary" data-ai-hint="person portrait" />
+              <div className="flex-grow">
+                <CardTitle className="text-3xl font-bold">
+                  Hi, {patient.name}!
+                </CardTitle>
+                <CardDescription className="text-lg">This is your personal dashboard.</CardDescription>
+              </div>
             </div>
-             <Link href="/patient/profile" passHref className="ml-auto">
-              <Button variant="outline" className="shadow-sm">View Full Profile <ArrowRight className="ml-2 h-4 w-4" /></Button>
-            </Link>
+            <div className="pt-4">
+              <Link href="/patient/profile" passHref>
+                  <Button variant="outline" className="shadow-sm">View Full Profile <ArrowRight className="ml-2 h-4 w-4" /></Button>
+              </Link>
+            </div>
           </CardHeader>
         </Card>
 
