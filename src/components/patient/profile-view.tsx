@@ -4,7 +4,7 @@
 import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { User, Users, MapPin, Droplets, Calendar, Stethoscope, Phone, Settings, Shield, Bell, Languages, TextSize } from 'lucide-react';
+import { User, Users, MapPin, Droplets, Calendar, Stethoscope, Phone, Settings, Shield, Bell, Languages, Baseline } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { patient } from '@/lib/data';
 import { useState, useEffect } from 'react';
@@ -167,7 +167,7 @@ export function ProfileView() {
                             </div>
                             <div className="space-y-4 p-4 border rounded-lg">
                                  <Label htmlFor="text-size" className="flex items-center gap-3 text-lg">
-                                    <TextSize className="h-6 w-6" />
+                                    <Baseline className="h-6 w-6" />
                                     Text Size
                                 </Label>
                                 <div className="flex items-center gap-4">
