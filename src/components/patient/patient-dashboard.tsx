@@ -13,11 +13,11 @@ import { Input } from '../ui/input';
 import { useToast } from '@/hooks/use-toast';
 
 const initialDailyPlan = [
-  { time: '08:00 AM', task: 'Wake up and get dressed', icon: <Sun className="h-6 w-6 text-primary" />, notes: '' },
-  { time: '09:00 AM', task: 'Eat breakfast & take pills', icon: <Utensils className="h-6 w-6 text-primary" />, notes: '' },
-  { time: '10:00 AM', task: 'Morning walk', icon: <HeartPulse className="h-6 w-6 text-primary" />, notes: 'Remember to wear comfortable shoes.' },
-  { time: '03:00 PM', task: 'Read a book', icon: <Brain className="h-6 w-6 text-primary" />, notes: '' },
-  { time: '08:00 PM', task: 'Prepare for bed', icon: <Moon className="h-6 w-6 text-primary" />, notes: '' },
+  { time: '08:00', task: 'Wake up and get dressed', icon: <Sun className="h-6 w-6 text-primary" />, notes: '' },
+  { time: '09:00', task: 'Eat breakfast & take pills', icon: <Utensils className="h-6 w-6 text-primary" />, notes: '' },
+  { time: '10:00', task: 'Morning walk', icon: <HeartPulse className="h-6 w-6 text-primary" />, notes: 'Remember to wear comfortable shoes.' },
+  { time: '15:00', task: 'Read a book', icon: <Brain className="h-6 w-6 text-primary" />, notes: '' },
+  { time: '20:00', task: 'Prepare for bed', icon: <Moon className="h-6 w-6 text-primary" />, notes: '' },
 ];
 
 const memoryPrompt = {
@@ -53,16 +53,16 @@ export function PatientDashboard() {
   const [dailyPlan, setDailyPlan] = useState(initialDailyPlan);
   const { toast } = useToast();
 
-  const handleNoteChange = (index: number, newNotes: string) => {
+  const handlePlanChange = (index: number, field: 'task' | 'time' | 'notes', value: string) => {
     const updatedPlan = [...dailyPlan];
-    updatedPlan[index].notes = newNotes;
+    updatedPlan[index] = { ...updatedPlan[index], [field]: value };
     setDailyPlan(updatedPlan);
   };
 
   const handleSavePlan = () => {
     toast({
       title: "Daily Plan Saved!",
-      description: "Your notes have been successfully saved."
+      description: "Your changes have been successfully saved."
     })
   }
 
@@ -146,19 +146,30 @@ export function PatientDashboard() {
           <CardContent>
             <ul className="space-y-4">
               {dailyPlan.map((item, index) => (
-                <li key={index} className="flex flex-col gap-2 p-3 rounded-lg bg-secondary/50">
-                  <div className="flex items-center gap-4">
+                <li key={index} className="flex flex-col gap-3 p-3 rounded-lg bg-secondary/50">
+                  <div className="flex items-center gap-3">
                     {item.icon}
-                    <div>
-                      <p className="font-bold">{item.task}</p>
-                      <p className="text-sm text-muted-foreground">{item.time}</p>
+                    <div className="flex-grow space-y-1.5">
+                      <Input
+                        type="text"
+                        placeholder="Task description..."
+                        value={item.task}
+                        onChange={(e) => handlePlanChange(index, 'task', e.target.value)}
+                        className="bg-background font-bold text-base h-10"
+                      />
+                      <Input
+                        type="time"
+                        value={item.time}
+                        onChange={(e) => handlePlanChange(index, 'time', e.target.value)}
+                        className="bg-background text-sm text-muted-foreground h-9"
+                      />
                     </div>
                   </div>
                   <Input
                     type="text"
                     placeholder="Add a note..."
                     value={item.notes}
-                    onChange={(e) => handleNoteChange(index, e.target.value)}
+                    onChange={(e) => handlePlanChange(index, 'notes', e.target.value)}
                     className="bg-background text-sm"
                   />
                 </li>
