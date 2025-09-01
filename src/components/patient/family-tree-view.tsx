@@ -44,18 +44,31 @@ export function FamilyTreeView() {
     useEffect(() => {
         const storedData = localStorage.getItem(FAMILY_TREE_STORAGE_KEY);
         let dataToSet: FamilyTree;
+        
         if (storedData) {
             dataToSet = JSON.parse(storedData);
         } else {
-            dataToSet = initialFamilyTree;
+            dataToSet = JSON.parse(JSON.stringify(initialFamilyTree)); // Deep copy to prevent mutation
         }
 
-        // Ensure all members have a unique ID
-        const initialDataWithIds = {
-            spouse: { ...dataToSet.spouse, id: dataToSet.spouse.id || Date.now() },
-            children: dataToSet.children.map((child, index) => ({ ...child, id: child.id || Date.now() + index + 1 }))
+        // Ensure all members have a unique ID.
+        const spouseWithId = { ...dataToSet.spouse, id: dataToSet.spouse.id || Date.now() };
+        const childrenWithIds = dataToSet.children.map((child, index) => ({
+            ...child,
+            id: child.id || Date.now() + index + 1,
+        }));
+
+        const validatedFamilyTree = {
+            spouse: spouseWithId,
+            children: childrenWithIds,
         };
-        setFamilyTree(initialDataWithIds);
+        
+        setFamilyTree(validatedFamilyTree);
+        // Persist the validated tree back to local storage if it was loaded from initial data
+        if (!storedData) {
+             localStorage.setItem(FAMILY_TREE_STORAGE_KEY, JSON.stringify(validatedFamilyTree));
+        }
+
     }, []);
 
     const saveFamilyTree = (newFamilyTree: FamilyTree) => {
@@ -75,21 +88,20 @@ export function FamilyTreeView() {
     };
 
     const handleSave = (memberToSave: FamilyMember) => {
-        let isNew = true;
         let newFamilyTree: FamilyTree;
 
         // Check if it's the spouse
         if (familyTree.spouse.id === memberToSave.id) {
             newFamilyTree = { ...familyTree, spouse: memberToSave };
-            isNew = false;
         } else {
              const childIndex = familyTree.children.findIndex(c => c.id === memberToSave.id);
              if (childIndex > -1) {
+                // Editing an existing child
                 const updatedChildren = [...familyTree.children];
                 updatedChildren[childIndex] = memberToSave;
                 newFamilyTree = { ...familyTree, children: updatedChildren };
-                isNew = false;
              } else {
+                // Adding a new child
                 newFamilyTree = { ...familyTree, children: [...familyTree.children, memberToSave] };
              }
         }
