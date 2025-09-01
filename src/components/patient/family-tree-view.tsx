@@ -92,18 +92,8 @@ export function FamilyTreeView() {
 
     useEffect(() => {
         // This effect runs only on the client, after hydration.
-        const storedData = localStorage.getItem(FAMILY_TREE_STORAGE_KEY);
-        if (storedData) {
-            try {
-                const parsedData = JSON.parse(storedData);
-                // Simple validation to ensure it's not malformed
-                if (parsedData.spouse && Array.isArray(parsedData.children)) {
-                     setFamilyTree(parsedData);
-                }
-            } catch (e) {
-                console.error("Could not parse family tree from local storage", e);
-            }
-        }
+        const validFamilyTree = loadAndValidateFamilyTree();
+        setFamilyTree(validFamilyTree);
     }, []);
 
     const saveFamilyTree = (newFamilyTree: FamilyTree) => {
@@ -124,20 +114,20 @@ export function FamilyTreeView() {
 
     const handleSave = (memberToSave: FamilyMember) => {
         let newFamilyTree;
-        // Check if it's a new member by seeing if the ID exists in children or spouse
-        const isSpouse = familyTree.spouse.id === memberToSave.id;
-        const childIndex = familyTree.children.findIndex(c => c.id === memberToSave.id);
-        const isExistingChild = childIndex > -1;
-
-        if (isSpouse) {
+        // Check if it's the spouse
+        if (familyTree.spouse.id === memberToSave.id) {
             newFamilyTree = { ...familyTree, spouse: memberToSave };
-        } else if (isExistingChild) {
-            const updatedChildren = [...familyTree.children];
-            updatedChildren[childIndex] = memberToSave;
-            newFamilyTree = { ...familyTree, children: updatedChildren };
         } else {
-            // It's a new child
-            const updatedChildren = [...familyTree.children, memberToSave];
+            const childIndex = familyTree.children.findIndex(c => c.id === memberToSave.id);
+            const updatedChildren = [...familyTree.children];
+
+            if (childIndex > -1) {
+                // It's an existing child, so update it
+                updatedChildren[childIndex] = memberToSave;
+            } else {
+                // It's a new child, so add it
+                updatedChildren.push(memberToSave);
+            }
             newFamilyTree = { ...familyTree, children: updatedChildren };
         }
         
@@ -319,3 +309,5 @@ function EditFamilyMemberView({ member, onSave, onCancel, onDelete, familyTree }
         </Card>
     );
 }
+
+    
