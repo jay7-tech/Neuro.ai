@@ -3,12 +3,11 @@
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Brain, Pill, Camera, MessageSquare, Calendar, Sun, Moon, Utensils, ArrowRight, Music, PhoneCall, HeartPulse, PlusCircle, Trash2 } from "lucide-react";
+import { Brain, Pill, Camera, MessageSquare, Calendar, Sun, Moon, Utensils, ArrowRight, Music, PhoneCall, HeartPulse, PlusCircle, Trash2, Album } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { AiCompanion } from "./ai-companion";
-import { patient as initialPatient, familyTree } from "@/lib/data";
-import { Separator } from "../ui/separator";
+import { patient as initialPatient } from "@/lib/data";
 import { Input } from '../ui/input';
 import { useToast } from '@/hooks/use-toast';
 
@@ -19,12 +18,6 @@ const initialDailyPlan = [
   { time: '15:00', task: 'Read a book', icon: <Brain className="h-6 w-6 text-primary" />, notes: '' },
   { time: '20:00', task: 'Prepare for bed', icon: <Moon className="h-6 w-6 text-primary" />, notes: '' },
 ];
-
-const memoryPrompt = {
-  image: "https://picsum.photos/600/400",
-  story: "This photo was taken during our family trip to the beach in 2012. Remember how much fun we had building sandcastles?",
-  prompt: "What was your favorite part of that day?"
-};
 
 const tools = [
   {
@@ -46,6 +39,11 @@ const tools = [
     name: "Gentle Exercises",
     href: "/patient/exercise",
     icon: <HeartPulse className="h-8 w-8 text-primary" />,
+  },
+  {
+    name: "Memory Lane",
+    href: "/patient/memory-lane",
+    icon: <Album className="h-8 w-8 text-primary" />,
   }
 ]
 
@@ -122,7 +120,7 @@ export function PatientDashboard() {
           <CardHeader>
             <CardTitle className="text-2xl">Tools to Help</CardTitle>
           </CardHeader>
-          <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {tools.map((tool) => (
               <Link href={tool.href} passHref key={tool.name}>
                 <div className="flex flex-col items-center justify-center text-center p-4 rounded-xl shadow-md transition-transform hover:scale-105 hover:bg-accent/50 cursor-pointer h-36 border">
@@ -242,62 +240,6 @@ export function PatientDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="shadow-lg rounded-2xl">
-          <CardHeader>
-            <CardTitle className="text-2xl">A walk down memory lane...</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Image 
-              src={memoryPrompt.image} 
-              alt="Memory prompt" 
-              width={600} 
-              height={400} 
-              className="rounded-xl w-full object-cover shadow-md" 
-              data-ai-hint="family beach"
-            />
-            <p className="text-base pt-2">{memoryPrompt.story}</p>
-            <p className="font-semibold text-base">{memoryPrompt.prompt}</p>
-
-            <Separator className="my-4" />
-
-            <div className="space-y-4">
-              <h3 className="text-xl font-semibold text-center">Your Family Tree</h3>
-              <div className="flex flex-col items-center gap-4">
-                  {/* Patient */}
-                  <div className="flex flex-col items-center">
-                      <Image src={initialPatient.photo} alt={initialPatient.name} width={100} height={100} className="rounded-full border-4 border-primary shadow-lg" data-ai-hint="person portrait" />
-                      <p className="font-bold mt-2">{initialPatient.name} (Me)</p>
-                  </div>
-                  
-                  {/* Connection Line */}
-                  <div className="w-px h-6 bg-border"></div>
-
-                  {/* Spouse */}
-                   <div className="flex items-center gap-4">
-                       <div className="flex flex-col items-center">
-                          <Image src={familyTree.spouse.photo} alt={familyTree.spouse.name} width={90} height={90} className="rounded-full shadow-md" data-ai-hint="person portrait" />
-                          <p className="font-bold mt-2 text-sm">{familyTree.spouse.name}</p>
-                          <p className="text-xs text-muted-foreground">{familyTree.spouse.relation}</p>
-                      </div>
-                  </div>
-
-                  {/* Connection Line */}
-                  <div className="w-px h-6 bg-border"></div>
-                  
-                  {/* Children */}
-                  <div className="flex justify-center gap-8">
-                      {familyTree.children.map(child => (
-                           <div key={child.name} className="flex flex-col items-center text-center">
-                              <Image src={child.photo} alt={child.name} width={80} height={80} className="rounded-full shadow-md" data-ai-hint="person portrait" />
-                              <p className="font-bold mt-2 text-sm">{child.name}</p>
-                              <p className="text-xs text-muted-foreground">{child.relation}</p>
-                          </div>
-                      ))}
-                  </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );
