@@ -4,7 +4,7 @@
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Brain, Pill, Camera, MessageSquare, Calendar, Sun, Moon, Utensils, ArrowRight, Music, PhoneCall, HeartPulse, PlusCircle, Trash2, Album, Edit, Save, X } from "lucide-react";
+import { Brain, Pill, Camera, MessageSquare, Calendar, Sun, Moon, Utensils, ArrowRight, Music, PhoneCall, HeartPulse, PlusCircle, Trash2, Album, Edit, Save, X, MapPin } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { AiCompanion } from "./ai-companion";
@@ -45,6 +45,11 @@ const tools = [
     name: "Memory Lane",
     href: "/patient/memory-lane",
     icon: <Album className="h-8 w-8 text-primary" />,
+  },
+  {
+    name: "My Location",
+    href: "/patient/location",
+    icon: <MapPin className="h-8 w-8 text-primary" />,
   }
 ]
 
@@ -53,7 +58,7 @@ export function PatientDashboard() {
   const [medications, setMedications] = useState(initialPatient.medications);
   
   const [isEditingPlan, setIsEditingPlan] = useState(false);
-  const [planBeforeEdit, setPlanBeforeEdit] = useState(initialDailyPlan);
+  const [planBeforeEdit, setPlanBeforeEdit] = useState<typeof initialDailyPlan>([]);
 
   const [isEditingMeds, setIsEditingMeds] = useState(false);
   const [medsBeforeEdit, setMedsBeforeEdit] = useState(initialPatient.medications);
@@ -75,6 +80,7 @@ export function PatientDashboard() {
 
   const handleSavePlan = () => {
     setIsEditingPlan(false);
+    setPlanBeforeEdit([]);
     toast({
       title: "Daily Plan Saved!",
       description: "Your changes have been successfully saved."
