@@ -27,6 +27,17 @@ const exercises = [
             { src: "https://picsum.photos/seed/stretch3/600/400", alt: "Wrist and finger stretch", hint: "person stretching" },
             { src: "https://picsum.photos/seed/stretch4/600/400", alt: "Ankle rotations", hint: "person stretching" },
         ]
+    },
+    {
+        name: "Seated Strength",
+        description: "Simple strength exercises using light weights or resistance bands.",
+        icon: <Dumbbell className="h-12 w-12 text-primary" />,
+        images: [
+            { src: "https://picsum.photos/seed/strength1/600/400", alt: "Bicep curls with light weights", hint: "person lifting weights" },
+            { src: "https://picsum.photos/seed/strength2/600/400", alt: "Overhead press with light weights", hint: "person lifting weights" },
+            { src: "https://picsum.photos/seed/strength3/600/400", alt: "Seated row with resistance band", hint: "person resistance band" },
+            { src: "https://picsum.photos/seed/strength4/600/400", alt: "Leg extension with ankle weights", hint: "person ankle weights" },
+        ]
     }
 ]
 
