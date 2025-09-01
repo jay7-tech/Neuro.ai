@@ -46,7 +46,7 @@ function loadAndValidateFamilyTree(): FamilyTree {
             dataToSet = JSON.parse(storedData);
         } catch (error) {
             console.error("Failed to parse family tree from local storage, using initial data.", error);
-            dataToSet = JSON.parse(JSON.stringify(initialFamilyTree)); // Fallback
+            dataToSet = JSON.parse(JSON.stringify(initialFamilyTree));
         }
     } else {
         dataToSet = JSON.parse(JSON.stringify(initialFamilyTree));
@@ -56,27 +56,29 @@ function loadAndValidateFamilyTree(): FamilyTree {
     const existingIds = new Set<number>();
 
     // Ensure spouse has a unique ID.
-    if (!dataToSet.spouse.id || existingIds.has(dataToSet.spouse.id)) {
-        dataToSet.spouse.id = Date.now();
+    if (!dataToSet.spouse || !dataToSet.spouse.id || existingIds.has(dataToSet.spouse.id)) {
+        dataToSet.spouse = { ...initialFamilyTree.spouse, id: Date.now() };
         dataWasModified = true;
     }
     existingIds.add(dataToSet.spouse.id);
 
-    // Ensure all children have unique IDs.
+    // Ensure children array exists and all children have unique IDs.
     if (!dataToSet.children) {
         dataToSet.children = [];
         dataWasModified = true;
     }
 
-    dataToSet.children.forEach((child, index) => {
-        if (!child.id || existingIds.has(child.id)) {
-            child.id = Date.now() + index + 1; // Assign a new unique ID
+    dataToSet.children = dataToSet.children.map((child, index) => {
+        if (!child || !child.id || existingIds.has(child.id)) {
             dataWasModified = true;
+            const newChild = { ...child, id: Date.now() + index + 1 };
+            existingIds.add(newChild.id);
+            return newChild;
         }
         existingIds.add(child.id);
+        return child;
     });
 
-    // Persist the validated tree back to local storage if it was modified
     if (dataWasModified && typeof window !== 'undefined') {
         localStorage.setItem(FAMILY_TREE_STORAGE_KEY, JSON.stringify(dataToSet));
     }
@@ -91,7 +93,6 @@ export function FamilyTreeView() {
     const [editingMember, setEditingMember] = useState<FamilyMember | null>(null);
 
     useEffect(() => {
-        // This effect runs only on the client, after hydration.
         const validFamilyTree = loadAndValidateFamilyTree();
         setFamilyTree(validFamilyTree);
     }, []);
@@ -114,21 +115,19 @@ export function FamilyTreeView() {
 
     const handleSave = (memberToSave: FamilyMember) => {
         let newFamilyTree;
-        // Check if it's the spouse
+        const childIndex = familyTree.children.findIndex(c => c.id === memberToSave.id);
+
         if (familyTree.spouse.id === memberToSave.id) {
             newFamilyTree = { ...familyTree, spouse: memberToSave };
-        } else {
-            const childIndex = familyTree.children.findIndex(c => c.id === memberToSave.id);
+        } else if (childIndex > -1) {
             const updatedChildren = [...familyTree.children];
-
-            if (childIndex > -1) {
-                // It's an existing child, so update it
-                updatedChildren[childIndex] = memberToSave;
-            } else {
-                // It's a new child, so add it
-                updatedChildren.push(memberToSave);
-            }
+            updatedChildren[childIndex] = memberToSave;
             newFamilyTree = { ...familyTree, children: updatedChildren };
+        } else {
+             newFamilyTree = { 
+                ...familyTree, 
+                children: [...familyTree.children, memberToSave] 
+            };
         }
         
         saveFamilyTree(newFamilyTree);
@@ -283,7 +282,6 @@ function EditFamilyMemberView({ member, onSave, onCancel, onDelete, familyTree }
                 <div className="flex justify-between pt-4">
                      <AlertDialog>
                         <AlertDialogTrigger asChild>
-                           {/* Do not show delete for the spouse as they cannot be deleted from this view */}
                            { familyTree.spouse.id !== member.id && <Button variant="destructive"><Trash2 className="mr-2 h-4 w-4" /> Delete</Button>}
                         </AlertDialogTrigger>
                         <AlertDialogContent>
