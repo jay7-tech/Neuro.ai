@@ -47,11 +47,6 @@ const tools = [
     icon: <Album className="h-8 w-8 text-primary" />,
   },
   {
-    name: "My Location",
-    href: "/patient/location",
-    icon: <MapPin className="h-8 w-8 text-primary" />,
-  },
-  {
     name: "Family Tree",
     href: "/patient/family-tree",
     icon: <Users className="h-8 w-8 text-primary" />,
@@ -59,7 +54,7 @@ const tools = [
 ]
 
 export function PatientDashboard() {
-  const [dailyPlan, setDailyPlan] = useState(initialDailyPlan);
+  const [dailyPlan, setDailyPlan] = useState(initialDailyPlan.map(item => ({...item, icon: item.icon})));
   const [medications, setMedications] = useState(initialPatient.medications);
   
   const [isEditingPlan, setIsEditingPlan] = useState(false);
