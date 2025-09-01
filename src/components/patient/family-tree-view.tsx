@@ -2,7 +2,7 @@
 'use client';
 import { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { familyTree as initialFamilyTree } from "@/lib/data";
+import { familyTree as initialFamilyTreeData } from "@/lib/data";
 import { Users, Heart, PlusCircle, Edit, Save, X, Trash2, Upload } from "lucide-react";
 import Image from "next/image";
 import { Button } from "../ui/button";
@@ -36,63 +36,68 @@ type FamilyTree = {
 
 const FAMILY_TREE_STORAGE_KEY = 'neuro-ai-family-tree';
 
+// Create a deep copy of the initial data with unique IDs to prevent mutation
+const getInitialFamilyTree = (): FamilyTree => {
+    const spouse = { ...initialFamilyTreeData.spouse, id: Date.now() };
+    const children = initialFamilyTreeData.children.map((child, index) => ({
+        ...child,
+        id: Date.now() + index + 1
+    }));
+    return { spouse, children };
+};
 
 function loadAndValidateFamilyTree(): FamilyTree {
-    let familyData: FamilyTree;
     const storedData = typeof window !== 'undefined' ? localStorage.getItem(FAMILY_TREE_STORAGE_KEY) : null;
 
     if (storedData) {
         try {
-            familyData = JSON.parse(storedData);
+            const parsedData = JSON.parse(storedData) as FamilyTree;
+            // Ensure data has the correct structure and unique IDs
+            let dataWasModified = false;
+            const existingIds = new Set<number>();
+
+            if (!parsedData.spouse || typeof parsedData.spouse.id !== 'number') {
+                parsedData.spouse = { ...initialFamilyTreeData.spouse, id: Date.now() };
+                dataWasModified = true;
+            }
+            existingIds.add(parsedData.spouse.id);
+
+            if (!Array.isArray(parsedData.children)) {
+                 parsedData.children = [];
+                 dataWasModified = true;
+            }
+
+            parsedData.children = parsedData.children.map((child, index) => {
+                if (!child || typeof child.id !== 'number' || existingIds.has(child.id)) {
+                    dataWasModified = true;
+                    const newId = Date.now() + index + 1;
+                    const fallbackChild = getInitialFamilyTree().children[index] || { name: '', relation: '', photo: '', quote: ''};
+                    const newChildData = child ? { ...child, id: newId } : { ...fallbackChild, id: newId };
+                    existingIds.add(newId);
+                    return newChildData;
+                }
+                existingIds.add(child.id);
+                return child;
+            });
+            
+            if (dataWasModified) {
+                 localStorage.setItem(FAMILY_TREE_STORAGE_KEY, JSON.stringify(parsedData));
+            }
+
+            return parsedData;
+
         } catch (error) {
             console.error("Failed to parse family tree from local storage, using initial data.", error);
-            familyData = JSON.parse(JSON.stringify(initialFamilyTree)); // Deep copy
+            return getInitialFamilyTree();
         }
-    } else {
-        familyData = JSON.parse(JSON.stringify(initialFamilyTree)); // Deep copy
     }
-
-    let dataWasModified = false;
-    const existingIds = new Set<number>();
-
-    // Ensure spouse has a unique ID.
-    if (!familyData.spouse || typeof familyData.spouse.id !== 'number' || existingIds.has(familyData.spouse.id)) {
-        familyData.spouse = { ...initialFamilyTree.spouse, id: Date.now() };
-        dataWasModified = true;
-    }
-    existingIds.add(familyData.spouse.id);
-
-    // Ensure children array exists and all children have unique IDs.
-    if (!Array.isArray(familyData.children)) {
-        familyData.children = [];
-        dataWasModified = true;
-    }
-
-    familyData.children = familyData.children.map((child, index) => {
-        if (!child || typeof child.id !== 'number' || existingIds.has(child.id)) {
-            dataWasModified = true;
-            const newId = Date.now() + index + 1;
-            // Use initial data as a fallback if the stored child is malformed
-            const fallbackChild = initialFamilyTree.children[index] || { name: '', relation: '', photo: '', quote: ''};
-            const newChildData = child ? { ...child, id: newId } : { ...fallbackChild, id: newId };
-            existingIds.add(newId);
-            return newChildData;
-        }
-        existingIds.add(child.id);
-        return child;
-    });
-
-    if (dataWasModified && typeof window !== 'undefined') {
-        localStorage.setItem(FAMILY_TREE_STORAGE_KEY, JSON.stringify(familyData));
-    }
-    
-    return familyData;
+    return getInitialFamilyTree();
 }
 
 
 export function FamilyTreeView() {
     const { toast } = useToast();
-    const [familyTree, setFamilyTree] = useState<FamilyTree>(initialFamilyTree);
+    const [familyTree, setFamilyTree] = useState<FamilyTree | null>(null);
     const [editingMember, setEditingMember] = useState<FamilyMember | null>(null);
 
     useEffect(() => {
@@ -116,24 +121,23 @@ export function FamilyTreeView() {
     };
 
     const handleSave = (memberToSave: FamilyMember) => {
+        if (!familyTree) return;
+
         let newFamilyTree;
         // Check if we are editing the spouse
         if (familyTree.spouse.id === memberToSave.id) {
             newFamilyTree = { ...familyTree, spouse: memberToSave };
         } else {
             const childIndex = familyTree.children.findIndex(c => c.id === memberToSave.id);
+            const updatedChildren = [...familyTree.children];
             // Check if we are editing an existing child
             if (childIndex > -1) {
-                const updatedChildren = [...familyTree.children];
                 updatedChildren[childIndex] = memberToSave;
-                newFamilyTree = { ...familyTree, children: updatedChildren };
             } else {
                 // Otherwise, we are adding a new child
-                newFamilyTree = { 
-                    ...familyTree, 
-                    children: [...familyTree.children, memberToSave] 
-                };
+                updatedChildren.push(memberToSave);
             }
+            newFamilyTree = { ...familyTree, children: updatedChildren };
         }
         
         saveFamilyTree(newFamilyTree);
@@ -142,6 +146,8 @@ export function FamilyTreeView() {
     };
 
     const handleDelete = (id: number) => {
+        if (!familyTree) return;
+
         // Prevent deleting the spouse
         if (familyTree.spouse.id === id) {
             toast({ title: "Cannot Delete Spouse", description: "This member cannot be deleted.", variant: "destructive" });
@@ -155,6 +161,10 @@ export function FamilyTreeView() {
         setEditingMember(null); // Close the edit view after deletion
         toast({ title: "Family Member Deleted", variant: "destructive" });
     };
+
+    if (!familyTree) {
+        return <div>Loading family tree...</div>;
+    }
 
     const { spouse, children } = familyTree;
     
@@ -319,3 +329,5 @@ function EditFamilyMemberView({ member, onSave, onCancel, onDelete, isSpouse }: 
         </Card>
     );
 }
+
+    
