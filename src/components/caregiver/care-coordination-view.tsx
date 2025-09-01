@@ -11,11 +11,11 @@ import { patient as initialPatient } from '@/lib/data';
 import { PlusCircle, Trash2, Sun, Moon, Utensils, HeartPulse, Brain, Edit, Save, X } from 'lucide-react';
 
 const initialDailyPlan = [
-  { time: '08:00', task: 'Wake up and get dressed', icon: <Sun className="h-6 w-6 text-primary" />, notes: '' },
-  { time: '09:00', task: 'Eat breakfast & take pills', icon: <Utensils className="h-6 w-6 text-primary" />, notes: '' },
-  { time: '10:00', task: 'Morning walk', icon: <HeartPulse className="h-6 w-6 text-primary" />, notes: 'Remember to wear comfortable shoes.' },
-  { time: '15:00', task: 'Read a book', icon: <Brain className="h-6 w-6 text-primary" />, notes: '' },
-  { time: '20:00', task: 'Prepare for bed', icon: <Moon className="h-6 w-6 text-primary" />, notes: '' },
+  { id: 1, time: '08:00', task: 'Wake up and get dressed', icon: <Sun className="h-6 w-6 text-primary" />, notes: '' },
+  { id: 2, time: '09:00', task: 'Eat breakfast & take pills', icon: <Utensils className="h-6 w-6 text-primary" />, notes: '' },
+  { id: 3, time: '10:00', task: 'Morning walk', icon: <HeartPulse className="h-6 w-6 text-primary" />, notes: 'Remember to wear comfortable shoes.' },
+  { id: 4, time: '15:00', task: 'Read a book', icon: <Brain className="h-6 w-6 text-primary" />, notes: '' },
+  { id: 5, time: '20:00', task: 'Prepare for bed', icon: <Moon className="h-6 w-6 text-primary" />, notes: '' },
 ];
 
 
@@ -23,21 +23,39 @@ export function CareCoordinationView() {
     const { toast } = useToast();
     const [medications, setMedications] = useState(initialPatient.medications);
     const [dailyPlan, setDailyPlan] = useState(initialDailyPlan);
+    
+    const [isEditingPlan, setIsEditingPlan] = useState(false);
+    const [planBeforeEdit, setPlanBeforeEdit] = useState(initialDailyPlan);
+
     const [isEditingMeds, setIsEditingMeds] = useState(false);
     const [medsBeforeEdit, setMedsBeforeEdit] = useState(initialPatient.medications);
 
 
     const handlePlanChange = (index: number, field: 'task' | 'time' | 'notes', value: string) => {
         const updatedPlan = [...dailyPlan];
-        updatedPlan[index] = { ...updatedPlan[index], [field]: value };
-        setDailyPlan(updatedPlan);
+        const planItem = updatedPlan[index];
+        if (planItem) {
+            (planItem as any)[field] = value;
+            setDailyPlan(updatedPlan);
+        }
+    };
+
+    const handleEditPlan = () => {
+        setPlanBeforeEdit(JSON.parse(JSON.stringify(dailyPlan)));
+        setIsEditingPlan(true);
     };
 
     const handleSavePlan = () => {
+        setIsEditingPlan(false);
         toast({
             title: "Patient's Plan Saved!",
             description: "The patient's daily plan has been updated successfully."
         });
+    };
+
+    const handleCancelPlan = () => {
+        setDailyPlan(planBeforeEdit);
+        setIsEditingPlan(false);
     };
 
     const handleMedicationChange = (index: number, field: 'name' | 'dose' | 'time', value: string) => {
@@ -85,43 +103,66 @@ export function CareCoordinationView() {
                 </TabsList>
                 <TabsContent value="planner" className="mt-4">
                     <Card>
-                        <CardHeader>
-                            <CardTitle>Manage Daily Planner</CardTitle>
-                            <CardDescription>Add, edit, or remove tasks from the patient's daily schedule. Changes will appear in their dashboard.</CardDescription>
+                        <CardHeader className="flex flex-row items-center justify-between">
+                            <div>
+                                <CardTitle>Manage Daily Planner</CardTitle>
+                                <CardDescription>Add, edit, or remove tasks from the patient's daily schedule. Changes will appear in their dashboard.</CardDescription>
+                            </div>
+                            {!isEditingPlan && <Button variant="outline" size="icon" onClick={handleEditPlan}><Edit className="h-4 w-4" /></Button>}
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            <ul className="space-y-4">
-                                {dailyPlan.map((item, index) => (
-                                    <li key={index} className="flex flex-col gap-3 p-3 rounded-lg bg-secondary/50">
-                                    <div className="flex items-center gap-3">
-                                        {item.icon}
-                                        <div className="flex-grow space-y-1.5">
-                                        <Input
-                                            type="text"
-                                            placeholder="Task description..."
-                                            value={item.task}
-                                            onChange={(e) => handlePlanChange(index, 'task', e.target.value)}
-                                            className="bg-background font-bold text-base h-10"
-                                        />
-                                        <Input
-                                            type="time"
-                                            value={item.time}
-                                            onChange={(e) => handlePlanChange(index, 'time', e.target.value)}
-                                            className="bg-background text-sm text-muted-foreground h-9"
-                                        />
-                                        </div>
+                            {isEditingPlan ? (
+                                <>
+                                    <ul className="space-y-4">
+                                        {dailyPlan.map((item, index) => (
+                                            <li key={item.id} className="flex flex-col gap-3 p-3 rounded-lg bg-secondary/50">
+                                            <div className="flex items-center gap-3">
+                                                {item.icon}
+                                                <div className="flex-grow space-y-1.5">
+                                                <Input
+                                                    type="text"
+                                                    placeholder="Task description..."
+                                                    value={item.task}
+                                                    onChange={(e) => handlePlanChange(index, 'task', e.target.value)}
+                                                    className="bg-background font-bold text-base h-10"
+                                                />
+                                                <Input
+                                                    type="time"
+                                                    value={item.time}
+                                                    onChange={(e) => handlePlanChange(index, 'time', e.target.value)}
+                                                    className="bg-background text-sm text-muted-foreground h-9"
+                                                />
+                                                </div>
+                                            </div>
+                                            <Input
+                                                type="text"
+                                                placeholder="Add a note for the patient..."
+                                                value={item.notes}
+                                                onChange={(e) => handlePlanChange(index, 'notes', e.target.value)}
+                                                className="bg-background text-sm"
+                                            />
+                                            </li>
+                                        ))}
+                                    </ul>
+                                     <div className="flex justify-end gap-2">
+                                        <Button variant="ghost" onClick={handleCancelPlan}><X className="mr-2 h-4 w-4"/>Cancel</Button>
+                                        <Button onClick={handleSavePlan}><Save className="mr-2 h-4 w-4"/>Save Patient's Plan</Button>
                                     </div>
-                                    <Input
-                                        type="text"
-                                        placeholder="Add a note for the patient..."
-                                        value={item.notes}
-                                        onChange={(e) => handlePlanChange(index, 'notes', e.target.value)}
-                                        className="bg-background text-sm"
-                                    />
-                                    </li>
-                                ))}
-                            </ul>
-                            <Button onClick={handleSavePlan} className="w-full mt-4">Save Patient's Plan</Button>
+                                </>
+                            ): (
+                                <ul className="space-y-4">
+                                    {dailyPlan.map((item) => (
+                                         <li key={item.id} className="flex items-start gap-4 p-3 rounded-lg bg-secondary/50">
+                                            <div className="pt-1">{item.icon}</div>
+                                            <div className="flex-grow">
+                                            <p className="font-bold">{item.task}</p>
+                                            <p className="text-sm text-muted-foreground">{item.time}</p>
+                                            {item.notes && <p className="text-sm mt-1 italic">{item.notes}</p>}
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
                         </CardContent>
                     </Card>
                 </TabsContent>
