@@ -1,6 +1,6 @@
 
-
 'use client';
+import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Brain, Pill, Camera, MessageSquare, Calendar, Sun, Moon, Utensils, ArrowRight, Music, PhoneCall, HeartPulse } from "lucide-react";
@@ -9,13 +9,15 @@ import Image from "next/image";
 import { AiCompanion } from "./ai-companion";
 import { patient, familyTree } from "@/lib/data";
 import { Separator } from "../ui/separator";
+import { Input } from '../ui/input';
+import { useToast } from '@/hooks/use-toast';
 
-const dailyPlan = [
-  { time: '08:00 AM', task: 'Wake up and get dressed', icon: <Sun className="h-6 w-6 text-primary" /> },
-  { time: '09:00 AM', task: 'Eat breakfast & take pills', icon: <Utensils className="h-6 w-6 text-primary" /> },
-  { time: '10:00 AM', task: 'Morning walk', icon: <HeartPulse className="h-6 w-6 text-primary" /> },
-  { time: '03:00 PM', task: 'Read a book', icon: <Brain className="h-6 w-6 text-primary" /> },
-  { time: '08:00 PM', task: 'Prepare for bed', icon: <Moon className="h-6 w-6 text-primary" /> },
+const initialDailyPlan = [
+  { time: '08:00 AM', task: 'Wake up and get dressed', icon: <Sun className="h-6 w-6 text-primary" />, notes: '' },
+  { time: '09:00 AM', task: 'Eat breakfast & take pills', icon: <Utensils className="h-6 w-6 text-primary" />, notes: '' },
+  { time: '10:00 AM', task: 'Morning walk', icon: <HeartPulse className="h-6 w-6 text-primary" />, notes: 'Remember to wear comfortable shoes.' },
+  { time: '03:00 PM', task: 'Read a book', icon: <Brain className="h-6 w-6 text-primary" />, notes: '' },
+  { time: '08:00 PM', task: 'Prepare for bed', icon: <Moon className="h-6 w-6 text-primary" />, notes: '' },
 ];
 
 const memoryPrompt = {
@@ -48,6 +50,22 @@ const tools = [
 ]
 
 export function PatientDashboard() {
+  const [dailyPlan, setDailyPlan] = useState(initialDailyPlan);
+  const { toast } = useToast();
+
+  const handleNoteChange = (index: number, newNotes: string) => {
+    const updatedPlan = [...dailyPlan];
+    updatedPlan[index].notes = newNotes;
+    setDailyPlan(updatedPlan);
+  };
+
+  const handleSavePlan = () => {
+    toast({
+      title: "Daily Plan Saved!",
+      description: "Your notes have been successfully saved."
+    })
+  }
+
   const handleCallHelp = () => {
     // This will attempt to open the phone app on mobile devices
     if(patient.caregivers[0]?.phone) {
@@ -123,19 +141,30 @@ export function PatientDashboard() {
             <CardTitle className="text-2xl flex items-center gap-2">
               <Calendar /> Your Day
             </CardTitle>
+            <CardDescription>Add notes to your plan for the day.</CardDescription>
           </CardHeader>
           <CardContent>
             <ul className="space-y-4">
               {dailyPlan.map((item, index) => (
-                <li key={index} className="flex items-center gap-4 p-3 rounded-lg bg-secondary/50">
-                  {item.icon}
-                  <div>
-                    <p className="font-bold">{item.task}</p>
-                    <p className="text-sm text-muted-foreground">{item.time}</p>
+                <li key={index} className="flex flex-col gap-2 p-3 rounded-lg bg-secondary/50">
+                  <div className="flex items-center gap-4">
+                    {item.icon}
+                    <div>
+                      <p className="font-bold">{item.task}</p>
+                      <p className="text-sm text-muted-foreground">{item.time}</p>
+                    </div>
                   </div>
+                  <Input
+                    type="text"
+                    placeholder="Add a note..."
+                    value={item.notes}
+                    onChange={(e) => handleNoteChange(index, e.target.value)}
+                    className="bg-background text-sm"
+                  />
                 </li>
               ))}
             </ul>
+             <Button onClick={handleSavePlan} className="w-full mt-4">Save Plan</Button>
           </CardContent>
         </Card>
 
@@ -223,5 +252,3 @@ export function PatientDashboard() {
     </div>
   );
 }
-
-    
