@@ -43,16 +43,19 @@ export function FamilyTreeView() {
 
     useEffect(() => {
         const storedData = localStorage.getItem(FAMILY_TREE_STORAGE_KEY);
+        let dataToSet: FamilyTree;
         if (storedData) {
-            setFamilyTree(JSON.parse(storedData));
+            dataToSet = JSON.parse(storedData);
         } else {
-             // Add unique IDs to initial data if no stored data
-            const initialDataWithIds = {
-                spouse: { ...initialFamilyTree.spouse, id: Date.now() },
-                children: initialFamilyTree.children.map((child, index) => ({ ...child, id: Date.now() + index + 1 }))
-            };
-            setFamilyTree(initialDataWithIds);
+            dataToSet = initialFamilyTree;
         }
+
+        // Ensure all members have a unique ID
+        const initialDataWithIds = {
+            spouse: { ...dataToSet.spouse, id: dataToSet.spouse.id || Date.now() },
+            children: dataToSet.children.map((child, index) => ({ ...child, id: child.id || Date.now() + index + 1 }))
+        };
+        setFamilyTree(initialDataWithIds);
     }, []);
 
     const saveFamilyTree = (newFamilyTree: FamilyTree) => {
@@ -113,6 +116,7 @@ export function FamilyTreeView() {
             onSave={handleSave} 
             onCancel={() => setEditingMember(null)} 
             onDelete={handleDelete}
+            familyTree={familyTree}
         />;
     }
 
@@ -181,7 +185,7 @@ export function FamilyTreeView() {
     )
 }
 
-function EditFamilyMemberView({ member, onSave, onCancel, onDelete }: { member: FamilyMember, onSave: (member: FamilyMember) => void, onCancel: () => void, onDelete: (id: number) => void }) {
+function EditFamilyMemberView({ member, onSave, onCancel, onDelete, familyTree }: { member: FamilyMember, onSave: (member: FamilyMember) => void, onCancel: () => void, onDelete: (id: number) => void, familyTree: FamilyTree }) {
     const [currentMember, setCurrentMember] = useState(member);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -242,7 +246,7 @@ function EditFamilyMemberView({ member, onSave, onCancel, onDelete }: { member: 
                 <div className="flex justify-between pt-4">
                      <AlertDialog>
                         <AlertDialogTrigger asChild>
-                           {/* Do not show delete for the initial spouse who cannot be deleted from the data structure */}
+                           {/* Do not show delete for the spouse as they cannot be deleted from this view */}
                            { familyTree.spouse.id !== member.id && <Button variant="destructive"><Trash2 className="mr-2 h-4 w-4" /> Delete</Button>}
                         </AlertDialogTrigger>
                         <AlertDialogContent>
@@ -268,5 +272,3 @@ function EditFamilyMemberView({ member, onSave, onCancel, onDelete }: { member: 
         </Card>
     );
 }
-
-    
