@@ -63,6 +63,11 @@ function loadAndValidateFamilyTree(): FamilyTree {
     existingIds.add(dataToSet.spouse.id);
 
     // Ensure all children have unique IDs.
+    if (!dataToSet.children) {
+        dataToSet.children = [];
+        dataWasModified = true;
+    }
+
     dataToSet.children.forEach((child, index) => {
         if (!child.id || existingIds.has(child.id)) {
             child.id = Date.now() + index + 1; // Assign a new unique ID
@@ -109,14 +114,15 @@ export function FamilyTreeView() {
         } else {
             const childIndex = familyTree.children.findIndex(c => c.id === memberToSave.id);
             const updatedChildren = [...familyTree.children];
+
             // Check if we are editing an existing child
             if (childIndex > -1) {
                 updatedChildren[childIndex] = memberToSave;
-                newFamilyTree = { ...familyTree, children: updatedChildren };
             } else {
                 // Otherwise, it's a new child
-                newFamilyTree = { ...familyTree, children: [...updatedChildren, memberToSave] };
+                updatedChildren.push(memberToSave);
             }
+            newFamilyTree = { ...familyTree, children: updatedChildren };
         }
         
         saveFamilyTree(newFamilyTree);
@@ -244,7 +250,7 @@ function EditFamilyMemberView({ member, onSave, onCancel, onDelete, familyTree }
                     <Image src={currentMember.photo} alt="Family member photo" width={400} height={400} className="w-full h-full object-cover" />
                 </div>
                 <Input type="file" accept="image/*" className="hidden" ref={fileInputRef} onChange={handleFileChange} />
-                <Button variant="outline" className="w-full" onClick={() => fileInput_current?.click()}>
+                <Button variant="outline" className="w-full" onClick={() => fileInputRef.current?.click()}>
                     <Upload className="mr-2 h-4 w-4" /> Change Photo
                 </Button>
                 
