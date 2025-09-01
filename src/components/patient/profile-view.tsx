@@ -4,10 +4,10 @@
 import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { User, Users, MapPin, Droplets, Calendar, Stethoscope, Phone, Settings, Shield, Bell, Languages, Baseline, Pencil, Save } from 'lucide-react';
+import { User, Users, MapPin, Droplets, Calendar, Stethoscope, Phone, Settings, Shield, Bell, Languages, Baseline, Pencil, Save, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { patient as initialPatient } from '@/lib/data';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -25,6 +25,7 @@ export function ProfileView() {
     const [notifications, setNotifications] = useState(true);
     const [language, setLanguage] = useState('en');
     const [textSize, setTextSize] = useState(16);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         const root = window.document.documentElement;
@@ -39,6 +40,22 @@ export function ProfileView() {
         const root = window.document.documentElement;
         root.style.fontSize = `${textSize}px`;
     }, [textSize]);
+    
+    const handleFieldChange = (field: keyof typeof patient, value: any) => {
+        setPatient(prev => ({...prev, [field]: value}));
+    }
+
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                handleFieldChange('photo', reader.result as string)
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
 
     const handleSave = () => {
         setIsEditing(false);
@@ -57,14 +74,24 @@ export function ProfileView() {
         <div className="space-y-6">
             <Card>
                 <CardContent className="p-6 flex flex-col md:flex-row items-center gap-6">
-                    <Image
-                        src={patient.photo}
-                        alt="Patient photo"
-                        width={150}
-                        height={150}
-                        className="rounded-full border-4 border-primary shadow-lg"
-                        data-ai-hint="person portrait"
-                    />
+                    <div className="flex flex-col items-center gap-2">
+                        <Image
+                            src={patient.photo}
+                            alt="Patient photo"
+                            width={150}
+                            height={150}
+                            className="rounded-full border-4 border-primary shadow-lg"
+                            data-ai-hint="person portrait"
+                        />
+                         {isEditing && (
+                            <>
+                                <Input type="file" accept="image/*" className="hidden" ref={fileInputRef} onChange={handleFileChange} />
+                                <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>
+                                    <Upload className="mr-2 h-4 w-4" /> Change Photo
+                                </Button>
+                            </>
+                        )}
+                    </div>
                     <div className="flex-grow text-center md:text-left">
                         <h1 className="text-4xl font-bold font-headline">{patient.name}</h1>
                         <p className="text-lg text-muted-foreground">Patient ID: {patient.id}</p>
