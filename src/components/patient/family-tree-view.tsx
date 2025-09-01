@@ -36,58 +36,54 @@ type FamilyTree = {
 
 const FAMILY_TREE_STORAGE_KEY = 'neuro-ai-family-tree';
 
+
+function loadAndValidateFamilyTree(): FamilyTree {
+    let dataToSet: FamilyTree;
+    const storedData = typeof window !== 'undefined' ? localStorage.getItem(FAMILY_TREE_STORAGE_KEY) : null;
+
+    if (storedData) {
+        try {
+            dataToSet = JSON.parse(storedData);
+        } catch (error) {
+            console.error("Failed to parse family tree from local storage, using initial data.", error);
+            dataToSet = JSON.parse(JSON.stringify(initialFamilyTree)); // Fallback
+        }
+    } else {
+        dataToSet = JSON.parse(JSON.stringify(initialFamilyTree));
+    }
+    
+    let dataWasModified = false;
+    const existingIds = new Set<number>();
+
+    // Ensure spouse has a unique ID.
+    if (!dataToSet.spouse.id || existingIds.has(dataToSet.spouse.id)) {
+        dataToSet.spouse.id = Date.now();
+        dataWasModified = true;
+    }
+    existingIds.add(dataToSet.spouse.id);
+
+    // Ensure all children have unique IDs.
+    dataToSet.children.forEach((child, index) => {
+        if (!child.id || existingIds.has(child.id)) {
+            child.id = Date.now() + index + 1; // Assign a new unique ID
+            dataWasModified = true;
+        }
+        existingIds.add(child.id);
+    });
+
+    // Persist the validated tree back to local storage if it was modified
+    if (dataWasModified && typeof window !== 'undefined') {
+        localStorage.setItem(FAMILY_TREE_STORAGE_KEY, JSON.stringify(dataToSet));
+    }
+    
+    return dataToSet;
+}
+
+
 export function FamilyTreeView() {
     const { toast } = useToast();
-    const [familyTree, setFamilyTree] = useState<FamilyTree>(() => {
-        // Deep copy to prevent mutation of the initial data object
-        const initialData = JSON.parse(JSON.stringify(initialFamilyTree));
-        initialData.spouse.id = initialData.spouse.id || Date.now();
-        initialData.children.forEach((child: FamilyMember, index: number) => {
-            child.id = child.id || Date.now() + index + 1;
-        });
-        return initialData;
-    });
+    const [familyTree, setFamilyTree] = useState<FamilyTree>(loadAndValidateFamilyTree);
     const [editingMember, setEditingMember] = useState<FamilyMember | null>(null);
-
-    useEffect(() => {
-        const storedData = localStorage.getItem(FAMILY_TREE_STORAGE_KEY);
-        if (storedData) {
-            try {
-                const dataToSet: FamilyTree = JSON.parse(storedData);
-                let dataWasModified = false;
-                
-                // Ensure spouse has a unique ID.
-                if (!dataToSet.spouse.id) {
-                    dataToSet.spouse.id = Date.now();
-                    dataWasModified = true;
-                }
-                
-                // Ensure all children have unique IDs.
-                const existingIds = new Set<number>();
-                existingIds.add(dataToSet.spouse.id);
-
-                dataToSet.children = dataToSet.children.map((child, index) => {
-                    if (!child.id || existingIds.has(child.id)) {
-                        child.id = Date.now() + index + 1; // Assign a new unique ID
-                        dataWasModified = true;
-                    }
-                    existingIds.add(child.id);
-                    return child;
-                });
-                
-                setFamilyTree(dataToSet);
-
-                // Persist the validated tree back to local storage if it was modified
-                if (dataWasModified) {
-                    localStorage.setItem(FAMILY_TREE_STORAGE_KEY, JSON.stringify(dataToSet));
-                }
-            } catch (error) {
-                console.error("Failed to parse family tree from local storage", error);
-                // Fallback to initial data if parsing fails
-                setFamilyTree(JSON.parse(JSON.stringify(initialFamilyTree)));
-            }
-        }
-    }, []);
 
     const saveFamilyTree = (newFamilyTree: FamilyTree) => {
         setFamilyTree(newFamilyTree);
@@ -248,7 +244,7 @@ function EditFamilyMemberView({ member, onSave, onCancel, onDelete, familyTree }
                     <Image src={currentMember.photo} alt="Family member photo" width={400} height={400} className="w-full h-full object-cover" />
                 </div>
                 <Input type="file" accept="image/*" className="hidden" ref={fileInputRef} onChange={handleFileChange} />
-                <Button variant="outline" className="w-full" onClick={() => fileInputRef.current?.click()}>
+                <Button variant="outline" className="w-full" onClick={() => fileInput_current?.click()}>
                     <Upload className="mr-2 h-4 w-4" /> Change Photo
                 </Button>
                 
