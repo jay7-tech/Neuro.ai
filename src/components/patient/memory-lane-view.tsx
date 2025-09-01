@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -138,11 +138,26 @@ export function MemoryLaneView() {
 
 
 function EditMemoryView({ memory, onSave, onCancel }: { memory: Memory, onSave: (memory: Memory) => void, onCancel: () => void }) {
-    const [story, setStory] = useState(memory.story);
-    const [image, setImage] = useState(memory.image);
+    const [currentMemory, setCurrentMemory] = useState(memory);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleSaveClick = () => {
-        onSave({ ...memory, story, image });
+        onSave(currentMemory);
+    };
+
+    const handleFieldChange = (field: keyof Memory, value: string) => {
+        setCurrentMemory(prev => ({...prev, [field]: value}));
+    }
+
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                handleFieldChange('image', reader.result as string)
+            };
+            reader.readAsDataURL(file);
+        }
     };
 
     return (
@@ -153,15 +168,18 @@ function EditMemoryView({ memory, onSave, onCancel }: { memory: Memory, onSave: 
             </CardHeader>
             <CardContent className="space-y-4">
                 <div className="aspect-video w-full rounded-lg overflow-hidden border">
-                    <Image src={image} alt="Memory" width={600} height={400} className="w-full h-full object-cover" />
+                    <Image src={currentMemory.image} alt="Memory" width={600} height={400} className="w-full h-full object-cover" />
                 </div>
-                <Button variant="outline" className="w-full"><Upload className="mr-2 h-4 w-4" /> Change Photo</Button>
+                <Input type="file" accept="image/*" className="hidden" ref={fileInputRef} onChange={handleFileChange} />
+                <Button variant="outline" className="w-full" onClick={() => fileInput_Ref.current?.click()}>
+                    <Upload className="mr-2 h-4 w-4" /> Change Photo
+                </Button>
                 <div>
                     <label htmlFor="story" className="font-semibold mb-2 block">Your Story</label>
                     <Textarea
                         id="story"
-                        value={story}
-                        onChange={(e) => setStory(e.target.value)}
+                        value={currentMemory.story}
+                        onChange={(e) => handleFieldChange('story', e.target.value)}
                         placeholder="What's the story behind this photo?"
                         rows={5}
                         className="text-base"
@@ -175,4 +193,3 @@ function EditMemoryView({ memory, onSave, onCancel }: { memory: Memory, onSave: 
         </Card>
     );
 }
-

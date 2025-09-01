@@ -1,6 +1,6 @@
 
 'use client';
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { familyTree as initialFamilyTree } from "@/lib/data";
 import { Users, Heart, PlusCircle, Edit, Save, X, Trash2, Upload } from "lucide-react";
@@ -169,6 +169,7 @@ export function FamilyTreeView() {
 
 function EditFamilyMemberView({ member, onSave, onCancel, onDelete }: { member: FamilyMember, onSave: (member: FamilyMember) => void, onCancel: () => void, onDelete: (id: number) => void }) {
     const [currentMember, setCurrentMember] = useState(member);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleSaveClick = () => {
         onSave(currentMember);
@@ -177,6 +178,17 @@ function EditFamilyMemberView({ member, onSave, onCancel, onDelete }: { member: 
     const handleFieldChange = (field: keyof FamilyMember, value: string) => {
         setCurrentMember(prev => ({...prev, [field]: value}));
     }
+
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                handleFieldChange('photo', reader.result as string)
+            };
+            reader.readAsDataURL(file);
+        }
+    };
 
     return (
         <Card className="max-w-2xl mx-auto shadow-2xl">
@@ -188,7 +200,10 @@ function EditFamilyMemberView({ member, onSave, onCancel, onDelete }: { member: 
                 <div className="aspect-square w-full rounded-lg overflow-hidden border mx-auto max-w-sm">
                     <Image src={currentMember.photo} alt="Family member photo" width={400} height={400} className="w-full h-full object-cover" />
                 </div>
-                <Button variant="outline" className="w-full"><Upload className="mr-2 h-4 w-4" /> Change Photo</Button>
+                <Input type="file" accept="image/*" className="hidden" ref={fileInputRef} onChange={handleFileChange} />
+                <Button variant="outline" className="w-full" onClick={() => fileInputRef.current?.click()}>
+                    <Upload className="mr-2 h-4 w-4" /> Change Photo
+                </Button>
                 
                 <div className="space-y-2">
                     <label htmlFor="name">Name</label>
@@ -239,4 +254,3 @@ function EditFamilyMemberView({ member, onSave, onCancel, onDelete }: { member: 
         </Card>
     );
 }
-
