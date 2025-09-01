@@ -2,7 +2,7 @@
 import { AppHeader } from "@/components/app/header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Brain, Palette, Puzzle } from "lucide-react";
+import { ArrowLeft, Brain, Palette, Puzzle, Pencil } from "lucide-react";
 import Link from "next/link";
 
 const games = [
@@ -18,6 +18,12 @@ const games = [
         href: "/patient/games/color-match",
         icon: <Palette className="h-12 w-12 text-primary" />
     },
+    {
+        name: "Word Scramble",
+        description: "Unscramble the letters to form a word.",
+        href: "/patient/games/word-scramble",
+        icon: <Pencil className="h-12 w-12 text-primary" />
+    }
 ]
 
 export default function GamesPage() {
@@ -36,7 +42,7 @@ export default function GamesPage() {
                         </Link>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {games.map((game) => (
                             <Link href={game.href} passHref key={game.name}>
                                 <Card className="h-full hover:shadow-xl hover:border-primary/50 transition-all cursor-pointer flex flex-col">
