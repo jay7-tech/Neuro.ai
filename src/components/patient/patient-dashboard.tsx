@@ -4,7 +4,7 @@
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Brain, Pill, Camera, MessageSquare, Calendar, Sun, Moon, Utensils, ArrowRight, Music, PhoneCall, HeartPulse, PlusCircle, Trash2, Album, Edit, Save, X, MapPin } from "lucide-react";
+import { Brain, Pill, Camera, MessageSquare, Calendar, Sun, Moon, Utensils, ArrowRight, Music, PhoneCall, HeartPulse, PlusCircle, Trash2, Album, Edit, Save, X, MapPin, Users } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { AiCompanion } from "./ai-companion";
@@ -50,6 +50,11 @@ const tools = [
     name: "My Location",
     href: "/patient/location",
     icon: <MapPin className="h-8 w-8 text-primary" />,
+  },
+  {
+    name: "Family Tree",
+    href: "/patient/family-tree",
+    icon: <Users className="h-8 w-8 text-primary" />,
   }
 ]
 
@@ -80,7 +85,6 @@ export function PatientDashboard() {
 
   const handleSavePlan = () => {
     setIsEditingPlan(false);
-    setPlanBeforeEdit([]);
     toast({
       title: "Daily Plan Saved!",
       description: "Your changes have been successfully saved."

@@ -25,10 +25,11 @@ export const familyTree = {
     spouse: {
         name: 'Jane Doe',
         relation: 'Wife',
-        photo: 'https://picsum.photos/id/1027/200/200'
+        photo: 'https://picsum.photos/id/1027/200/200',
+        quote: '"Through thick and thin, for all these years. I love you more every day."'
     },
     children: [
-        { name: 'Peter Doe', relation: 'Son', photo: 'https://picsum.photos/id/64/200/200' },
-        { name: 'Mary Doe', relation: 'Daughter', photo: 'https://picsum.photos/id/1011/200/200' },
+        { name: 'Peter Doe', relation: 'Son', photo: 'https://picsum.photos/id/64/200/200', quote: '"Dad, you taught me everything I know about being strong and kind."' },
+        { name: 'Mary Doe', relation: 'Daughter', photo: 'https://picsum.photos/id/1011/200/200', quote: '"Remember our fishing trips? Those are my favorite memories, Dad."' },
     ]
 }
