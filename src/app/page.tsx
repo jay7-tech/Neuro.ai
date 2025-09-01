@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,7 +23,18 @@ export default function Home() {
   const { toast } = useToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true); // Start with loading true to check session
+
+  useEffect(() => {
+    // Check if the user is already logged in
+    const isLoggedIn = localStorage.getItem('isLoggedIn');
+    if (isLoggedIn === 'true') {
+      router.replace('/selection');
+    } else {
+      setLoading(false); // Only allow interaction if not logged in
+    }
+  }, [router]);
+
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,9 +54,18 @@ export default function Home() {
     // In a real app, you would have a proper backend authentication.
     setTimeout(() => {
         toast({ title: "Login Successful", description: "Redirecting to role selection..." });
+        localStorage.setItem('isLoggedIn', 'true'); // Save login state
         router.push('/selection');
     }, 1000);
   };
+
+  if (loading) {
+    return (
+        <div className="flex items-center justify-center min-h-screen bg-background">
+            <p>Loading...</p>
+        </div>
+    );
+  }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-background p-4">
@@ -56,7 +76,7 @@ export default function Home() {
                <AppIcon />
              </div>
             <CardTitle className="text-4xl font-extrabold tracking-tight lg:text-5xl">Welcome to Neuro-AI</CardTitle>
-            <CardDescription className="text-lg text-muted-foreground pt-2">Sign in or create an account to continue.</CardDescription>
+            <CardDescription className="text-lg text-muted-foreground pt-2">Sign in to continue.</CardDescription>
           </CardHeader>
           <CardContent className="p-8 bg-secondary/30">
             <form onSubmit={handleLogin} className="space-y-6">
