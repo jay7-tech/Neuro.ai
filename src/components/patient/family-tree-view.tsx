@@ -1,4 +1,5 @@
 
+
 'use client';
 import { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -47,10 +48,9 @@ export function FamilyTreeView() {
             setFamilyTree(JSON.parse(storedData));
         } else {
              // Add unique IDs to initial data if no stored data
-            let idCounter = 0;
             const initialDataWithIds = {
-                spouse: { ...initialFamilyTree.spouse, id: idCounter++ },
-                children: initialFamilyTree.children.map(child => ({ ...child, id: idCounter++ }))
+                spouse: { ...initialFamilyTree.spouse, id: Date.now() },
+                children: initialFamilyTree.children.map((child, index) => ({ ...child, id: Date.now() + index + 1 }))
             };
             setFamilyTree(initialDataWithIds);
         }
