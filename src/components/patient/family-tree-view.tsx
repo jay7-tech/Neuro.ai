@@ -56,7 +56,7 @@ function loadAndValidateFamilyTree(): FamilyTree {
     const existingIds = new Set<number>();
 
     // Ensure spouse has a unique ID.
-    if (!familyData.spouse || !familyData.spouse.id || existingIds.has(familyData.spouse.id)) {
+    if (!familyData.spouse || typeof familyData.spouse.id !== 'number' || existingIds.has(familyData.spouse.id)) {
         familyData.spouse = { ...initialFamilyTree.spouse, id: Date.now() };
         dataWasModified = true;
     }
@@ -72,9 +72,9 @@ function loadAndValidateFamilyTree(): FamilyTree {
         if (!child || typeof child.id !== 'number' || existingIds.has(child.id)) {
             dataWasModified = true;
             const newId = Date.now() + index + 1;
-            const newChild = { ...child, id: newId };
+            const newChildData = child ? { ...child, id: newId } : { ...initialFamilyTree.children[index], id: newId };
             existingIds.add(newId);
-            return newChild;
+            return newChildData;
         }
         existingIds.add(child.id);
         return child;
