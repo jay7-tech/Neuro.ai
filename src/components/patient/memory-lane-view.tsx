@@ -61,8 +61,31 @@ export function MemoryLaneView() {
     }, []);
 
     const saveMemories = (newMemories: Memory[]) => {
-        setMemories(newMemories);
-        localStorage.setItem(MEMORIES_STORAGE_KEY, JSON.stringify(newMemories));
+        try {
+            setMemories(newMemories);
+            localStorage.setItem(MEMORIES_STORAGE_KEY, JSON.stringify(newMemories));
+        } catch (error) {
+            if (error instanceof DOMException && (error.name === 'QuotaExceededError' || error.name === 'NS_ERROR_DOM_QUOTA_REACHED')) {
+                 toast({
+                    title: "Failed to Save Memory",
+                    description: "The photo you uploaded is too large. Please choose a smaller file.",
+                    variant: "destructive",
+                });
+                // Revert to the old state to avoid inconsistent UI
+                const storedData = localStorage.getItem(MEMORIES_STORAGE_KEY);
+                if (storedData) {
+                    setMemories(JSON.parse(storedData));
+                } else {
+                    setMemories(initialMemories);
+                }
+            } else {
+                toast({
+                    title: "An unexpected error occurred.",
+                    description: "Your memory could not be saved.",
+                    variant: "destructive",
+                });
+            }
+        }
     }
 
     const handleAddNew = () => {
