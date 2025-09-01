@@ -1,9 +1,10 @@
 
+
 'use client';
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Brain, Pill, Camera, MessageSquare, Calendar, Sun, Moon, Utensils, ArrowRight, Music, PhoneCall, HeartPulse, PlusCircle, Trash2, Album } from "lucide-react";
+import { Brain, Pill, Camera, MessageSquare, Calendar, Sun, Moon, Utensils, ArrowRight, Music, PhoneCall, HeartPulse, PlusCircle, Trash2, Album, Edit, Save, X } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { AiCompanion } from "./ai-companion";
@@ -50,6 +51,8 @@ const tools = [
 export function PatientDashboard() {
   const [dailyPlan, setDailyPlan] = useState(initialDailyPlan);
   const [medications, setMedications] = useState(initialPatient.medications);
+  const [isEditingMeds, setIsEditingMeds] = useState(false);
+  const [medsBeforeEdit, setMedsBeforeEdit] = useState(initialPatient.medications);
   const { toast } = useToast();
 
   const handlePlanChange = (index: number, field: 'task' | 'time' | 'notes', value: string) => {
@@ -78,16 +81,26 @@ export function PatientDashboard() {
   const handleRemoveMedication = (id: number) => {
     setMedications(medications.filter(med => med.id !== id));
   };
+  
+  const handleEditMeds = () => {
+    setMedsBeforeEdit(JSON.parse(JSON.stringify(medications)));
+    setIsEditingMeds(true);
+  }
 
   const handleSaveMedications = () => {
+    setIsEditingMeds(false);
     toast({
       title: "Medication Plan Saved!",
       description: "Your medication schedule has been updated."
     });
   };
 
+  const handleCancelMeds = () => {
+    setMedications(medsBeforeEdit);
+    setIsEditingMeds(false);
+  }
+
   const handleCallHelp = () => {
-    // This will attempt to open the phone app on mobile devices
     if(initialPatient.caregivers[0]?.phone) {
       window.location.href = `tel:${initialPatient.caregivers[0].phone}`;
     }
@@ -200,43 +213,73 @@ export function PatientDashboard() {
         </Card>
 
         <Card className="shadow-lg rounded-2xl">
-          <CardHeader>
-            <CardTitle className="text-2xl flex items-center gap-2">
-              <Pill /> Medication
-            </CardTitle>
+          <CardHeader className="flex-row items-center justify-between">
+            <div className="space-y-1">
+                <CardTitle className="text-2xl flex items-center gap-2">
+                <Pill /> Medication
+                </CardTitle>
+                <CardDescription>Your daily medication schedule.</CardDescription>
+            </div>
+            {!isEditingMeds && (
+              <Button variant="outline" size="icon" onClick={handleEditMeds}>
+                <Edit className="h-4 w-4" />
+              </Button>
+            )}
           </CardHeader>
           <CardContent className="space-y-4">
-            {medications.map((med, index) => (
-              <div key={med.id} className="p-3 rounded-lg bg-accent/50 space-y-2">
-                <div className="flex gap-2">
-                    <Input
-                      placeholder="Medicine Name"
-                      value={med.name}
-                      onChange={(e) => handleMedicationChange(index, 'name', e.target.value)}
-                      className="bg-background font-semibold"
-                    />
-                    <Button variant="ghost" size="icon" onClick={() => handleRemoveMedication(med.id)}>
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                    </Button>
+            {isEditingMeds ? (
+                <>
+                {medications.map((med, index) => (
+                    <div key={med.id} className="p-3 rounded-lg bg-accent/50 space-y-2">
+                        <div className="flex gap-2">
+                            <Input
+                            placeholder="Medicine Name"
+                            value={med.name}
+                            onChange={(e) => handleMedicationChange(index, 'name', e.target.value)}
+                            className="bg-background font-semibold"
+                            />
+                            <Button variant="ghost" size="icon" onClick={() => handleRemoveMedication(med.id)}>
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                        </div>
+                        <Input
+                        placeholder="Dosage (e.g., 1 tablet)"
+                        value={med.dose}
+                        onChange={(e) => handleMedicationChange(index, 'dose', e.target.value)}
+                        className="bg-background"
+                        />
+                        <Input
+                        type="time"
+                        value={med.time}
+                        onChange={(e) => handleMedicationChange(index, 'time', e.target.value)}
+                        className="bg-background"
+                        />
+                    </div>
+                ))}
+                <Button variant="outline" onClick={handleAddMedication} className="w-full">
+                    <PlusCircle className="mr-2 h-4 w-4" /> Add Medication
+                </Button>
+                <div className="flex justify-end gap-2">
+                    <Button variant="ghost" onClick={handleCancelMeds}><X className="mr-2 h-4 w-4"/>Cancel</Button>
+                    <Button onClick={handleSaveMedications}><Save className="mr-2 h-4 w-4"/>Save</Button>
                 </div>
-                <Input
-                  placeholder="Dosage (e.g., 1 tablet)"
-                  value={med.dose}
-                  onChange={(e) => handleMedicationChange(index, 'dose', e.target.value)}
-                  className="bg-background"
-                />
-                <Input
-                  type="time"
-                  value={med.time}
-                  onChange={(e) => handleMedicationChange(index, 'time', e.target.value)}
-                  className="bg-background"
-                />
-              </div>
-            ))}
-            <Button variant="outline" onClick={handleAddMedication} className="w-full">
-              <PlusCircle className="mr-2 h-4 w-4" /> Add Medication
-            </Button>
-            <Button onClick={handleSaveMedications} className="w-full">Save Medications</Button>
+              </>
+            ) : (
+                <ul className="space-y-2">
+                    {medications.map(med => (
+                        <li key={med.id} className="p-3 rounded-lg bg-secondary/50 flex justify-between items-center">
+                            <div>
+                                <p className="font-bold">{med.name}</p>
+                                <p className="text-sm text-muted-foreground">{med.dose}</p>
+                            </div>
+                            <p className="font-mono text-lg">{med.time}</p>
+                        </li>
+                    ))}
+                     {medications.length === 0 && (
+                        <p className="text-muted-foreground text-center p-4">No medications scheduled.</p>
+                     )}
+                </ul>
+            )}
           </CardContent>
         </Card>
 
