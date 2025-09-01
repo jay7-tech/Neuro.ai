@@ -15,6 +15,10 @@ export const patient = {
         { name: 'Peter Doe', relation: 'Son', phone: '555-0103' },
         { name: 'Mary Doe', relation: 'Daughter', phone: '555-0104' },
     ],
+    medications: [
+      { id: 1, name: 'Aricept', dose: '1 tablet', time: '09:00' },
+      { id: 2, name: 'Namenda', dose: '1 tablet', time: '20:00' },
+    ]
 };
 
 export const familyTree = {

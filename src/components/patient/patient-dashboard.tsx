@@ -3,11 +3,11 @@
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Brain, Pill, Camera, MessageSquare, Calendar, Sun, Moon, Utensils, ArrowRight, Music, PhoneCall, HeartPulse } from "lucide-react";
+import { Brain, Pill, Camera, MessageSquare, Calendar, Sun, Moon, Utensils, ArrowRight, Music, PhoneCall, HeartPulse, PlusCircle, Trash2 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { AiCompanion } from "./ai-companion";
-import { patient, familyTree } from "@/lib/data";
+import { patient as initialPatient, familyTree } from "@/lib/data";
 import { Separator } from "../ui/separator";
 import { Input } from '../ui/input';
 import { useToast } from '@/hooks/use-toast';
@@ -51,6 +51,7 @@ const tools = [
 
 export function PatientDashboard() {
   const [dailyPlan, setDailyPlan] = useState(initialDailyPlan);
+  const [medications, setMedications] = useState(initialPatient.medications);
   const { toast } = useToast();
 
   const handlePlanChange = (index: number, field: 'task' | 'time' | 'notes', value: string) => {
@@ -65,11 +66,32 @@ export function PatientDashboard() {
       description: "Your changes have been successfully saved."
     })
   }
+  
+  const handleMedicationChange = (index: number, field: 'name' | 'dose' | 'time', value: string) => {
+    const updatedMeds = [...medications];
+    updatedMeds[index] = { ...updatedMeds[index], [field]: value };
+    setMedications(updatedMeds);
+  };
+
+  const handleAddMedication = () => {
+    setMedications([...medications, { id: Date.now(), name: '', dose: '', time: '' }]);
+  };
+
+  const handleRemoveMedication = (id: number) => {
+    setMedications(medications.filter(med => med.id !== id));
+  };
+
+  const handleSaveMedications = () => {
+    toast({
+      title: "Medication Plan Saved!",
+      description: "Your medication schedule has been updated."
+    });
+  };
 
   const handleCallHelp = () => {
     // This will attempt to open the phone app on mobile devices
-    if(patient.caregivers[0]?.phone) {
-      window.location.href = `tel:${patient.caregivers[0].phone}`;
+    if(initialPatient.caregivers[0]?.phone) {
+      window.location.href = `tel:${initialPatient.caregivers[0].phone}`;
     }
   };
 
@@ -79,19 +101,19 @@ export function PatientDashboard() {
       <div className="xl:col-span-2 space-y-6">
         <Card className="shadow-lg rounded-2xl">
           <CardHeader>
-            <div className="flex items-center gap-6">
-              <Image src={patient.photo} alt={patient.name} width={80} height={80} className="rounded-full border-4 border-primary" data-ai-hint="person portrait" />
+            <div className="flex flex-col md:flex-row items-center md:items-start text-center md:text-left gap-6">
+              <Image src={initialPatient.photo} alt={initialPatient.name} width={80} height={80} className="rounded-full border-4 border-primary" data-ai-hint="person portrait" />
               <div className="flex-grow">
                 <CardTitle className="text-3xl font-bold">
-                  Hi, {patient.name}!
+                  Hi, {initialPatient.name}!
                 </CardTitle>
                 <CardDescription className="text-lg">This is your personal dashboard.</CardDescription>
+                <div className="pt-4">
+                  <Link href="/patient/profile" passHref>
+                      <Button variant="outline" className="shadow-sm">View Full Profile <ArrowRight className="ml-2 h-4 w-4" /></Button>
+                  </Link>
+                </div>
               </div>
-            </div>
-            <div className="pt-4">
-              <Link href="/patient/profile" passHref>
-                  <Button variant="outline" className="shadow-sm">View Full Profile <ArrowRight className="ml-2 h-4 w-4" /></Button>
-              </Link>
             </div>
           </CardHeader>
         </Card>
@@ -186,20 +208,37 @@ export function PatientDashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-             <div className="flex items-start gap-4 p-4 rounded-xl bg-accent/50">
-                <Pill className="h-8 w-8 text-primary mt-1 shrink-0" />
-                <div>
-                    <p className="font-bold text-lg">Morning Pills</p>
-                    <p className="text-base text-muted-foreground">Take 1 tablet of Aricept at 9:00 AM</p>
+            {medications.map((med, index) => (
+              <div key={med.id} className="p-3 rounded-lg bg-accent/50 space-y-2">
+                <div className="flex gap-2">
+                    <Input
+                      placeholder="Medicine Name"
+                      value={med.name}
+                      onChange={(e) => handleMedicationChange(index, 'name', e.target.value)}
+                      className="bg-background font-semibold"
+                    />
+                    <Button variant="ghost" size="icon" onClick={() => handleRemoveMedication(med.id)}>
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
                 </div>
-            </div>
-             <div className="flex items-start gap-4 p-4 rounded-xl bg-accent/50">
-                <Pill className="h-8 w-8 text-primary mt-1 shrink-0" />
-                <div>
-                    <p className="font-bold text-lg">Evening Pills</p>
-                    <p className="text-base text-muted-foreground">Take 1 tablet of Namenda at 8:00 PM</p>
-                </div>
-            </div>
+                <Input
+                  placeholder="Dosage (e.g., 1 tablet)"
+                  value={med.dose}
+                  onChange={(e) => handleMedicationChange(index, 'dose', e.target.value)}
+                  className="bg-background"
+                />
+                <Input
+                  type="time"
+                  value={med.time}
+                  onChange={(e) => handleMedicationChange(index, 'time', e.target.value)}
+                  className="bg-background"
+                />
+              </div>
+            ))}
+            <Button variant="outline" onClick={handleAddMedication} className="w-full">
+              <PlusCircle className="mr-2 h-4 w-4" /> Add Medication
+            </Button>
+            <Button onClick={handleSaveMedications} className="w-full">Save Medications</Button>
           </CardContent>
         </Card>
 
@@ -226,8 +265,8 @@ export function PatientDashboard() {
               <div className="flex flex-col items-center gap-4">
                   {/* Patient */}
                   <div className="flex flex-col items-center">
-                      <Image src={patient.photo} alt={patient.name} width={100} height={100} className="rounded-full border-4 border-primary shadow-lg" data-ai-hint="person portrait" />
-                      <p className="font-bold mt-2">{patient.name} (Me)</p>
+                      <Image src={initialPatient.photo} alt={initialPatient.name} width={100} height={100} className="rounded-full border-4 border-primary shadow-lg" data-ai-hint="person portrait" />
+                      <p className="font-bold mt-2">{initialPatient.name} (Me)</p>
                   </div>
                   
                   {/* Connection Line */}
