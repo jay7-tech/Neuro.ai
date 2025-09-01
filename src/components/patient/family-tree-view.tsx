@@ -48,7 +48,8 @@ export function FamilyTreeView() {
         if (storedData) {
             dataToSet = JSON.parse(storedData);
         } else {
-            dataToSet = JSON.parse(JSON.stringify(initialFamilyTree)); // Deep copy to prevent mutation
+            // Deep copy to prevent mutation of the initial data object
+            dataToSet = JSON.parse(JSON.stringify(initialFamilyTree)); 
         }
 
         // Ensure all members have a unique ID.
@@ -89,21 +90,19 @@ export function FamilyTreeView() {
 
     const handleSave = (memberToSave: FamilyMember) => {
         let newFamilyTree: FamilyTree;
+        const childIndex = familyTree.children.findIndex(c => c.id === memberToSave.id);
 
-        // Check if it's the spouse
         if (familyTree.spouse.id === memberToSave.id) {
+            // It's the spouse
             newFamilyTree = { ...familyTree, spouse: memberToSave };
+        } else if (childIndex > -1) {
+            // It's an existing child
+            const updatedChildren = [...familyTree.children];
+            updatedChildren[childIndex] = memberToSave;
+            newFamilyTree = { ...familyTree, children: updatedChildren };
         } else {
-             const childIndex = familyTree.children.findIndex(c => c.id === memberToSave.id);
-             if (childIndex > -1) {
-                // Editing an existing child
-                const updatedChildren = [...familyTree.children];
-                updatedChildren[childIndex] = memberToSave;
-                newFamilyTree = { ...familyTree, children: updatedChildren };
-             } else {
-                // Adding a new child
-                newFamilyTree = { ...familyTree, children: [...familyTree.children, memberToSave] };
-             }
+            // It's a new child
+            newFamilyTree = { ...familyTree, children: [...familyTree.children, memberToSave] };
         }
         
         saveFamilyTree(newFamilyTree);
