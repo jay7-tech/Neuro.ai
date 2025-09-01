@@ -1,5 +1,4 @@
 
-
 'use client';
 import { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -244,7 +243,7 @@ function EditFamilyMemberView({ member, onSave, onCancel, onDelete }: { member: 
                      <AlertDialog>
                         <AlertDialogTrigger asChild>
                            {/* Do not show delete for the initial spouse who cannot be deleted from the data structure */}
-                           { member.id > 0 && <Button variant="destructive"><Trash2 className="mr-2 h-4 w-4" /> Delete</Button>}
+                           { familyTree.spouse.id !== member.id && <Button variant="destructive"><Trash2 className="mr-2 h-4 w-4" /> Delete</Button>}
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                             <AlertDialogHeader>
@@ -269,3 +268,5 @@ function EditFamilyMemberView({ member, onSave, onCancel, onDelete }: { member: 
         </Card>
     );
 }
+
+    
