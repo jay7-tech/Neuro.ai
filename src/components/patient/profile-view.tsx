@@ -94,7 +94,7 @@ export function ProfileView() {
                             alt="Patient photo"
                             width={150}
                             height={150}
-                            className="rounded-full border-4 border-primary shadow-lg"
+                            className="rounded-full shadow-lg"
                             data-ai-hint="person portrait"
                         />
                          {isEditing && (
