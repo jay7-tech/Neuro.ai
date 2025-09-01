@@ -2,7 +2,7 @@
 import { AppHeader } from "@/components/app/header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Brain, Palette, Puzzle, Pencil } from "lucide-react";
+import { ArrowLeft, Brain, Palette, Puzzle, Pencil, ListOrdered } from "lucide-react";
 import Link from "next/link";
 
 const games = [
@@ -23,6 +23,12 @@ const games = [
         description: "Unscramble the letters to form a word.",
         href: "/patient/games/word-scramble",
         icon: <Pencil className="h-12 w-12 text-primary" />
+    },
+    {
+        name: "Sequence Memory",
+        description: "Remember and repeat the sequence of numbers.",
+        href: "/patient/games/sequence-memory",
+        icon: <ListOrdered className="h-12 w-12 text-primary" />
     }
 ]
 
