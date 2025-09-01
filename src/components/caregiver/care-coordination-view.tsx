@@ -47,6 +47,7 @@ export function CareCoordinationView() {
 
     const handleSavePlan = () => {
         setIsEditingPlan(false);
+        setPlanBeforeEdit(dailyPlan);
         toast({
             title: "Patient's Plan Saved!",
             description: "The patient's daily plan has been updated successfully."

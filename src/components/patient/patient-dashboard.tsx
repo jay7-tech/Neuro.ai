@@ -75,6 +75,7 @@ export function PatientDashboard() {
 
   const handleSavePlan = () => {
     setIsEditingPlan(false);
+    setPlanBeforeEdit(dailyPlan);
     toast({
       title: "Daily Plan Saved!",
       description: "Your changes have been successfully saved."
