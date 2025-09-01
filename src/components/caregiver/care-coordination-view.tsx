@@ -8,19 +8,34 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { patient as initialPatient } from '@/lib/data';
-import { PlusCircle, Trash2 } from 'lucide-react';
+import { PlusCircle, Trash2, Sun, Moon, Utensils, HeartPulse, Brain } from 'lucide-react';
+
+const initialDailyPlan = [
+  { time: '08:00', task: 'Wake up and get dressed', icon: <Sun className="h-6 w-6 text-primary" />, notes: '' },
+  { time: '09:00', task: 'Eat breakfast & take pills', icon: <Utensils className="h-6 w-6 text-primary" />, notes: '' },
+  { time: '10:00', task: 'Morning walk', icon: <HeartPulse className="h-6 w-6 text-primary" />, notes: 'Remember to wear comfortable shoes.' },
+  { time: '15:00', task: 'Read a book', icon: <Brain className="h-6 w-6 text-primary" />, notes: '' },
+  { time: '20:00', task: 'Prepare for bed', icon: <Moon className="h-6 w-6 text-primary" />, notes: '' },
+];
+
 
 export function CareCoordinationView() {
     const { toast } = useToast();
     const [medications, setMedications] = useState(initialPatient.medications);
+    const [dailyPlan, setDailyPlan] = useState(initialDailyPlan);
 
-    const handleAddTask = () => {
-        toast({ title: "Task Added", description: "The new task has been added to the patient's daily plan." });
-    }
+    const handlePlanChange = (index: number, field: 'task' | 'time' | 'notes', value: string) => {
+        const updatedPlan = [...dailyPlan];
+        updatedPlan[index] = { ...updatedPlan[index], [field]: value };
+        setDailyPlan(updatedPlan);
+    };
 
-    const handleAddPrompt = () => {
-        toast({ title: "Prompt Added", description: "The new memory prompt is now available for the patient." });
-    }
+    const handleSavePlan = () => {
+        toast({
+            title: "Patient's Plan Saved!",
+            description: "The patient's daily plan has been updated successfully."
+        });
+    };
 
     const handleMedicationChange = (index: number, field: 'name' | 'dose' | 'time', value: string) => {
         const updatedMeds = [...medications];
@@ -38,7 +53,7 @@ export function CareCoordinationView() {
 
     const handleSaveMedications = () => {
         toast({
-            title: "Medication Plan Saved!",
+            title: "Patient's Medications Saved!",
             description: "The patient's medication schedule has been updated."
         });
     };
@@ -58,21 +73,41 @@ export function CareCoordinationView() {
                     <Card>
                         <CardHeader>
                             <CardTitle>Manage Daily Planner</CardTitle>
-                            <CardDescription>Add, edit, or remove tasks from the patient's daily schedule.</CardDescription>
+                            <CardDescription>Add, edit, or remove tasks from the patient's daily schedule. Changes will appear in their dashboard.</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            <div className="p-4 border rounded-lg space-y-2">
-                                <h3 className="font-semibold">Add New Task</h3>
-                                <div className="flex flex-col md:flex-row gap-2">
-                                    <Input placeholder="Task description (e.g., Morning walk)" />
-                                    <Input type="time" className="w-auto" />
-                                    <Button onClick={handleAddTask} className="w-full md:w-auto">Add Task</Button>
-                                </div>
-                            </div>
-                            <div>
-                                <h3 className="font-semibold mb-2">Current Schedule</h3>
-                                <p className="text-sm text-muted-foreground">This is where the list of current tasks would be displayed for editing or removal.</p>
-                            </div>
+                            <ul className="space-y-4">
+                                {dailyPlan.map((item, index) => (
+                                    <li key={index} className="flex flex-col gap-3 p-3 rounded-lg bg-secondary/50">
+                                    <div className="flex items-center gap-3">
+                                        {item.icon}
+                                        <div className="flex-grow space-y-1.5">
+                                        <Input
+                                            type="text"
+                                            placeholder="Task description..."
+                                            value={item.task}
+                                            onChange={(e) => handlePlanChange(index, 'task', e.target.value)}
+                                            className="bg-background font-bold text-base h-10"
+                                        />
+                                        <Input
+                                            type="time"
+                                            value={item.time}
+                                            onChange={(e) => handlePlanChange(index, 'time', e.target.value)}
+                                            className="bg-background text-sm text-muted-foreground h-9"
+                                        />
+                                        </div>
+                                    </div>
+                                    <Input
+                                        type="text"
+                                        placeholder="Add a note for the patient..."
+                                        value={item.notes}
+                                        onChange={(e) => handlePlanChange(index, 'notes', e.target.value)}
+                                        className="bg-background text-sm"
+                                    />
+                                    </li>
+                                ))}
+                            </ul>
+                            <Button onClick={handleSavePlan} className="w-full mt-4">Save Patient's Plan</Button>
                         </CardContent>
                     </Card>
                 </TabsContent>
@@ -80,22 +115,10 @@ export function CareCoordinationView() {
                     <Card>
                         <CardHeader>
                             <CardTitle>Manage Memory Prompts</CardTitle>
-                            <CardDescription>Add photos and stories to help with memory recall.</CardDescription>
+                            <CardDescription>This feature is not yet implemented.</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            <div className="p-4 border rounded-lg space-y-2">
-                                <h3 className="font-semibold">Add New Prompt</h3>
-                                 <div className="flex flex-col gap-2">
-                                    <Input placeholder="Image URL (e.g., from https://picsum.photos)" />
-                                    <Textarea placeholder="Story behind the photo..." />
-                                    <Textarea placeholder="Prompt question (e.g., What do you remember about this day?)" />
-                                    <Button onClick={handleAddPrompt} className="self-start">Add Prompt</Button>
-                                </div>
-                            </div>
-                             <div>
-                                <h3 className="font-semibold mb-2">Current Prompts</h3>
-                                <p className="text-sm text-muted-foreground">This is where existing memory prompts would be listed.</p>
-                            </div>
+                           <p className="text-sm text-muted-foreground">The ability to add and manage memory prompts from the caregiver dashboard is coming soon.</p>
                         </CardContent>
                     </Card>
                 </TabsContent>
