@@ -38,38 +38,55 @@ const FAMILY_TREE_STORAGE_KEY = 'neuro-ai-family-tree';
 
 export function FamilyTreeView() {
     const { toast } = useToast();
-    const [familyTree, setFamilyTree] = useState<FamilyTree>(initialFamilyTree);
+    const [familyTree, setFamilyTree] = useState<FamilyTree>(() => {
+        // Deep copy to prevent mutation of the initial data object
+        const initialData = JSON.parse(JSON.stringify(initialFamilyTree));
+        initialData.spouse.id = initialData.spouse.id || Date.now();
+        initialData.children.forEach((child: FamilyMember, index: number) => {
+            child.id = child.id || Date.now() + index + 1;
+        });
+        return initialData;
+    });
     const [editingMember, setEditingMember] = useState<FamilyMember | null>(null);
 
     useEffect(() => {
         const storedData = localStorage.getItem(FAMILY_TREE_STORAGE_KEY);
-        let dataToSet: FamilyTree;
-        
         if (storedData) {
-            dataToSet = JSON.parse(storedData);
-        } else {
-            // Deep copy to prevent mutation of the initial data object
-            dataToSet = JSON.parse(JSON.stringify(initialFamilyTree)); 
+            try {
+                const dataToSet: FamilyTree = JSON.parse(storedData);
+                let dataWasModified = false;
+                
+                // Ensure spouse has a unique ID.
+                if (!dataToSet.spouse.id) {
+                    dataToSet.spouse.id = Date.now();
+                    dataWasModified = true;
+                }
+                
+                // Ensure all children have unique IDs.
+                const existingIds = new Set<number>();
+                existingIds.add(dataToSet.spouse.id);
+
+                dataToSet.children = dataToSet.children.map((child, index) => {
+                    if (!child.id || existingIds.has(child.id)) {
+                        child.id = Date.now() + index + 1; // Assign a new unique ID
+                        dataWasModified = true;
+                    }
+                    existingIds.add(child.id);
+                    return child;
+                });
+                
+                setFamilyTree(dataToSet);
+
+                // Persist the validated tree back to local storage if it was modified
+                if (dataWasModified) {
+                    localStorage.setItem(FAMILY_TREE_STORAGE_KEY, JSON.stringify(dataToSet));
+                }
+            } catch (error) {
+                console.error("Failed to parse family tree from local storage", error);
+                // Fallback to initial data if parsing fails
+                setFamilyTree(JSON.parse(JSON.stringify(initialFamilyTree)));
+            }
         }
-
-        // Ensure all members have a unique ID.
-        const spouseWithId = { ...dataToSet.spouse, id: dataToSet.spouse.id || Date.now() };
-        const childrenWithIds = dataToSet.children.map((child, index) => ({
-            ...child,
-            id: child.id || Date.now() + index + 1,
-        }));
-
-        const validatedFamilyTree = {
-            spouse: spouseWithId,
-            children: childrenWithIds,
-        };
-        
-        setFamilyTree(validatedFamilyTree);
-        // Persist the validated tree back to local storage if it was loaded from initial data
-        if (!storedData) {
-             localStorage.setItem(FAMILY_TREE_STORAGE_KEY, JSON.stringify(validatedFamilyTree));
-        }
-
     }, []);
 
     const saveFamilyTree = (newFamilyTree: FamilyTree) => {
@@ -95,14 +112,14 @@ export function FamilyTreeView() {
             newFamilyTree = { ...familyTree, spouse: memberToSave };
         } else {
             const childIndex = familyTree.children.findIndex(c => c.id === memberToSave.id);
+            const updatedChildren = [...familyTree.children];
             // Check if we are editing an existing child
             if (childIndex > -1) {
-                const updatedChildren = [...familyTree.children];
                 updatedChildren[childIndex] = memberToSave;
                 newFamilyTree = { ...familyTree, children: updatedChildren };
             } else {
                 // Otherwise, it's a new child
-                newFamilyTree = { ...familyTree, children: [...familyTree.children, memberToSave] };
+                newFamilyTree = { ...familyTree, children: [...updatedChildren, memberToSave] };
             }
         }
         
