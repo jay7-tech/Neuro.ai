@@ -1,4 +1,5 @@
 
+
 'use client';
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
@@ -41,13 +42,12 @@ export function CareCoordinationView() {
     };
 
     const handleEditPlan = () => {
-        setPlanBeforeEdit(JSON.parse(JSON.stringify(dailyPlan)));
+        setPlanBeforeEdit(dailyPlan.map(p => ({...p})));
         setIsEditingPlan(true);
     };
 
     const handleSavePlan = () => {
         setIsEditingPlan(false);
-        setPlanBeforeEdit(dailyPlan);
         toast({
             title: "Patient's Plan Saved!",
             description: "The patient's daily plan has been updated successfully."
@@ -74,7 +74,7 @@ export function CareCoordinationView() {
     };
 
     const handleEditMeds = () => {
-        setMedsBeforeEdit(JSON.parse(JSON.stringify(medications)));
+        setMedsBeforeEdit(medications.map(m => ({...m})));
         setIsEditingMeds(true);
     }
 

@@ -69,13 +69,12 @@ export function PatientDashboard() {
   };
 
   const handleEditPlan = () => {
-    setPlanBeforeEdit(JSON.parse(JSON.stringify(dailyPlan)));
+    setPlanBeforeEdit(dailyPlan.map(p => ({...p})));
     setIsEditingPlan(true);
   }
 
   const handleSavePlan = () => {
     setIsEditingPlan(false);
-    setPlanBeforeEdit(dailyPlan);
     toast({
       title: "Daily Plan Saved!",
       description: "Your changes have been successfully saved."
@@ -102,7 +101,7 @@ export function PatientDashboard() {
   };
   
   const handleEditMeds = () => {
-    setMedsBeforeEdit(JSON.parse(JSON.stringify(medications)));
+    setMedsBeforeEdit(medications.map(m => ({...m})));
     setIsEditingMeds(true);
   }
 
