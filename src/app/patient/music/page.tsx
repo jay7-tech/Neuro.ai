@@ -1,3 +1,4 @@
+
 import { AppHeader } from "@/components/app/header";
 import { MusicTherapy } from "@/components/patient/music-therapy";
 import { Button } from "@/components/ui/button";
@@ -19,3 +20,5 @@ export default function MusicPage() {
         </div>
     )
 }
+
+    

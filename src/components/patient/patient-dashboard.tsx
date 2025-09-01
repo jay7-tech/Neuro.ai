@@ -4,7 +4,7 @@
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Brain, Pill, Camera, MessageSquare, Calendar, Sun, Moon, Utensils, ArrowRight, Music, PhoneCall, HeartPulse, PlusCircle, Trash2, Album, Edit, Save, X, MapPin, Users } from "lucide-react";
+import { Brain, Pill, Camera, MessageSquare, Calendar, Sun, Moon, Utensils, ArrowRight, Music, PhoneCall, HeartPulse, PlusCircle, Trash2, Album, Edit, Save, X, MapPin, Users, Palette, Puzzle, Pencil, ListOrdered } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { AiCompanion } from "./ai-companion";
@@ -21,36 +21,36 @@ const initialDailyPlan = [
 ];
 
 const tools = [
-  {
+    {
     name: "Cognitive Games",
     href: "/patient/games",
     icon: <Brain className="h-8 w-8 text-primary" />,
-  },
-  {
-    name: "Identify Medicine",
-    href: "/patient/med-identifier",
-    icon: <Camera className="h-8 w-8 text-primary" />,
-  },
-  {
-    name: "Music Therapy",
-    href: "/patient/music",
-    icon: <Music className="h-8 w-8 text-primary" />,
-  },
-  {
-    name: "Gentle Exercises",
-    href: "/patient/exercise",
-    icon: <HeartPulse className="h-8 w-8 text-primary" />,
-  },
-  {
-    name: "Memory Lane",
-    href: "/patient/memory-lane",
-    icon: <Album className="h-8 w-8 text-primary" />,
-  },
-  {
-    name: "Family Tree",
-    href: "/patient/family-tree",
-    icon: <Users className="h-8 w-8 text-primary" />,
-  }
+    },
+    {
+        name: "Identify Medicine",
+        href: "/patient/med-identifier",
+        icon: <Camera className="h-8 w-8 text-primary" />,
+    },
+    {
+        name: "Music Therapy",
+        href: "/patient/music",
+        icon: <Music className="h-8 w-8 text-primary" />,
+    },
+    {
+        name: "Gentle Exercises",
+        href: "/patient/exercise",
+        icon: <HeartPulse className="h-8 w-8 text-primary" />,
+    },
+    {
+        name: "Memory Lane",
+        href: "/patient/memory-lane",
+        icon: <Album className="h-8 w-8 text-primary" />,
+    },
+    {
+        name: "Family Tree",
+        href: "/patient/family-tree",
+        icon: <Users className="h-8 w-8 text-primary" />,
+    }
 ]
 
 export function PatientDashboard() {
@@ -74,7 +74,7 @@ export function PatientDashboard() {
   };
 
   const handleEditPlan = () => {
-    setPlanBeforeEdit(dailyPlan.map(p => ({...p})));
+    setPlanBeforeEdit(dailyPlan.map(p => ({...p, icon: p.icon})));
     setIsEditingPlan(true);
   }
 
@@ -337,3 +337,5 @@ export function PatientDashboard() {
     </div>
   );
 }
+
+    
