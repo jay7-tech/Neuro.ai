@@ -139,18 +139,18 @@ export function PatientDashboard() {
   };
 
   return (
-    <div className="p-4 md:p-8 grid grid-cols-1 xl:grid-cols-3 gap-6 items-start">
+    <div className="p-4 md:p-8 grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
       {/* Main Content Column */}
-      <div className="xl:col-span-2 space-y-6">
-        <Card className="shadow-lg rounded-2xl">
+      <div className="lg:col-span-2 space-y-8">
+        <Card className="shadow-xl rounded-2xl">
           <CardHeader>
             <div className="flex flex-col md:flex-row items-center md:items-start text-center md:text-left gap-6">
-              <Image src={patientData.photo} alt={patientData.name} width={80} height={80} className="rounded-full border-4 border-primary" data-ai-hint="person portrait" />
+              <Image src={patientData.photo} alt={patientData.name} width={100} height={100} className="rounded-full shadow-md" data-ai-hint="person portrait" />
               <div className="flex-grow">
-                <CardTitle className="text-3xl font-bold">
+                <CardTitle className="text-4xl font-bold font-headline">
                   Hi, {patientData.name}!
                 </CardTitle>
-                <CardDescription className="text-lg">This is your personal dashboard.</CardDescription>
+                <CardDescription className="text-lg text-muted-foreground">Welcome back. Here is your dashboard for today.</CardDescription>
                 <div className="pt-4">
                   <Link href="/patient/profile" passHref>
                       <Button variant="outline" className="shadow-sm">View Full Profile <ArrowRight className="ml-2 h-4 w-4" /></Button>
@@ -161,9 +161,10 @@ export function PatientDashboard() {
           </CardHeader>
         </Card>
 
-        <Card className="shadow-lg rounded-2xl">
+        <Card className="shadow-xl rounded-2xl">
           <CardHeader>
             <CardTitle className="text-2xl">Tools to Help</CardTitle>
+             <CardDescription>Click on a tool to get started.</CardDescription>
           </CardHeader>
           <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {tools.map((tool) => (
@@ -177,12 +178,12 @@ export function PatientDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="shadow-lg rounded-2xl">
+        <Card className="shadow-xl rounded-2xl">
             <CardHeader>
                 <CardTitle className="text-2xl flex items-center gap-2">
                     <MessageSquare /> AI Companion
                 </CardTitle>
-                <CardDescription>Have a question? Ask me anything!</CardDescription>
+                <CardDescription>Have a question? Ask your AI companion.</CardDescription>
             </CardHeader>
             <CardContent>
                 <AiCompanion />
@@ -191,8 +192,8 @@ export function PatientDashboard() {
       </div>
 
       {/* Right Sidebar Column */}
-      <div className="xl:col-span-1 space-y-6">
-        <Card className="shadow-lg rounded-2xl border-destructive/50">
+      <div className="lg:col-span-1 space-y-8">
+        <Card className="shadow-xl rounded-2xl border-destructive/50">
             <CardContent className="p-4">
                 <Button variant="destructive" size="lg" className="w-full h-24 text-2xl rounded-xl shadow-lg" onClick={handleCallHelp}>
                     <PhoneCall className="mr-4 h-10 w-10" />
@@ -201,7 +202,7 @@ export function PatientDashboard() {
             </CardContent>
         </Card>
 
-        <Card className="shadow-lg rounded-2xl">
+        <Card className="shadow-xl rounded-2xl">
           <CardHeader className="flex-row items-center justify-between">
             <div>
               <CardTitle className="text-2xl flex items-center gap-2">
@@ -271,7 +272,7 @@ export function PatientDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="shadow-lg rounded-2xl">
+        <Card className="shadow-xl rounded-2xl">
           <CardHeader className="flex-row items-center justify-between">
             <div className="space-y-1">
                 <CardTitle className="text-2xl flex items-center gap-2">
@@ -346,6 +347,3 @@ export function PatientDashboard() {
     </div>
   );
 }
-
-    
-    
