@@ -87,8 +87,24 @@ function loadAndValidateFamilyTree(): FamilyTree {
 
 export function FamilyTreeView() {
     const { toast } = useToast();
-    const [familyTree, setFamilyTree] = useState<FamilyTree>(loadAndValidateFamilyTree);
+    const [familyTree, setFamilyTree] = useState<FamilyTree>(initialFamilyTree);
     const [editingMember, setEditingMember] = useState<FamilyMember | null>(null);
+
+    useEffect(() => {
+        // This effect runs only on the client, after hydration.
+        const storedData = localStorage.getItem(FAMILY_TREE_STORAGE_KEY);
+        if (storedData) {
+            try {
+                const parsedData = JSON.parse(storedData);
+                // Simple validation to ensure it's not malformed
+                if (parsedData.spouse && Array.isArray(parsedData.children)) {
+                     setFamilyTree(parsedData);
+                }
+            } catch (e) {
+                console.error("Could not parse family tree from local storage", e);
+            }
+        }
+    }, []);
 
     const saveFamilyTree = (newFamilyTree: FamilyTree) => {
         setFamilyTree(newFamilyTree);
@@ -108,20 +124,20 @@ export function FamilyTreeView() {
 
     const handleSave = (memberToSave: FamilyMember) => {
         let newFamilyTree;
-        // Check if we are editing the spouse
-        if (familyTree.spouse.id === memberToSave.id) {
-            newFamilyTree = { ...familyTree, spouse: memberToSave };
-        } else {
-            const childIndex = familyTree.children.findIndex(c => c.id === memberToSave.id);
-            const updatedChildren = [...familyTree.children];
+        // Check if it's a new member by seeing if the ID exists in children or spouse
+        const isSpouse = familyTree.spouse.id === memberToSave.id;
+        const childIndex = familyTree.children.findIndex(c => c.id === memberToSave.id);
+        const isExistingChild = childIndex > -1;
 
-            // Check if we are editing an existing child
-            if (childIndex > -1) {
-                updatedChildren[childIndex] = memberToSave;
-            } else {
-                // Otherwise, it's a new child
-                updatedChildren.push(memberToSave);
-            }
+        if (isSpouse) {
+            newFamilyTree = { ...familyTree, spouse: memberToSave };
+        } else if (isExistingChild) {
+            const updatedChildren = [...familyTree.children];
+            updatedChildren[childIndex] = memberToSave;
+            newFamilyTree = { ...familyTree, children: updatedChildren };
+        } else {
+            // It's a new child
+            const updatedChildren = [...familyTree.children, memberToSave];
             newFamilyTree = { ...familyTree, children: updatedChildren };
         }
         
