@@ -63,7 +63,7 @@ function loadAndValidateFamilyTree(): FamilyTree {
     existingIds.add(familyData.spouse.id);
 
     // Ensure children array exists and all children have unique IDs.
-    if (!familyData.children) {
+    if (!Array.isArray(familyData.children)) {
         familyData.children = [];
         dataWasModified = true;
     }
@@ -72,7 +72,9 @@ function loadAndValidateFamilyTree(): FamilyTree {
         if (!child || typeof child.id !== 'number' || existingIds.has(child.id)) {
             dataWasModified = true;
             const newId = Date.now() + index + 1;
-            const newChildData = child ? { ...child, id: newId } : { ...initialFamilyTree.children[index], id: newId };
+            // Use initial data as a fallback if the stored child is malformed
+            const fallbackChild = initialFamilyTree.children[index] || { name: '', relation: '', photo: '', quote: ''};
+            const newChildData = child ? { ...child, id: newId } : { ...fallbackChild, id: newId };
             existingIds.add(newId);
             return newChildData;
         }
@@ -115,20 +117,23 @@ export function FamilyTreeView() {
 
     const handleSave = (memberToSave: FamilyMember) => {
         let newFamilyTree;
-        const isSpouse = familyTree.spouse.id === memberToSave.id;
-        const childIndex = familyTree.children.findIndex(c => c.id === memberToSave.id);
-
-        if (isSpouse) {
+        // Check if we are editing the spouse
+        if (familyTree.spouse.id === memberToSave.id) {
             newFamilyTree = { ...familyTree, spouse: memberToSave };
-        } else if (childIndex > -1) {
-            const updatedChildren = [...familyTree.children];
-            updatedChildren[childIndex] = memberToSave;
-            newFamilyTree = { ...familyTree, children: updatedChildren };
         } else {
-             newFamilyTree = { 
-                ...familyTree, 
-                children: [...familyTree.children, memberToSave] 
-            };
+            const childIndex = familyTree.children.findIndex(c => c.id === memberToSave.id);
+            // Check if we are editing an existing child
+            if (childIndex > -1) {
+                const updatedChildren = [...familyTree.children];
+                updatedChildren[childIndex] = memberToSave;
+                newFamilyTree = { ...familyTree, children: updatedChildren };
+            } else {
+                // Otherwise, we are adding a new child
+                newFamilyTree = { 
+                    ...familyTree, 
+                    children: [...familyTree.children, memberToSave] 
+                };
+            }
         }
         
         saveFamilyTree(newFamilyTree);
@@ -137,11 +142,17 @@ export function FamilyTreeView() {
     };
 
     const handleDelete = (id: number) => {
+        // Prevent deleting the spouse
+        if (familyTree.spouse.id === id) {
+            toast({ title: "Cannot Delete Spouse", description: "This member cannot be deleted.", variant: "destructive" });
+            return;
+        }
         const newFamilyTree = {
             ...familyTree,
             children: familyTree.children.filter(c => c.id !== id)
         };
         saveFamilyTree(newFamilyTree);
+        setEditingMember(null); // Close the edit view after deletion
         toast({ title: "Family Member Deleted", variant: "destructive" });
     };
 
@@ -153,7 +164,7 @@ export function FamilyTreeView() {
             onSave={handleSave} 
             onCancel={() => setEditingMember(null)} 
             onDelete={handleDelete}
-            familyTree={familyTree}
+            isSpouse={familyTree.spouse.id === editingMember.id}
         />;
     }
 
@@ -222,7 +233,7 @@ export function FamilyTreeView() {
     )
 }
 
-function EditFamilyMemberView({ member, onSave, onCancel, onDelete, familyTree }: { member: FamilyMember, onSave: (member: FamilyMember) => void, onCancel: () => void, onDelete: (id: number) => void, familyTree: FamilyTree }) {
+function EditFamilyMemberView({ member, onSave, onCancel, onDelete, isSpouse }: { member: FamilyMember, onSave: (member: FamilyMember) => void, onCancel: () => void, onDelete: (id: number) => void, isSpouse: boolean }) {
     const [currentMember, setCurrentMember] = useState(member);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -283,7 +294,7 @@ function EditFamilyMemberView({ member, onSave, onCancel, onDelete, familyTree }
                 <div className="flex justify-between pt-4">
                      <AlertDialog>
                         <AlertDialogTrigger asChild>
-                           { familyTree.spouse.id !== member.id && <Button variant="destructive"><Trash2 className="mr-2 h-4 w-4" /> Delete</Button>}
+                           { !isSpouse && <Button variant="destructive"><Trash2 className="mr-2 h-4 w-4" /> Delete</Button>}
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                             <AlertDialogHeader>
