@@ -38,41 +38,42 @@ const FAMILY_TREE_STORAGE_KEY = 'neuro-ai-family-tree';
 
 
 function loadAndValidateFamilyTree(): FamilyTree {
-    let dataToSet: FamilyTree;
+    let familyData: FamilyTree;
     const storedData = typeof window !== 'undefined' ? localStorage.getItem(FAMILY_TREE_STORAGE_KEY) : null;
 
     if (storedData) {
         try {
-            dataToSet = JSON.parse(storedData);
+            familyData = JSON.parse(storedData);
         } catch (error) {
             console.error("Failed to parse family tree from local storage, using initial data.", error);
-            dataToSet = JSON.parse(JSON.stringify(initialFamilyTree));
+            familyData = JSON.parse(JSON.stringify(initialFamilyTree)); // Deep copy
         }
     } else {
-        dataToSet = JSON.parse(JSON.stringify(initialFamilyTree));
+        familyData = JSON.parse(JSON.stringify(initialFamilyTree)); // Deep copy
     }
-    
+
     let dataWasModified = false;
     const existingIds = new Set<number>();
 
     // Ensure spouse has a unique ID.
-    if (!dataToSet.spouse || !dataToSet.spouse.id || existingIds.has(dataToSet.spouse.id)) {
-        dataToSet.spouse = { ...initialFamilyTree.spouse, id: Date.now() };
+    if (!familyData.spouse || !familyData.spouse.id || existingIds.has(familyData.spouse.id)) {
+        familyData.spouse = { ...initialFamilyTree.spouse, id: Date.now() };
         dataWasModified = true;
     }
-    existingIds.add(dataToSet.spouse.id);
+    existingIds.add(familyData.spouse.id);
 
     // Ensure children array exists and all children have unique IDs.
-    if (!dataToSet.children) {
-        dataToSet.children = [];
+    if (!familyData.children) {
+        familyData.children = [];
         dataWasModified = true;
     }
 
-    dataToSet.children = dataToSet.children.map((child, index) => {
-        if (!child || !child.id || existingIds.has(child.id)) {
+    familyData.children = familyData.children.map((child, index) => {
+        if (!child || typeof child.id !== 'number' || existingIds.has(child.id)) {
             dataWasModified = true;
-            const newChild = { ...child, id: Date.now() + index + 1 };
-            existingIds.add(newChild.id);
+            const newId = Date.now() + index + 1;
+            const newChild = { ...child, id: newId };
+            existingIds.add(newId);
             return newChild;
         }
         existingIds.add(child.id);
@@ -80,10 +81,10 @@ function loadAndValidateFamilyTree(): FamilyTree {
     });
 
     if (dataWasModified && typeof window !== 'undefined') {
-        localStorage.setItem(FAMILY_TREE_STORAGE_KEY, JSON.stringify(dataToSet));
+        localStorage.setItem(FAMILY_TREE_STORAGE_KEY, JSON.stringify(familyData));
     }
     
-    return dataToSet;
+    return familyData;
 }
 
 
@@ -93,8 +94,7 @@ export function FamilyTreeView() {
     const [editingMember, setEditingMember] = useState<FamilyMember | null>(null);
 
     useEffect(() => {
-        const validFamilyTree = loadAndValidateFamilyTree();
-        setFamilyTree(validFamilyTree);
+        setFamilyTree(loadAndValidateFamilyTree());
     }, []);
 
     const saveFamilyTree = (newFamilyTree: FamilyTree) => {
@@ -115,9 +115,10 @@ export function FamilyTreeView() {
 
     const handleSave = (memberToSave: FamilyMember) => {
         let newFamilyTree;
+        const isSpouse = familyTree.spouse.id === memberToSave.id;
         const childIndex = familyTree.children.findIndex(c => c.id === memberToSave.id);
 
-        if (familyTree.spouse.id === memberToSave.id) {
+        if (isSpouse) {
             newFamilyTree = { ...familyTree, spouse: memberToSave };
         } else if (childIndex > -1) {
             const updatedChildren = [...familyTree.children];
@@ -307,5 +308,3 @@ function EditFamilyMemberView({ member, onSave, onCancel, onDelete, familyTree }
         </Card>
     );
 }
-
-    
