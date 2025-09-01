@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -44,10 +44,26 @@ type Memory = {
     hint: string;
 };
 
+const MEMORIES_STORAGE_KEY = 'neuro-ai-memories';
+
 export function MemoryLaneView() {
     const { toast } = useToast();
     const [memories, setMemories] = useState<Memory[]>(initialMemories);
     const [editingMemory, setEditingMemory] = useState<Memory | null>(null);
+
+     useEffect(() => {
+        const storedData = localStorage.getItem(MEMORIES_STORAGE_KEY);
+        if (storedData) {
+            setMemories(JSON.parse(storedData));
+        } else {
+            setMemories(initialMemories);
+        }
+    }, []);
+
+    const saveMemories = (newMemories: Memory[]) => {
+        setMemories(newMemories);
+        localStorage.setItem(MEMORIES_STORAGE_KEY, JSON.stringify(newMemories));
+    }
 
     const handleAddNew = () => {
         const newMemory: Memory = {
@@ -61,19 +77,21 @@ export function MemoryLaneView() {
 
     const handleSave = (memoryToSave: Memory) => {
         const index = memories.findIndex(m => m.id === memoryToSave.id);
+        let newMemories;
         if (index > -1) {
-            const updatedMemories = [...memories];
-            updatedMemories[index] = memoryToSave;
-            setMemories(updatedMemories);
+            newMemories = [...memories];
+            newMemories[index] = memoryToSave;
         } else {
-            setMemories([memoryToSave, ...memories]);
+            newMemories = [memoryToSave, ...memories];
         }
+        saveMemories(newMemories);
         setEditingMemory(null);
         toast({ title: "Memory Saved!", description: "Your precious memory has been saved." });
     };
 
     const handleDelete = (id: number) => {
-        setMemories(memories.filter(m => m.id !== id));
+        const newMemories = memories.filter(m => m.id !== id);
+        saveMemories(newMemories);
         toast({ title: "Memory Deleted", description: "The memory has been removed from your album.", variant: "destructive" });
     };
 
@@ -171,7 +189,7 @@ function EditMemoryView({ memory, onSave, onCancel }: { memory: Memory, onSave: 
                     <Image src={currentMemory.image} alt="Memory" width={600} height={400} className="w-full h-full object-cover" />
                 </div>
                 <Input type="file" accept="image/*" className="hidden" ref={fileInputRef} onChange={handleFileChange} />
-                <Button variant="outline" className="w-full" onClick={() => fileInput_Ref.current?.click()}>
+                <Button variant="outline" className="w-full" onClick={() => fileInputRef.current?.click()}>
                     <Upload className="mr-2 h-4 w-4" /> Change Photo
                 </Button>
                 <div>

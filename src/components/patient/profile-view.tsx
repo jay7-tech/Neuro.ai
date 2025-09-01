@@ -4,7 +4,7 @@
 import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { User, Users, MapPin, Droplets, Calendar, Stethoscope, Phone, Settings, Shield, Bell, Languages, Baseline, Pencil, Save, Upload } from 'lucide-react';
+import { User, Users, MapPin, Droplets, Calendar, Stethoscope, Phone, Settings, Shield, Bell, Languages, Baseline, Pencil, Save, Upload, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { patient as initialPatient } from '@/lib/data';
 import { useState, useEffect, useRef } from 'react';
@@ -16,6 +16,7 @@ import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 
+const PATIENT_STORAGE_KEY = 'neuro-ai-patient-data';
 
 export function ProfileView() {
     const { toast } = useToast();
@@ -26,6 +27,13 @@ export function ProfileView() {
     const [language, setLanguage] = useState('en');
     const [textSize, setTextSize] = useState(16);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+     useEffect(() => {
+        const storedData = localStorage.getItem(PATIENT_STORAGE_KEY);
+        if (storedData) {
+            setPatient(JSON.parse(storedData));
+        }
+    }, []);
 
     useEffect(() => {
         const root = window.document.documentElement;
@@ -58,6 +66,7 @@ export function ProfileView() {
 
 
     const handleSave = () => {
+        localStorage.setItem(PATIENT_STORAGE_KEY, JSON.stringify(patient));
         setIsEditing(false);
         toast({
             title: "Profile Saved",
@@ -66,7 +75,12 @@ export function ProfileView() {
     }
 
     const handleCancel = () => {
-        setPatient(initialPatient);
+        const storedData = localStorage.getItem(PATIENT_STORAGE_KEY);
+        if (storedData) {
+            setPatient(JSON.parse(storedData));
+        } else {
+            setPatient(initialPatient);
+        }
         setIsEditing(false);
     }
 
@@ -100,7 +114,7 @@ export function ProfileView() {
                         {isEditing ? (
                             <div className="flex gap-2">
                                 <Button onClick={handleSave}><Save className="mr-2 h-4 w-4" /> Save</Button>
-                                <Button onClick={handleCancel} variant="outline">Cancel</Button>
+                                <Button onClick={handleCancel} variant="outline"><X className="mr-2 h-4 w-4"/>Cancel</Button>
                             </div>
                         ) : (
                             <Button onClick={() => setIsEditing(true)}><Pencil className="mr-2 h-4 w-4" /> Edit Profile</Button>

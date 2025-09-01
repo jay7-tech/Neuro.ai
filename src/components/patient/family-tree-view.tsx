@@ -1,6 +1,6 @@
 
 'use client';
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { familyTree as initialFamilyTree } from "@/lib/data";
 import { Users, Heart, PlusCircle, Edit, Save, X, Trash2, Upload } from "lucide-react";
@@ -34,18 +34,32 @@ type FamilyTree = {
     children: FamilyMember[];
 };
 
+const FAMILY_TREE_STORAGE_KEY = 'neuro-ai-family-tree';
+
 export function FamilyTreeView() {
     const { toast } = useToast();
-    const [familyTree, setFamilyTree] = useState<FamilyTree>(() => {
-        // Add unique IDs to initial data
-        let idCounter = 0;
-        return {
-            spouse: { ...initialFamilyTree.spouse, id: idCounter++ },
-            children: initialFamilyTree.children.map(child => ({ ...child, id: idCounter++ }))
-        };
-    });
-
+    const [familyTree, setFamilyTree] = useState<FamilyTree>(initialFamilyTree);
     const [editingMember, setEditingMember] = useState<FamilyMember | null>(null);
+
+    useEffect(() => {
+        const storedData = localStorage.getItem(FAMILY_TREE_STORAGE_KEY);
+        if (storedData) {
+            setFamilyTree(JSON.parse(storedData));
+        } else {
+             // Add unique IDs to initial data if no stored data
+            let idCounter = 0;
+            const initialDataWithIds = {
+                spouse: { ...initialFamilyTree.spouse, id: idCounter++ },
+                children: initialFamilyTree.children.map(child => ({ ...child, id: idCounter++ }))
+            };
+            setFamilyTree(initialDataWithIds);
+        }
+    }, []);
+
+    const saveFamilyTree = (newFamilyTree: FamilyTree) => {
+        setFamilyTree(newFamilyTree);
+        localStorage.setItem(FAMILY_TREE_STORAGE_KEY, JSON.stringify(newFamilyTree));
+    };
 
     const handleAddNew = () => {
         const newMember: FamilyMember = {
@@ -60,34 +74,35 @@ export function FamilyTreeView() {
 
     const handleSave = (memberToSave: FamilyMember) => {
         let isNew = true;
-        
+        let newFamilyTree: FamilyTree;
+
         // Check if it's the spouse
         if (familyTree.spouse.id === memberToSave.id) {
-            setFamilyTree(prev => ({ ...prev, spouse: memberToSave }));
+            newFamilyTree = { ...familyTree, spouse: memberToSave };
             isNew = false;
         } else {
              const childIndex = familyTree.children.findIndex(c => c.id === memberToSave.id);
              if (childIndex > -1) {
                 const updatedChildren = [...familyTree.children];
                 updatedChildren[childIndex] = memberToSave;
-                setFamilyTree(prev => ({ ...prev, children: updatedChildren }));
+                newFamilyTree = { ...familyTree, children: updatedChildren };
                 isNew = false;
+             } else {
+                newFamilyTree = { ...familyTree, children: [...familyTree.children, memberToSave] };
              }
         }
-
-        if (isNew) {
-            setFamilyTree(prev => ({ ...prev, children: [...prev.children, memberToSave] }));
-        }
-
+        
+        saveFamilyTree(newFamilyTree);
         setEditingMember(null);
         toast({ title: "Family Member Saved!", description: "Your changes have been saved." });
     };
 
     const handleDelete = (id: number) => {
-        setFamilyTree(prev => ({
-            ...prev,
-            children: prev.children.filter(c => c.id !== id)
-        }));
+        const newFamilyTree = {
+            ...familyTree,
+            children: familyTree.children.filter(c => c.id !== id)
+        };
+        saveFamilyTree(newFamilyTree);
         toast({ title: "Family Member Deleted", variant: "destructive" });
     };
 
