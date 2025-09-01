@@ -89,20 +89,21 @@ export function FamilyTreeView() {
     };
 
     const handleSave = (memberToSave: FamilyMember) => {
-        let newFamilyTree: FamilyTree;
-        const childIndex = familyTree.children.findIndex(c => c.id === memberToSave.id);
-
+        let newFamilyTree;
+        // Check if we are editing the spouse
         if (familyTree.spouse.id === memberToSave.id) {
-            // It's the spouse
             newFamilyTree = { ...familyTree, spouse: memberToSave };
-        } else if (childIndex > -1) {
-            // It's an existing child
-            const updatedChildren = [...familyTree.children];
-            updatedChildren[childIndex] = memberToSave;
-            newFamilyTree = { ...familyTree, children: updatedChildren };
         } else {
-            // It's a new child
-            newFamilyTree = { ...familyTree, children: [...familyTree.children, memberToSave] };
+            const childIndex = familyTree.children.findIndex(c => c.id === memberToSave.id);
+            // Check if we are editing an existing child
+            if (childIndex > -1) {
+                const updatedChildren = [...familyTree.children];
+                updatedChildren[childIndex] = memberToSave;
+                newFamilyTree = { ...familyTree, children: updatedChildren };
+            } else {
+                // Otherwise, it's a new child
+                newFamilyTree = { ...familyTree, children: [...familyTree.children, memberToSave] };
+            }
         }
         
         saveFamilyTree(newFamilyTree);
