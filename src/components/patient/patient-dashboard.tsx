@@ -1,7 +1,6 @@
 
-
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Brain, Pill, Camera, MessageSquare, Calendar, Sun, Moon, Utensils, ArrowRight, Music, PhoneCall, HeartPulse, PlusCircle, Trash2, Album, Edit, Save, X, MapPin, Users, Palette, Puzzle, Pencil, ListOrdered } from "lucide-react";
@@ -11,6 +10,8 @@ import { AiCompanion } from "./ai-companion";
 import { patient as initialPatient } from "@/lib/data";
 import { Input } from '../ui/input';
 import { useToast } from '@/hooks/use-toast';
+
+const PATIENT_STORAGE_KEY = 'neuro-ai-patient-data';
 
 const initialDailyPlan = [
   { id: 1, time: '08:00', task: 'Wake up and get dressed', icon: <Sun className="h-6 w-6 text-primary" />, notes: '' },
@@ -54,6 +55,7 @@ const tools = [
 ]
 
 export function PatientDashboard() {
+  const [patientData, setPatientData] = useState(initialPatient);
   const [dailyPlan, setDailyPlan] = useState(initialDailyPlan.map(item => ({...item, icon: item.icon})));
   const [medications, setMedications] = useState(initialPatient.medications);
   
@@ -63,6 +65,13 @@ export function PatientDashboard() {
   const [isEditingMeds, setIsEditingMeds] = useState(false);
   const [medsBeforeEdit, setMedsBeforeEdit] = useState(initialPatient.medications);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const storedData = localStorage.getItem(PATIENT_STORAGE_KEY);
+    if (storedData) {
+        setPatientData(JSON.parse(storedData));
+    }
+  }, []);
 
   const handlePlanChange = (index: number, field: 'task' | 'time' | 'notes', value: string) => {
     const updatedPlan = [...dailyPlan];
@@ -124,8 +133,8 @@ export function PatientDashboard() {
   }
 
   const handleCallHelp = () => {
-    if(initialPatient.caregivers[0]?.phone) {
-      window.location.href = `tel:${initialPatient.caregivers[0].phone}`;
+    if(patientData.caregivers[0]?.phone) {
+      window.location.href = `tel:${patientData.caregivers[0].phone}`;
     }
   };
 
@@ -136,10 +145,10 @@ export function PatientDashboard() {
         <Card className="shadow-lg rounded-2xl">
           <CardHeader>
             <div className="flex flex-col md:flex-row items-center md:items-start text-center md:text-left gap-6">
-              <Image src={initialPatient.photo} alt={initialPatient.name} width={80} height={80} className="rounded-full border-4 border-primary" data-ai-hint="person portrait" />
+              <Image src={patientData.photo} alt={patientData.name} width={80} height={80} className="rounded-full border-4 border-primary" data-ai-hint="person portrait" />
               <div className="flex-grow">
                 <CardTitle className="text-3xl font-bold">
-                  Hi, {initialPatient.name}!
+                  Hi, {patientData.name}!
                 </CardTitle>
                 <CardDescription className="text-lg">This is your personal dashboard.</CardDescription>
                 <div className="pt-4">
@@ -338,4 +347,5 @@ export function PatientDashboard() {
   );
 }
 
+    
     
