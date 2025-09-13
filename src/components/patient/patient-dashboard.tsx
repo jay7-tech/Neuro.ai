@@ -1,4 +1,5 @@
 
+
 'use client';
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
@@ -158,6 +159,23 @@ export function PatientDashboard() {
         setDailyPlan(updatedPlan);
     }
   };
+  
+  const handleAddPlanItem = () => {
+    const newPlanItem: PlanItem = {
+        id: Date.now(),
+        time: '12:00',
+        task: 'New Task',
+        icon: getIcon('Brain'),
+        notes: '',
+        iconName: 'Brain'
+    };
+    setDailyPlan([...dailyPlan, newPlanItem]);
+  };
+
+  const handleRemovePlanItem = (id: number) => {
+    setDailyPlan(dailyPlan.filter(item => item.id !== id));
+  };
+
 
   const handleEditPlan = () => {
     setPlanBeforeEdit(JSON.parse(JSON.stringify(dailyPlan)));
@@ -318,6 +336,9 @@ export function PatientDashboard() {
                             className="bg-background text-sm text-muted-foreground h-9"
                           />
                         </div>
+                         <Button variant="ghost" size="icon" onClick={() => handleRemovePlanItem(item.id)}>
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
                       </div>
                       <Input
                         type="text"
@@ -329,7 +350,10 @@ export function PatientDashboard() {
                     </li>
                   ))}
                 </ul>
-                <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={handleAddPlanItem} className="w-full">
+                    <PlusCircle className="mr-2 h-4 w-4" /> Add New Task
+                </Button>
+                <div className="flex justify-end gap-2 mt-4">
                   <Button variant="ghost" onClick={handleCancelPlan}><X className="mr-2 h-4 w-4"/>Cancel</Button>
                   <Button onClick={handleSavePlan}><Save className="mr-2 h-4 w-4"/>Save Plan</Button>
                 </div>

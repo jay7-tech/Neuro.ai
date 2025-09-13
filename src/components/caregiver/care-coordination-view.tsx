@@ -121,6 +121,22 @@ export function CareCoordinationView() {
             setDailyPlan(updatedPlan);
         }
     };
+    
+    const handleAddPlanItem = () => {
+        const newPlanItem: PlanItem = {
+            id: Date.now(),
+            time: '12:00',
+            task: 'New Task',
+            icon: getIcon('Brain'),
+            notes: '',
+            iconName: 'Brain'
+        };
+        setDailyPlan([...dailyPlan, newPlanItem]);
+    };
+
+    const handleRemovePlanItem = (id: number) => {
+        setDailyPlan(dailyPlan.filter(item => item.id !== id));
+    };
 
     const handleEditPlan = () => {
         setPlanBeforeEdit(JSON.parse(JSON.stringify(dailyPlan)));
@@ -204,20 +220,23 @@ export function CareCoordinationView() {
                                             <div className="flex items-center gap-3">
                                                 {item.icon}
                                                 <div className="flex-grow space-y-1.5">
-                                                <Input
-                                                    type="text"
-                                                    placeholder="Task description..."
-                                                    value={item.task}
-                                                    onChange={(e) => handlePlanChange(index, 'task', e.target.value)}
-                                                    className="bg-background font-bold text-base h-10"
-                                                />
-                                                <Input
-                                                    type="time"
-                                                    value={item.time}
-                                                    onChange={(e) => handlePlanChange(index, 'time', e.target.value)}
-                                                    className="bg-background text-sm text-muted-foreground h-9"
-                                                />
+                                                    <Input
+                                                        type="text"
+                                                        placeholder="Task description..."
+                                                        value={item.task}
+                                                        onChange={(e) => handlePlanChange(index, 'task', e.target.value)}
+                                                        className="bg-background font-bold text-base h-10"
+                                                    />
+                                                    <Input
+                                                        type="time"
+                                                        value={item.time}
+                                                        onChange={(e) => handlePlanChange(index, 'time', e.target.value)}
+                                                        className="bg-background text-sm text-muted-foreground h-9"
+                                                    />
                                                 </div>
+                                                <Button variant="ghost" size="icon" onClick={() => handleRemovePlanItem(item.id)}>
+                                                    <Trash2 className="h-4 w-4 text-destructive" />
+                                                </Button>
                                             </div>
                                             <Input
                                                 type="text"
@@ -229,7 +248,10 @@ export function CareCoordinationView() {
                                             </li>
                                         ))}
                                     </ul>
-                                     <div className="flex justify-end gap-2">
+                                    <Button variant="outline" onClick={handleAddPlanItem} className="w-full">
+                                        <PlusCircle className="mr-2 h-4 w-4" /> Add New Task
+                                    </Button>
+                                     <div className="flex justify-end gap-2 mt-4">
                                         <Button variant="ghost" onClick={handleCancelPlan}><X className="mr-2 h-4 w-4"/>Cancel</Button>
                                         <Button onClick={handleSavePlan}><Save className="mr-2 h-4 w-4"/>Save Patient's Plan</Button>
                                     </div>
