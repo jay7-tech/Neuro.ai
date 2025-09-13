@@ -98,12 +98,13 @@ export function MemoryLaneView() {
     };
 
     const handleSave = (memoryToSave: Memory) => {
-        let newMemories;
         const index = memories.findIndex(m => m.id === memoryToSave.id);
+        let newMemories;
         
         if (index > -1) {
             // Editing an existing memory
-            newMemories = memories.map(m => m.id === memoryToSave.id ? memoryToSave : m);
+            newMemories = [...memories];
+            newMemories[index] = memoryToSave;
         } else {
             // Adding a new memory
             newMemories = [memoryToSave, ...memories];
