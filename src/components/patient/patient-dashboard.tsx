@@ -1,5 +1,4 @@
 
-
 'use client';
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
@@ -355,8 +354,11 @@ export function PatientDashboard() {
         <Card className="shadow-xl rounded-2xl">
           <CardHeader className="flex-row items-center justify-between">
             <div className="space-y-1">
-                <CardTitle className="text-2xl flex items-center gap-2">
-                <Pill /> Medication
+                <CardTitle className="text-2xl">
+                  <span className="flex items-center gap-2">
+                    <Pill />
+                    Medication
+                  </span>
                 </CardTitle>
                 <CardDescription>Your daily medication schedule.</CardDescription>
             </div>
@@ -427,3 +429,5 @@ export function PatientDashboard() {
     </div>
   );
 }
+
+  
