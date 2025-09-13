@@ -93,7 +93,7 @@ function loadAndValidateFamilyTree(): FamilyTree {
 }
 
 
-export function FamilyTreeView() {
+export function FamilyTreeView({ isCaregiverView = false }: { isCaregiverView?: boolean }) {
     const { toast } = useToast();
     const [familyTree, setFamilyTree] = useState<FamilyTree | null>(null);
     const [editingMember, setEditingMember] = useState<FamilyMember | null>(null);
@@ -166,7 +166,7 @@ export function FamilyTreeView() {
         
         saveFamilyTree(newFamilyTree);
         setEditingMember(null);
-        toast({ title: "Family Member Saved!", description: "Your changes have been saved." });
+        toast({ title: "Family Member Saved!", description: "The family member's details have been saved." });
     };
 
     const handleDelete = (id: number) => {
@@ -204,15 +204,30 @@ export function FamilyTreeView() {
 
     return (
         <div className="space-y-8">
-            <div className="text-center md:text-left flex flex-col md:flex-row justify-between items-center gap-4">
-                <div>
-                    <h1 className="text-4xl font-bold font-headline flex items-center justify-center md:justify-start gap-3"><Users /> My Family</h1>
-                    <p className="text-lg text-muted-foreground">The people who love you most.</p>
+            {!isCaregiverView && (
+                <div className="text-center md:text-left flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div>
+                        <h1 className="text-4xl font-bold font-headline flex items-center justify-center md:justify-start gap-3"><Users /> My Family</h1>
+                        <p className="text-lg text-muted-foreground">The people who love you most.</p>
+                    </div>
+                    <Button onClick={handleAddNew}>
+                        <PlusCircle className="mr-2 h-4 w-4" /> Add New Member
+                    </Button>
                 </div>
-                 <Button onClick={handleAddNew}>
-                    <PlusCircle className="mr-2 h-4 w-4" /> Add New Member
-                </Button>
-            </div>
+            )}
+             {isCaregiverView && (
+                <Card>
+                    <CardHeader className="flex-row items-center justify-between">
+                         <div>
+                            <CardTitle>Manage Family Tree</CardTitle>
+                            <CardDescription>View and edit the patient's family members.</CardDescription>
+                        </div>
+                        <Button onClick={handleAddNew}>
+                            <PlusCircle className="mr-2 h-4 w-4" /> Add Member
+                        </Button>
+                    </CardHeader>
+                </Card>
+             )}
             
             <Card className="shadow-2xl rounded-2xl overflow-hidden max-w-lg mx-auto border-2 border-primary/30 relative group">
                 <div className="flex flex-col md:flex-row items-center">
@@ -294,7 +309,7 @@ function EditFamilyMemberView({ member, onSave, onCancel, onDelete, isSpouse }: 
         <Card className="max-w-2xl mx-auto shadow-2xl">
             <CardHeader>
                 <CardTitle>{member.name ? `Edit ${member.name}`: "Add a New Family Member"}</CardTitle>
-                <CardDescription>Update the details for your family member.</CardDescription>
+                <CardDescription>Update the details for the family member.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
                 <div className="aspect-square w-full rounded-lg overflow-hidden border mx-auto max-w-sm">
@@ -353,3 +368,5 @@ function EditFamilyMemberView({ member, onSave, onCancel, onDelete, isSpouse }: 
         </Card>
     );
 }
+
+    

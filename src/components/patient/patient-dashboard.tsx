@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Brain, Pill, Camera, MessageSquare, Calendar, Sun, Moon, Utensils, ArrowRight, Music, PhoneCall, HeartPulse, PlusCircle, Trash2, Album, Edit, Save, X, MapPin, Users, Palette, Puzzle, Pencil, ListOrdered } from "lucide-react";
+import { Brain, Pill, Camera, MessageSquare, Calendar, Sun, Moon, Utensils, ArrowRight, Music, PhoneCall, HeartPulse, PlusCircle, Trash2, Album, Edit, Save, X, Users } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { AiCompanion } from "./ai-companion";
@@ -14,6 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 
 const PATIENT_STORAGE_KEY = 'neuro-ai-patient-data';
 const DAILY_PLAN_STORAGE_KEY = 'neuro-ai-daily-plan';
+const MEDICATIONS_STORAGE_KEY = 'neuro-ai-medications';
 
 type PlanItem = {
     id: number;
@@ -24,12 +25,24 @@ type PlanItem = {
     iconName: string;
 };
 
+type Medication = {
+    id: number;
+    name: string;
+    dose: string;
+    time: string;
+};
+
 const initialDailyPlan: PlanItem[] = [
   { id: 1, time: '08:00', task: 'Wake up and get dressed', icon: <Sun className="h-6 w-6 text-primary" />, notes: '', iconName: 'Sun' },
   { id: 2, time: '09:00', task: 'Eat breakfast & take pills', icon: <Utensils className="h-6 w-6 text-primary" />, notes: '', iconName: 'Utensils' },
   { id: 3, time: '10:00', task: 'Morning walk', icon: <HeartPulse className="h-6 w-6 text-primary" />, notes: 'Remember to wear comfortable shoes.', iconName: 'HeartPulse' },
   { id: 4, time: '15:00', task: 'Read a book', icon: <Brain className="h-6 w-6 text-primary" />, notes: '', iconName: 'Brain' },
   { id: 5, time: '20:00', task: 'Prepare for bed', icon: <Moon className="h-6 w-6 text-primary" />, notes: '', iconName: 'Moon' },
+];
+
+const initialMedications: Medication[] = [
+    { id: 1, name: 'Aricept', dose: '1 tablet', time: '09:00' },
+    { id: 2, name: 'Namenda', dose: '1 tablet', time: '20:00' },
 ];
 
 const tools = [
@@ -67,14 +80,14 @@ const tools = [
 
 export function PatientDashboard() {
   const [patientData, setPatientData] = useState(initialPatient);
-  const [dailyPlan, setDailyPlan] = useState<PlanItem[]>(initialDailyPlan);
-  const [medications, setMedications] = useState(initialPatient.medications);
+  const [dailyPlan, setDailyPlan] = useState<PlanItem[]>([]);
+  const [medications, setMedications] = useState<Medication[]>([]);
   
   const [isEditingPlan, setIsEditingPlan] = useState(false);
   const [planBeforeEdit, setPlanBeforeEdit] = useState<PlanItem[]>([]);
 
   const [isEditingMeds, setIsEditingMeds] = useState(false);
-  const [medsBeforeEdit, setMedsBeforeEdit] = useState(initialPatient.medications);
+  const [medsBeforeEdit, setMedsBeforeEdit] = useState<Medication[]>([]);
   const { toast } = useToast();
 
     const getIcon = (iconName: string) => {
@@ -105,6 +118,19 @@ export function PatientDashboard() {
         } catch {
             setDailyPlan(initialDailyPlan);
         }
+    } else {
+        setDailyPlan(initialDailyPlan);
+    }
+
+    const storedMeds = localStorage.getItem(MEDICATIONS_STORAGE_KEY);
+    if(storedMeds) {
+        try {
+            setMedications(JSON.parse(storedMeds));
+        } catch {
+            setMedications(initialMedications);
+        }
+    } else {
+        setMedications(initialMedications);
     }
   }, []);
 
@@ -120,6 +146,11 @@ export function PatientDashboard() {
         setDailyPlan(plan);
     };
 
+  const saveMedications = (meds: Medication[]) => {
+    localStorage.setItem(MEDICATIONS_STORAGE_KEY, JSON.stringify(meds));
+    setMedications(meds);
+  }
+
   const handlePlanChange = (index: number, field: 'task' | 'time' | 'notes', value: string) => {
     const updatedPlan = [...dailyPlan];
     const planItem = updatedPlan[index];
@@ -130,7 +161,7 @@ export function PatientDashboard() {
   };
 
   const handleEditPlan = () => {
-    setPlanBeforeEdit(dailyPlan.map(p => ({...p})));
+    setPlanBeforeEdit(JSON.parse(JSON.stringify(dailyPlan)));
     setIsEditingPlan(true);
   }
 
@@ -163,12 +194,13 @@ export function PatientDashboard() {
   };
   
   const handleEditMeds = () => {
-    setMedsBeforeEdit(medications.map(m => ({...m})));
+    setMedsBeforeEdit(JSON.parse(JSON.stringify(medications)));
     setIsEditingMeds(true);
   }
 
   const handleSaveMedications = () => {
     setIsEditingMeds(false);
+    saveMedications(medications);
     toast({
       title: "Medication Plan Saved!",
       description: "Your medication schedule has been updated."
@@ -395,3 +427,5 @@ export function PatientDashboard() {
     </div>
   );
 }
+
+    

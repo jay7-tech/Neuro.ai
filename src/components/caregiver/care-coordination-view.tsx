@@ -5,13 +5,15 @@ import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { patient as initialPatient } from '@/lib/data';
 import { PlusCircle, Trash2, Sun, Moon, Utensils, HeartPulse, Brain, Edit, Save, X } from 'lucide-react';
+import { FamilyTreeView } from '@/components/shared/family-tree-view';
+import { MemoryLaneView } from '@/components/shared/memory-lane-view';
+
 
 const DAILY_PLAN_STORAGE_KEY = 'neuro-ai-daily-plan';
+const MEDICATIONS_STORAGE_KEY = 'neuro-ai-medications';
 
 type PlanItem = {
     id: number;
@@ -22,6 +24,12 @@ type PlanItem = {
     iconName: string;
 };
 
+type Medication = {
+    id: number;
+    name: string;
+    dose: string;
+    time: string;
+};
 
 const initialDailyPlan = [
   { id: 1, time: '08:00', task: 'Wake up and get dressed', icon: <Sun className="h-6 w-6 text-primary" />, notes: '', iconName: 'Sun' },
@@ -31,17 +39,22 @@ const initialDailyPlan = [
   { id: 5, time: '20:00', task: 'Prepare for bed', icon: <Moon className="h-6 w-6 text-primary" />, notes: '', iconName: 'Moon' },
 ];
 
+const initialMedications: Medication[] = [
+    { id: 1, name: 'Aricept', dose: '1 tablet', time: '09:00' },
+    { id: 2, name: 'Namenda', dose: '1 tablet', time: '20:00' },
+];
+
 
 export function CareCoordinationView() {
     const { toast } = useToast();
-    const [medications, setMedications] = useState(initialPatient.medications);
-    const [dailyPlan, setDailyPlan] = useState<PlanItem[]>(initialDailyPlan);
+    const [medications, setMedications] = useState<Medication[]>([]);
+    const [dailyPlan, setDailyPlan] = useState<PlanItem[]>([]);
     
     const [isEditingPlan, setIsEditingPlan] = useState(false);
-    const [planBeforeEdit, setPlanBeforeEdit] = useState<PlanItem[]>(initialDailyPlan);
+    const [planBeforeEdit, setPlanBeforeEdit] = useState<PlanItem[]>([]);
 
     const [isEditingMeds, setIsEditingMeds] = useState(false);
-    const [medsBeforeEdit, setMedsBeforeEdit] = useState(initialPatient.medications);
+    const [medsBeforeEdit, setMedsBeforeEdit] = useState<Medication[]>([]);
 
     const getIcon = (iconName: string) => {
         const iconMap: { [key: string]: JSX.Element } = {
@@ -66,6 +79,19 @@ export function CareCoordinationView() {
             } catch {
                 setDailyPlan(initialDailyPlan);
             }
+        } else {
+             setDailyPlan(initialDailyPlan);
+        }
+
+        const storedMeds = localStorage.getItem(MEDICATIONS_STORAGE_KEY);
+        if (storedMeds) {
+            try {
+                setMedications(JSON.parse(storedMeds));
+            } catch {
+                setMedications(initialMedications);
+            }
+        } else {
+            setMedications(initialMedications);
         }
     }, []);
 
@@ -81,6 +107,11 @@ export function CareCoordinationView() {
         setDailyPlan(plan);
     };
 
+    const saveMedications = (meds: Medication[]) => {
+        localStorage.setItem(MEDICATIONS_STORAGE_KEY, JSON.stringify(meds));
+        setMedications(meds);
+    }
+
 
     const handlePlanChange = (index: number, field: 'task' | 'time' | 'notes', value: string) => {
         const updatedPlan = [...dailyPlan];
@@ -92,7 +123,7 @@ export function CareCoordinationView() {
     };
 
     const handleEditPlan = () => {
-        setPlanBeforeEdit(dailyPlan.map(p => ({...p})));
+        setPlanBeforeEdit(JSON.parse(JSON.stringify(dailyPlan)));
         setIsEditingPlan(true);
     };
 
@@ -125,12 +156,13 @@ export function CareCoordinationView() {
     };
 
     const handleEditMeds = () => {
-        setMedsBeforeEdit(medications.map(m => ({...m})));
+        setMedsBeforeEdit(JSON.parse(JSON.stringify(medications)));
         setIsEditingMeds(true);
     }
 
     const handleSaveMedications = () => {
         setIsEditingMeds(false);
+        saveMedications(medications);
         toast({
             title: "Patient's Medications Saved!",
             description: "The patient's medication schedule has been updated."
@@ -146,19 +178,20 @@ export function CareCoordinationView() {
     return (
         <div className="space-y-6">
             <h1 className="text-3xl font-bold font-headline">Care Coordination</h1>
-            <p className="text-muted-foreground">Manage the patient's daily routine, memory aids, and medications.</p>
+            <p className="text-muted-foreground">Manage the patient's daily routine, memories, family contacts, and medications.</p>
             <Tabs defaultValue="planner">
-                <TabsList className="grid w-full grid-cols-3 max-w-md">
+                <TabsList className="grid w-full grid-cols-4 max-w-2xl">
                     <TabsTrigger value="planner">Daily Planner</TabsTrigger>
-                    <TabsTrigger value="prompts">Memory Prompts</TabsTrigger>
                     <TabsTrigger value="meds">Medications</TabsTrigger>
+                    <TabsTrigger value="memory-lane">Memory Lane</TabsTrigger>
+                    <TabsTrigger value="family-tree">Family Tree</TabsTrigger>
                 </TabsList>
                 <TabsContent value="planner" className="mt-4">
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between">
                             <div>
                                 <CardTitle>Manage Daily Planner</CardTitle>
-                                <CardDescription>Add, edit, or remove tasks from the patient's daily schedule. Changes will appear in their dashboard.</CardDescription>
+                                <CardDescription>Add, edit, or remove tasks from the patient's daily schedule.</CardDescription>
                             </div>
                             {!isEditingPlan && <Button variant="outline" size="icon" onClick={handleEditPlan}><Edit className="h-4 w-4" /></Button>}
                         </CardHeader>
@@ -218,17 +251,7 @@ export function CareCoordinationView() {
                         </CardContent>
                     </Card>
                 </TabsContent>
-                <TabsContent value="prompts" className="mt-4">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Manage Memory Prompts</CardTitle>
-                            <CardDescription>This feature is not yet implemented.</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                           <p className="text-sm text-muted-foreground">The ability to add and manage memory prompts from the caregiver dashboard is coming soon.</p>
-                        </CardContent>
-                    </Card>
-                </TabsContent>
+                
                 <TabsContent value="meds" className="mt-4">
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between">
@@ -287,12 +310,21 @@ export function CareCoordinationView() {
                                             <p className="font-mono text-lg">{med.time}</p>
                                         </li>
                                     ))}
+                                    {medications.length === 0 && <p className="text-muted-foreground text-center p-4">No medications found.</p>}
                                 </ul>
                            )}
                         </CardContent>
                     </Card>
                 </TabsContent>
+                <TabsContent value="memory-lane" className="mt-4">
+                   <MemoryLaneView isCaregiverView={true} />
+                </TabsContent>
+                 <TabsContent value="family-tree" className="mt-4">
+                    <FamilyTreeView isCaregiverView={true} />
+                </TabsContent>
             </Tabs>
         </div>
     );
 }
+
+    

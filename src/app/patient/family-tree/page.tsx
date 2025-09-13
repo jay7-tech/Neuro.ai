@@ -1,6 +1,6 @@
 
 import { AppHeader } from "@/components/app/header";
-import { FamilyTreeView } from "@/components/patient/family-tree-view";
+import { FamilyTreeView } from "@/components/shared/family-tree-view";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
@@ -20,3 +20,5 @@ export default function FamilyTreePage() {
         </div>
     )
 }
+
+    

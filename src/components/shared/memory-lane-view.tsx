@@ -46,7 +46,7 @@ type Memory = {
 
 const MEMORIES_STORAGE_KEY = 'neuro-ai-memories';
 
-export function MemoryLaneView() {
+export function MemoryLaneView({ isCaregiverView = false }: { isCaregiverView?: boolean }) {
     const { toast } = useToast();
     const [memories, setMemories] = useState<Memory[]>([]);
     const [editingMemory, setEditingMemory] = useState<Memory | null>(null);
@@ -64,8 +64,7 @@ export function MemoryLaneView() {
         }
     }, []);
 
-    const saveMemories = (newMemories: Memory[]) => {
-        const oldMemories = memories;
+    const saveMemories = (newMemories: Memory[], oldMemoriesState?: Memory[]) => {
         setMemories(newMemories);
         try {
             localStorage.setItem(MEMORIES_STORAGE_KEY, JSON.stringify(newMemories));
@@ -76,14 +75,15 @@ export function MemoryLaneView() {
                     description: "The photo you uploaded is too large. Please choose a smaller file.",
                     variant: "destructive",
                 });
-                setMemories(oldMemories);
+                if(oldMemoriesState) setMemories(oldMemoriesState);
+
             } else {
                 toast({
                     title: "An unexpected error occurred.",
                     description: "Your memory could not be saved.",
                     variant: "destructive",
                 });
-                 setMemories(oldMemories);
+                 if(oldMemoriesState) setMemories(oldMemoriesState);
             }
         }
     }
@@ -99,6 +99,7 @@ export function MemoryLaneView() {
     };
 
     const handleSave = (memoryToSave: Memory) => {
+        const oldMemories = [...memories];
         let newMemories;
         const index = memories.findIndex(m => m.id === memoryToSave.id);
         
@@ -109,7 +110,7 @@ export function MemoryLaneView() {
             newMemories = [memoryToSave, ...memories];
         }
         
-        saveMemories(newMemories);
+        saveMemories(newMemories, oldMemories);
         setEditingMemory(null);
         toast({ title: "Memory Saved!", description: "Your precious memory has been saved." });
     };
@@ -129,8 +130,8 @@ export function MemoryLaneView() {
             <Card className="shadow-lg">
                 <CardHeader className="flex-row items-center justify-between">
                     <div>
-                        <CardTitle className="text-3xl font-bold font-headline flex items-center gap-3"><Album /> Memory Lane</CardTitle>
-                        <CardDescription className="text-lg">A collection of your cherished moments.</CardDescription>
+                        <CardTitle className="text-3xl font-bold font-headline flex items-center gap-3"><Album /> {isCaregiverView ? "Manage Memories" : "Memory Lane"}</CardTitle>
+                        <CardDescription className="text-lg">{isCaregiverView ? "Add or edit memories for the patient." : "A collection of your cherished moments."}</CardDescription>
                     </div>
                     <Button onClick={handleAddNew}>
                         <PlusCircle className="mr-2 h-4 w-4" /> Add New Memory
@@ -174,6 +175,7 @@ export function MemoryLaneView() {
                         </CardContent>
                     </Card>
                 ))}
+                {memories.length === 0 && <p className="text-muted-foreground text-center col-span-full">No memories yet. Click "Add New Memory" to create one.</p>}
             </div>
         </div>
     );
@@ -245,3 +247,5 @@ function EditMemoryView({ memory, onSave, onCancel }: { memory: Memory, onSave: 
         </Card>
     );
 }
+
+    

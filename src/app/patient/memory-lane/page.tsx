@@ -1,6 +1,6 @@
 
 import { AppHeader } from "@/components/app/header";
-import { MemoryLaneView } from "@/components/patient/memory-lane-view";
+import { MemoryLaneView } from "@/components/shared/memory-lane-view";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
@@ -20,3 +20,5 @@ export default function MemoryLanePage() {
         </div>
     )
 }
+
+    
