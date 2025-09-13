@@ -13,41 +13,55 @@ import { PlusCircle, Trash2, Sun, Moon, Utensils, HeartPulse, Brain, Edit, Save,
 
 const DAILY_PLAN_STORAGE_KEY = 'neuro-ai-daily-plan';
 
+type PlanItem = {
+    id: number;
+    time: string;
+    task: string;
+    icon: JSX.Element;
+    notes: string;
+    iconName: string;
+};
+
+
 const initialDailyPlan = [
-  { id: 1, time: '08:00', task: 'Wake up and get dressed', icon: <Sun className="h-6 w-6 text-primary" />, notes: '' },
-  { id: 2, time: '09:00', task: 'Eat breakfast & take pills', icon: <Utensils className="h-6 w-6 text-primary" />, notes: '' },
-  { id: 3, time: '10:00', task: 'Morning walk', icon: <HeartPulse className="h-6 w-6 text-primary" />, notes: 'Remember to wear comfortable shoes.' },
-  { id: 4, time: '15:00', task: 'Read a book', icon: <Brain className="h-6 w-6 text-primary" />, notes: '' },
-  { id: 5, time: '20:00', task: 'Prepare for bed', icon: <Moon className="h-6 w-6 text-primary" />, notes: '' },
+  { id: 1, time: '08:00', task: 'Wake up and get dressed', icon: <Sun className="h-6 w-6 text-primary" />, notes: '', iconName: 'Sun' },
+  { id: 2, time: '09:00', task: 'Eat breakfast & take pills', icon: <Utensils className="h-6 w-6 text-primary" />, notes: '', iconName: 'Utensils' },
+  { id: 3, time: '10:00', task: 'Morning walk', icon: <HeartPulse className="h-6 w-6 text-primary" />, notes: 'Remember to wear comfortable shoes.', iconName: 'HeartPulse' },
+  { id: 4, time: '15:00', task: 'Read a book', icon: <Brain className="h-6 w-6 text-primary" />, notes: '', iconName: 'Brain' },
+  { id: 5, time: '20:00', task: 'Prepare for bed', icon: <Moon className="h-6 w-6 text-primary" />, notes: '', iconName: 'Moon' },
 ];
 
 
 export function CareCoordinationView() {
     const { toast } = useToast();
     const [medications, setMedications] = useState(initialPatient.medications);
-    const [dailyPlan, setDailyPlan] = useState(initialDailyPlan);
+    const [dailyPlan, setDailyPlan] = useState<PlanItem[]>(initialDailyPlan);
     
     const [isEditingPlan, setIsEditingPlan] = useState(false);
-    const [planBeforeEdit, setPlanBeforeEdit] = useState(initialDailyPlan);
+    const [planBeforeEdit, setPlanBeforeEdit] = useState<PlanItem[]>(initialDailyPlan);
 
     const [isEditingMeds, setIsEditingMeds] = useState(false);
     const [medsBeforeEdit, setMedsBeforeEdit] = useState(initialPatient.medications);
+
+    const getIcon = (iconName: string) => {
+        const iconMap: { [key: string]: JSX.Element } = {
+            Sun: <Sun className="h-6 w-6 text-primary" />,
+            Utensils: <Utensils className="h-6 w-6 text-primary" />,
+            HeartPulse: <HeartPulse className="h-6 w-6 text-primary" />,
+            Brain: <Brain className="h-6 w-6 text-primary" />,
+            Moon: <Moon className="h-6 w-6 text-primary" />,
+        };
+        return iconMap[iconName] || <Brain className="h-6 w-6 text-primary" />;
+    };
 
     useEffect(() => {
         const storedPlan = localStorage.getItem(DAILY_PLAN_STORAGE_KEY);
         if (storedPlan) {
             try {
-                const parsedPlan = JSON.parse(storedPlan).map((item: any) => {
-                    const iconMap: { [key: string]: JSX.Element } = {
-                        Sun: <Sun className="h-6 w-6 text-primary" />,
-                        Utensils: <Utensils className="h-6 w-6 text-primary" />,
-                        HeartPulse: <HeartPulse className="h-6 w-6 text-primary" />,
-                        Brain: <Brain className="h-6 w-6 text-primary" />,
-                        Moon: <Moon className="h-6 w-6 text-primary" />,
-                    };
-                    const iconName = item.iconName || 'Brain';
-                    return { ...item, icon: iconMap[iconName] };
-                });
+                const parsedPlan = JSON.parse(storedPlan).map((item: any) => ({
+                    ...item,
+                    icon: getIcon(item.iconName),
+                }));
                 setDailyPlan(parsedPlan);
             } catch {
                 setDailyPlan(initialDailyPlan);
@@ -55,12 +69,15 @@ export function CareCoordinationView() {
         }
     }, []);
 
-    const saveDailyPlan = (plan: typeof initialDailyPlan) => {
-        const planWithIconNames = plan.map(item => ({
-            ...item,
-            iconName: (item.icon.type as any).displayName
+    const saveDailyPlan = (plan: PlanItem[]) => {
+        const planToSave = plan.map(item => ({
+            id: item.id,
+            time: item.time,
+            task: item.task,
+            notes: item.notes,
+            iconName: item.iconName,
         }));
-        localStorage.setItem(DAILY_PLAN_STORAGE_KEY, JSON.stringify(planWithIconNames));
+        localStorage.setItem(DAILY_PLAN_STORAGE_KEY, JSON.stringify(planToSave));
         setDailyPlan(plan);
     };
 
@@ -277,5 +294,5 @@ export function CareCoordinationView() {
                 </TabsContent>
             </Tabs>
         </div>
-    )
+    );
 }
