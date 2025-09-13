@@ -15,6 +15,7 @@ import { Slider } from '@/components/ui/slider';
 import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea';
 import { useToast } from '@/hooks/use-toast';
+import { useTheme } from '../app/theme-provider';
 
 const PATIENT_STORAGE_KEY = 'neuro-ai-patient-data';
 
@@ -22,7 +23,9 @@ export function ProfileView() {
     const { toast } = useToast();
     const [patient, setPatient] = useState(initialPatient);
     const [isEditing, setIsEditing] = useState(false);
-    const [isDark, setIsDark] = useState(false);
+    const { theme, setTheme } = useTheme();
+    const isDark = theme === 'dark';
+
     const [notifications, setNotifications] = useState(true);
     const [language, setLanguage] = useState('en');
     const [textSize, setTextSize] = useState(16);
@@ -33,20 +36,17 @@ export function ProfileView() {
         if (storedData) {
             setPatient(JSON.parse(storedData));
         }
+
+        const storedTextSize = localStorage.getItem('neuro-ai-text-size');
+        if(storedTextSize) {
+            setTextSize(Number(storedTextSize));
+        }
     }, []);
 
     useEffect(() => {
         const root = window.document.documentElement;
-        if (isDark) {
-            root.classList.add('dark');
-        } else {
-            root.classList.remove('dark');
-        }
-    }, [isDark]);
-
-    useEffect(() => {
-        const root = window.document.documentElement;
         root.style.fontSize = `${textSize}px`;
+        localStorage.setItem('neuro-ai-text-size', String(textSize));
     }, [textSize]);
     
     const handleFieldChange = (field: keyof typeof patient, value: any) => {
@@ -82,6 +82,10 @@ export function ProfileView() {
             setPatient(initialPatient);
         }
         setIsEditing(false);
+    }
+    
+    const handleThemeChange = (checked: boolean) => {
+        setTheme(checked ? 'dark' : 'light');
     }
 
     return (
@@ -218,7 +222,7 @@ export function ProfileView() {
                                     <Settings className="h-6 w-6" />
                                     Dark Mode
                                 </Label>
-                                <Switch id="dark-mode" checked={isDark} onCheckedChange={setIsDark} />
+                                <Switch id="dark-mode" checked={isDark} onCheckedChange={handleThemeChange} />
                             </div>
                             <div className="flex items-center justify-between p-4 border rounded-lg">
                                 <Label htmlFor="notifications" className="flex items-center gap-3 text-lg">
@@ -256,7 +260,7 @@ export function ProfileView() {
                                         max={20}
                                         step={1}
                                         value={[textSize]}
-                                        onValueChange={(value) => setTextSize(value[0])}
+                                        onValue-commit={v => setTextSize(v[0])}
                                     />
                                     <span className="text-sm">Large</span>
                                 </div>
