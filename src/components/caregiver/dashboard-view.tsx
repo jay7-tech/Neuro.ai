@@ -1,4 +1,5 @@
 'use client';
+import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,12 +9,22 @@ import { useToast } from "@/hooks/use-toast";
 export function DashboardView() {
   const caregiverId = "C-ABCDE12";
   const { toast } = useToast();
+  const [patientId, setPatientId] = useState('');
 
   const handleLink = () => {
+    if (!patientId.trim()) {
+        toast({
+            title: "Patient ID Required",
+            description: "Please enter a valid Patient ID to link accounts.",
+            variant: "destructive",
+        });
+        return;
+    }
     toast({
         title: "Patient Linked",
         description: "You are now successfully linked to the patient's account.",
     })
+    setPatientId('');
   }
 
   return (
@@ -27,7 +38,11 @@ export function DashboardView() {
             </CardHeader>
             <CardContent>
                 <div className="flex gap-2 max-w-sm">
-                    <Input placeholder="Patient ID (e.g., P-12345XYZ)" />
+                    <Input 
+                        placeholder="Patient ID (e.g., P-12345XYZ)" 
+                        value={patientId}
+                        onChange={(e) => setPatientId(e.target.value)}
+                    />
                     <Button onClick={handleLink}>Link Account</Button>
                 </div>
             </CardContent>
