@@ -427,5 +427,3 @@ export function PatientDashboard() {
     </div>
   );
 }
-
-    
