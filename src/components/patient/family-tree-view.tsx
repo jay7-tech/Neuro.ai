@@ -103,8 +103,29 @@ export function FamilyTreeView() {
     }, []);
 
     const saveFamilyTree = (newFamilyTree: FamilyTree) => {
-        setFamilyTree(newFamilyTree);
-        localStorage.setItem(FAMILY_TREE_STORAGE_KEY, JSON.stringify(newFamilyTree));
+        const oldFamilyTree = familyTree; // Keep a reference to revert if save fails
+        try {
+            setFamilyTree(newFamilyTree);
+            localStorage.setItem(FAMILY_TREE_STORAGE_KEY, JSON.stringify(newFamilyTree));
+        } catch (error) {
+            if (error instanceof DOMException && (error.name === 'QuotaExceededError' || error.name === 'NS_ERROR_DOM_QUOTA_REACHED')) {
+                 toast({
+                    title: "Failed to Save",
+                    description: "The photo you uploaded is too large. Please choose a smaller file.",
+                    variant: "destructive",
+                });
+                // Revert to the old state to avoid inconsistent UI
+                if(oldFamilyTree) {
+                    setFamilyTree(oldFamilyTree);
+                }
+            } else {
+                toast({
+                    title: "An unexpected error occurred.",
+                    description: "Your changes could not be saved.",
+                    variant: "destructive",
+                });
+            }
+        }
     };
 
     const handleAddNew = () => {
@@ -332,5 +353,3 @@ function EditFamilyMemberView({ member, onSave, onCancel, onDelete, isSpouse }: 
         </Card>
     );
 }
-
-    
