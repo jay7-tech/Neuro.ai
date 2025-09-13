@@ -65,10 +65,9 @@ export function MemoryLaneView() {
     }, []);
 
     const saveMemories = (newMemories: Memory[]) => {
-        const oldMemories = memories;
         try {
-            setMemories(newMemories);
             localStorage.setItem(MEMORIES_STORAGE_KEY, JSON.stringify(newMemories));
+            setMemories(newMemories);
         } catch (error) {
             if (error instanceof DOMException && (error.name === 'QuotaExceededError' || error.name === 'NS_ERROR_DOM_QUOTA_REACHED')) {
                  toast({
@@ -76,7 +75,6 @@ export function MemoryLaneView() {
                     description: "The photo you uploaded is too large. Please choose a smaller file.",
                     variant: "destructive",
                 });
-                setMemories(oldMemories);
             } else {
                 toast({
                     title: "An unexpected error occurred.",
