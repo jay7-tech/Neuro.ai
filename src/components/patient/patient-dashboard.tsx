@@ -1,4 +1,5 @@
 
+
 'use client';
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,7 @@ import { Input } from '../ui/input';
 import { useToast } from '@/hooks/use-toast';
 
 const PATIENT_STORAGE_KEY = 'neuro-ai-patient-data';
+const DAILY_PLAN_STORAGE_KEY = 'neuro-ai-daily-plan';
 
 const initialDailyPlan = [
   { id: 1, time: '08:00', task: 'Wake up and get dressed', icon: <Sun className="h-6 w-6 text-primary" />, notes: '' },
@@ -71,7 +73,36 @@ export function PatientDashboard() {
     if (storedData) {
         setPatientData(JSON.parse(storedData));
     }
+
+    const storedPlan = localStorage.getItem(DAILY_PLAN_STORAGE_KEY);
+    if (storedPlan) {
+        try {
+            const parsedPlan = JSON.parse(storedPlan).map((item: any) => {
+                const iconMap: { [key: string]: JSX.Element } = {
+                    Sun: <Sun className="h-6 w-6 text-primary" />,
+                    Utensils: <Utensils className="h-6 w-6 text-primary" />,
+                    HeartPulse: <HeartPulse className="h-6 w-6 text-primary" />,
+                    Brain: <Brain className="h-6 w-6 text-primary" />,
+                    Moon: <Moon className="h-6 w-6 text-primary" />,
+                };
+                const iconName = item.iconName || 'Brain';
+                return { ...item, icon: iconMap[iconName] };
+            });
+            setDailyPlan(parsedPlan);
+        } catch {
+            setDailyPlan(initialDailyPlan);
+        }
+    }
   }, []);
+
+  const saveDailyPlan = (plan: typeof dailyPlan) => {
+        const planWithIconNames = plan.map(item => ({
+            ...item,
+            iconName: (item.icon.type as any).displayName
+        }));
+        localStorage.setItem(DAILY_PLAN_STORAGE_KEY, JSON.stringify(planWithIconNames));
+        setDailyPlan(plan);
+    };
 
   const handlePlanChange = (index: number, field: 'task' | 'time' | 'notes', value: string) => {
     const updatedPlan = [...dailyPlan];
@@ -89,6 +120,7 @@ export function PatientDashboard() {
 
   const handleSavePlan = () => {
     setIsEditingPlan(false);
+    saveDailyPlan(dailyPlan);
     toast({
       title: "Daily Plan Saved!",
       description: "Your changes have been successfully saved."

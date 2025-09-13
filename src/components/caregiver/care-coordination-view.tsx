@@ -1,7 +1,7 @@
 
 
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { patient as initialPatient } from '@/lib/data';
 import { PlusCircle, Trash2, Sun, Moon, Utensils, HeartPulse, Brain, Edit, Save, X } from 'lucide-react';
+
+const DAILY_PLAN_STORAGE_KEY = 'neuro-ai-daily-plan';
 
 const initialDailyPlan = [
   { id: 1, time: '08:00', task: 'Wake up and get dressed', icon: <Sun className="h-6 w-6 text-primary" />, notes: '' },
@@ -31,6 +33,37 @@ export function CareCoordinationView() {
     const [isEditingMeds, setIsEditingMeds] = useState(false);
     const [medsBeforeEdit, setMedsBeforeEdit] = useState(initialPatient.medications);
 
+    useEffect(() => {
+        const storedPlan = localStorage.getItem(DAILY_PLAN_STORAGE_KEY);
+        if (storedPlan) {
+            try {
+                const parsedPlan = JSON.parse(storedPlan).map((item: any) => {
+                    const iconMap: { [key: string]: JSX.Element } = {
+                        Sun: <Sun className="h-6 w-6 text-primary" />,
+                        Utensils: <Utensils className="h-6 w-6 text-primary" />,
+                        HeartPulse: <HeartPulse className="h-6 w-6 text-primary" />,
+                        Brain: <Brain className="h-6 w-6 text-primary" />,
+                        Moon: <Moon className="h-6 w-6 text-primary" />,
+                    };
+                    const iconName = item.iconName || 'Brain';
+                    return { ...item, icon: iconMap[iconName] };
+                });
+                setDailyPlan(parsedPlan);
+            } catch {
+                setDailyPlan(initialDailyPlan);
+            }
+        }
+    }, []);
+
+    const saveDailyPlan = (plan: typeof initialDailyPlan) => {
+        const planWithIconNames = plan.map(item => ({
+            ...item,
+            iconName: (item.icon.type as any).displayName
+        }));
+        localStorage.setItem(DAILY_PLAN_STORAGE_KEY, JSON.stringify(planWithIconNames));
+        setDailyPlan(plan);
+    };
+
 
     const handlePlanChange = (index: number, field: 'task' | 'time' | 'notes', value: string) => {
         const updatedPlan = [...dailyPlan];
@@ -48,6 +81,7 @@ export function CareCoordinationView() {
 
     const handleSavePlan = () => {
         setIsEditingPlan(false);
+        saveDailyPlan(dailyPlan);
         toast({
             title: "Patient's Plan Saved!",
             description: "The patient's daily plan has been updated successfully."
