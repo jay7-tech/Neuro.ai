@@ -36,7 +36,6 @@ type FamilyTree = {
 
 const FAMILY_TREE_STORAGE_KEY = 'neuro-ai-family-tree';
 
-// Create a deep copy of the initial data with unique IDs to prevent mutation
 const getInitialFamilyTree = (): FamilyTree => {
     const spouse = { ...initialFamilyTreeData.spouse, id: Date.now() };
     const children = initialFamilyTreeData.children.map((child, index) => ({
@@ -52,7 +51,6 @@ function loadAndValidateFamilyTree(): FamilyTree {
     if (storedData) {
         try {
             const parsedData = JSON.parse(storedData) as FamilyTree;
-            // Ensure data has the correct structure and unique IDs
             let dataWasModified = false;
             const existingIds = new Set<number>();
 
@@ -68,9 +66,9 @@ function loadAndValidateFamilyTree(): FamilyTree {
             }
 
             parsedData.children = parsedData.children.map((child, index) => {
+                const newId = Date.now() + index + 100;
                 if (!child || typeof child.id !== 'number' || existingIds.has(child.id)) {
                     dataWasModified = true;
-                    const newId = Date.now() + index + 1;
                     const fallbackChild = getInitialFamilyTree().children[index] || { name: '', relation: '', photo: '', quote: ''};
                     const newChildData = child ? { ...child, id: newId } : { ...fallbackChild, id: newId };
                     existingIds.add(newId);
@@ -123,18 +121,23 @@ export function FamilyTreeView() {
     const handleSave = (memberToSave: FamilyMember) => {
         if (!familyTree) return;
 
-        let newFamilyTree;
-        // Check if we are editing the spouse
+        let newFamilyTree: FamilyTree;
+        
+        // Check if it's a new member by seeing if the ID exists in children
+        const isNewMember = !familyTree.children.some(c => c.id === memberToSave.id) && familyTree.spouse.id !== memberToSave.id;
+
         if (familyTree.spouse.id === memberToSave.id) {
+            // Editing the spouse
             newFamilyTree = { ...familyTree, spouse: memberToSave };
         } else {
             const childIndex = familyTree.children.findIndex(c => c.id === memberToSave.id);
             const updatedChildren = [...familyTree.children];
-            // Check if we are editing an existing child
+            
             if (childIndex > -1) {
+                // Editing an existing child
                 updatedChildren[childIndex] = memberToSave;
             } else {
-                // Otherwise, we are adding a new child
+                // Adding a new child
                 updatedChildren.push(memberToSave);
             }
             newFamilyTree = { ...familyTree, children: updatedChildren };
