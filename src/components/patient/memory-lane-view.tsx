@@ -54,13 +54,18 @@ export function MemoryLaneView() {
      useEffect(() => {
         const storedData = localStorage.getItem(MEMORIES_STORAGE_KEY);
         if (storedData) {
-            setMemories(JSON.parse(storedData));
+            try {
+                setMemories(JSON.parse(storedData));
+            } catch {
+                setMemories(initialMemories);
+            }
         } else {
             setMemories(initialMemories);
         }
     }, []);
 
     const saveMemories = (newMemories: Memory[]) => {
+        const oldMemories = memories;
         try {
             setMemories(newMemories);
             localStorage.setItem(MEMORIES_STORAGE_KEY, JSON.stringify(newMemories));
@@ -71,13 +76,7 @@ export function MemoryLaneView() {
                     description: "The photo you uploaded is too large. Please choose a smaller file.",
                     variant: "destructive",
                 });
-                // Revert to the old state to avoid inconsistent UI
-                const storedData = localStorage.getItem(MEMORIES_STORAGE_KEY);
-                if (storedData) {
-                    setMemories(JSON.parse(storedData));
-                } else {
-                    setMemories(initialMemories);
-                }
+                setMemories(oldMemories);
             } else {
                 toast({
                     title: "An unexpected error occurred.",
@@ -99,14 +98,17 @@ export function MemoryLaneView() {
     };
 
     const handleSave = (memoryToSave: Memory) => {
-        const index = memories.findIndex(m => m.id === memoryToSave.id);
         let newMemories;
+        const index = memories.findIndex(m => m.id === memoryToSave.id);
+        
         if (index > -1) {
-            newMemories = [...memories];
-            newMemories[index] = memoryToSave;
+            // Editing an existing memory
+            newMemories = memories.map(m => m.id === memoryToSave.id ? memoryToSave : m);
         } else {
+            // Adding a new memory
             newMemories = [memoryToSave, ...memories];
         }
+        
         saveMemories(newMemories);
         setEditingMemory(null);
         toast({ title: "Memory Saved!", description: "Your precious memory has been saved." });
@@ -186,7 +188,7 @@ function EditMemoryView({ memory, onSave, onCancel }: { memory: Memory, onSave: 
         onSave(currentMemory);
     };
 
-    const handleFieldChange = (field: keyof Memory, value: string) => {
+    const handleFieldChange = (field: keyof Omit<Memory, 'id'>, value: string) => {
         setCurrentMemory(prev => ({...prev, [field]: value}));
     }
 
@@ -204,7 +206,7 @@ function EditMemoryView({ memory, onSave, onCancel }: { memory: Memory, onSave: 
     return (
         <Card className="max-w-2xl mx-auto shadow-2xl">
             <CardHeader>
-                <CardTitle>{memory.id > initialMemories.length ? "Add a New Memory" : "Edit Your Memory"}</CardTitle>
+                <CardTitle>{memory.story ? "Edit Your Memory" : "Add a New Memory"}</CardTitle>
                 <CardDescription>Share the story behind the photo.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -224,6 +226,15 @@ function EditMemoryView({ memory, onSave, onCancel }: { memory: Memory, onSave: 
                         placeholder="What's the story behind this photo?"
                         rows={5}
                         className="text-base"
+                    />
+                </div>
+                 <div>
+                    <label htmlFor="hint" className="font-semibold mb-2 block">Image Hint</label>
+                    <Input
+                        id="hint"
+                        value={currentMemory.hint}
+                        onChange={(e) => handleFieldChange('hint', e.target.value)}
+                        placeholder="e.g., family beach"
                     />
                 </div>
                 <div className="flex justify-end gap-2 pt-4">
