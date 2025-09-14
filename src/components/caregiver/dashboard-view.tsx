@@ -4,20 +4,18 @@ import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Bell, Images, ListTodo, UserPlus, Lightbulb, Loader2, Users } from "lucide-react";
+import { Bell, Images, ListTodo, UserPlus, Lightbulb, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { getCaregiverTip } from '@/ai/flows/caregiver-tips';
-import type { Patient } from './caregiver-dashboard';
+import type { PatientLink } from './caregiver-dashboard';
 import { patient as mockPatientData } from '@/lib/data';
 
 type DashboardViewProps = {
-    addPatient: (patient: Patient) => void;
-    changeActivePatient: (patient: Patient) => void;
-    patients: Patient[];
-    activePatient: Patient | null;
+    linkPatient: (patient: PatientLink) => void;
+    linkedPatient: PatientLink | null;
 }
 
-export function DashboardView({ addPatient, changeActivePatient, patients, activePatient }: DashboardViewProps) {
+export function DashboardView({ linkPatient, linkedPatient }: DashboardViewProps) {
   const { toast } = useToast();
   const [patientIdInput, setPatientIdInput] = useState('');
   const [tip, setTip] = useState('');
@@ -27,24 +25,24 @@ export function DashboardView({ addPatient, changeActivePatient, patients, activ
     if (!patientIdInput.trim()) {
         toast({
             title: "Patient ID Required",
-            description: "Please enter a valid Patient ID to link accounts.",
+            description: "Please enter a valid Patient ID to link your account.",
             variant: "destructive",
         });
         return;
     }
     
     // In a real app, you'd fetch patient details from a backend.
-    // For this demo, we'll use a mock name based on the ID.
-    const newPatient: Patient = {
+    // For this demo, we'll use mock data.
+    const newPatient: PatientLink = {
         id: patientIdInput.trim(),
-        name: mockPatientData.name // for simplicity, let's assume it's always John Doe
+        name: mockPatientData.name 
     }
 
-    addPatient(newPatient);
+    linkPatient(newPatient);
 
     toast({
-        title: "Patient Added",
-        description: `You can now manage ${newPatient.name}.`,
+        title: "Patient Account Linked",
+        description: `You are now managing ${newPatient.name}.`,
     })
     setPatientIdInput('');
   }
@@ -72,64 +70,55 @@ export function DashboardView({ addPatient, changeActivePatient, patients, activ
     <div className="space-y-6">
         <h1 className="text-3xl font-bold font-headline">Caregiver Dashboard</h1>
         
-        {!activePatient ? (
+        {!linkedPatient ? (
             <Card className='border-primary'>
                 <CardHeader>
                     <CardTitle>Welcome, Caregiver!</CardTitle>
-                    <CardDescription>To get started, please add a patient to your list and select them.</CardDescription>
+                    <CardDescription>To get started, please link to your loved one's account using their patient ID.</CardDescription>
                 </CardHeader>
-            </Card>
-        ) : (
-             <p className="text-muted-foreground">You are currently managing <span className="font-bold text-foreground">{activePatient.name}</span>. Use the sidebar to navigate.</p>
-        )}
-        
-        <div className="grid lg:grid-cols-2 gap-6">
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2"><UserPlus />Add a New Patient</CardTitle>
-                    <CardDescription>Enter the Patient's ID to add them to your managed list.</CardDescription>
-                </CardHeader>
-                <CardContent>
+                 <CardContent>
                     <div className="flex gap-2 max-w-sm">
                         <Input 
                             placeholder="Patient ID (e.g., P-12345XYZ)" 
                             value={patientIdInput}
                             onChange={(e) => setPatientIdInput(e.target.value)}
                         />
-                        <Button onClick={handleLink}>Add Patient</Button>
+                        <Button onClick={handleLink}><UserPlus className="mr-2 h-4 w-4" />Link Account</Button>
                     </div>
                 </CardContent>
             </Card>
+        ) : (
+             <p className="text-muted-foreground">You are currently managing <span className="font-bold text-foreground">{linkedPatient.name}</span>. Use the sidebar to navigate.</p>
+        )}
+        
+        <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2"><Lightbulb /> AI Caregiver Assistant</CardTitle>
+                <CardDescription>A daily tip to help you on your caregiving journey.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                {loadingTip ? (
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                        <span>Getting a helpful tip for you...</span>
+                    </div>
+                ) : (
+                     <p className="text-base italic p-4 bg-accent/50 rounded-lg border-l-4 border-accent-foreground/50">
+                        {tip}
+                    </p>
+                )}
+                <Button variant="secondary" onClick={fetchTip} disabled={loadingTip}>
+                    Get a New Tip
+                </Button>
+            </CardContent>
+        </Card>
 
-             <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2"><Lightbulb /> AI Caregiver Assistant</CardTitle>
-                    <CardDescription>A daily tip to help you on your caregiving journey.</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    {loadingTip ? (
-                        <div className="flex items-center gap-2 text-muted-foreground">
-                            <Loader2 className="h-5 w-5 animate-spin" />
-                            <span>Getting a helpful tip for you...</span>
-                        </div>
-                    ) : (
-                         <p className="text-base italic p-4 bg-accent/50 rounded-lg border-l-4 border-accent-foreground/50">
-                            {tip}
-                        </p>
-                    )}
-                    <Button variant="secondary" onClick={fetchTip} disabled={loadingTip}>
-                        Get a New Tip
-                    </Button>
-                </CardContent>
-            </Card>
-        </div>
 
-
-       {activePatient && (
+       {linkedPatient && (
          <Card>
             <CardHeader>
-                <CardTitle>Quick Overview for {activePatient.name}</CardTitle>
-                <CardDescription>A summary of the selected patient's current setup.</CardDescription>
+                <CardTitle>Quick Overview for {linkedPatient.name}</CardTitle>
+                <CardDescription>A summary of your loved one's current setup.</CardDescription>
             </CardHeader>
             <CardContent className="grid md:grid-cols-3 gap-4">
                  <div className="p-4 bg-muted rounded-lg space-y-2">
