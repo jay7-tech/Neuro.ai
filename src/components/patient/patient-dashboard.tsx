@@ -264,21 +264,7 @@ export function PatientDashboard() {
             </div>
           </CardHeader>
         </Card>
-
-        <CaregiverChat patientId={patientId} />
-
-         <Card className="shadow-xl rounded-2xl">
-            <CardHeader>
-                <CardTitle className="text-2xl flex items-center gap-2">
-                    <Smile /> How are you feeling?
-                </CardTitle>
-                <CardDescription>Let your caregiver know how your day is going.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <MoodTracker patientId={patientId} />
-            </CardContent>
-        </Card>
-
+        
         <Card className="shadow-xl rounded-2xl">
           <CardHeader>
             <CardTitle className="text-2xl">Tools to Help</CardTitle>
@@ -294,6 +280,20 @@ export function PatientDashboard() {
               </Link>
             ))}
           </CardContent>
+        </Card>
+
+        <CaregiverChat patientId={patientId} />
+
+         <Card className="shadow-xl rounded-2xl">
+            <CardHeader>
+                <CardTitle className="text-2xl flex items-center gap-2">
+                    <Smile /> How are you feeling?
+                </CardTitle>
+                <CardDescription>Let your caregiver know how your day is going.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <MoodTracker patientId={patientId} />
+            </CardContent>
         </Card>
 
         <Card className="shadow-xl rounded-2xl">
@@ -457,6 +457,7 @@ export function PatientDashboard() {
                         <li key={med.id} className="p-3 rounded-lg bg-secondary/50 flex justify-between items-center">
                             <div>
                                 <p className="font-bold">{med.name}</p>
+
                                 <p className="text-sm text-muted-foreground">{med.dose}</p>
                             </div>
                             <p className="font-mono text-lg">{med.time}</p>
