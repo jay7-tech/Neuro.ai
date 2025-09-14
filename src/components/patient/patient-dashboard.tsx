@@ -282,44 +282,6 @@ export function PatientDashboard() {
           </CardContent>
         </Card>
 
-        <CaregiverChat patientId={patientId} />
-
-         <Card className="shadow-xl rounded-2xl">
-            <CardHeader>
-                <CardTitle className="text-2xl flex items-center gap-2">
-                    <Smile /> How are you feeling?
-                </CardTitle>
-                <CardDescription>Let your caregiver know how your day is going.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <MoodTracker patientId={patientId} />
-            </CardContent>
-        </Card>
-
-        <Card className="shadow-xl rounded-2xl">
-            <CardHeader>
-                <CardTitle className="text-2xl flex items-center gap-2">
-                    <MessageSquare /> AI Companion
-                </CardTitle>
-                <CardDescription>Have a question? Ask your AI companion.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <AiCompanion />
-            </CardContent>
-        </Card>
-      </div>
-
-      {/* Right Sidebar Column */}
-      <div className="lg:col-span-1 space-y-8">
-        <Card className="shadow-xl rounded-2xl border-destructive/50">
-            <CardContent className="p-4">
-                <Button variant="destructive" size="lg" className="w-full h-24 text-2xl rounded-xl shadow-lg" onClick={handleCallHelp}>
-                    <PhoneCall className="mr-4 h-10 w-10" />
-                    Call for Help
-                </Button>
-            </CardContent>
-        </Card>
-
         <Card className="shadow-xl rounded-2xl">
           <CardHeader className="flex-row items-center justify-between">
             <div>
@@ -395,7 +357,7 @@ export function PatientDashboard() {
             )}
           </CardContent>
         </Card>
-
+        
         <Card className="shadow-xl rounded-2xl">
           <CardHeader className="flex-row items-center justify-between">
             <div className="space-y-1">
@@ -471,6 +433,44 @@ export function PatientDashboard() {
           </CardContent>
         </Card>
 
+      </div>
+
+      {/* Right Sidebar Column */}
+      <div className="lg:col-span-1 space-y-8">
+        <Card className="shadow-xl rounded-2xl border-destructive/50">
+            <CardContent className="p-4">
+                <Button variant="destructive" size="lg" className="w-full h-24 text-2xl rounded-xl shadow-lg" onClick={handleCallHelp}>
+                    <PhoneCall className="mr-4 h-10 w-10" />
+                    Call for Help
+                </Button>
+            </CardContent>
+        </Card>
+
+        <CaregiverChat patientId={patientId} />
+
+        <Card className="shadow-xl rounded-2xl">
+            <CardHeader>
+                <CardTitle className="text-2xl flex items-center gap-2">
+                    <Smile /> How are you feeling?
+                </CardTitle>
+                <CardDescription>Let your caregiver know how your day is going.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <MoodTracker patientId={patientId} />
+            </CardContent>
+        </Card>
+
+        <Card className="shadow-xl rounded-2xl">
+            <CardHeader>
+                <CardTitle className="text-2xl flex items-center gap-2">
+                    <MessageSquare /> AI Companion
+                </CardTitle>
+                <CardDescription>Have a question? Ask your AI companion.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <AiCompanion />
+            </CardContent>
+        </Card>
       </div>
     </div>
   );
