@@ -2,21 +2,24 @@
 'use client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Music, Waves, Wind, Leaf, Coffee, Heart } from "lucide-react";
+import { Music, Waves, Wind, Leaf, Coffee, Star } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
 import { patient as initialPatient } from '@/lib/data';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 
 type MusicItem = {
     id: number;
     name: string;
 }
 
-const initialMusicList: MusicItem[] = [
-    { id: 1, name: "Calm Piano" },
-    { id: 2, name: "Ocean Waves" },
-    { id: 3, name: "Gentle Wind" },
-];
+const defaultSounds = [
+    { id: 1, name: "Ocean Waves", icon: <Waves className="h-10 w-10 text-primary" /> },
+    { id: 2, name: "Gentle Wind", icon: <Wind className="h-10 w-10 text-primary" /> },
+    { id: 3, name: "Forest Leaves", icon: <Leaf className="h-10 w-10 text-primary" /> },
+    { id: 4, name: "Cozy Cafe", icon: <Coffee className="h-10 w-10 text-primary" /> },
+]
 
 
 export function MusicTherapy() {
@@ -25,31 +28,29 @@ export function MusicTherapy() {
     
     const { toast } = useToast();
     const [nowPlaying, setNowPlaying] = useState<string | null>(null);
-    const [musicList, setMusicList] = useState<MusicItem[]>([]);
+    const [caregiverMusicList, setCaregiverMusicList] = useState<MusicItem[]>([]);
 
     useEffect(() => {
         const storedMusic = localStorage.getItem(MUSIC_STORAGE_KEY);
         if (storedMusic) {
             try {
                 const parsedMusic = JSON.parse(storedMusic);
-                if (Array.isArray(parsedMusic) && parsedMusic.length > 0) {
-                    setMusicList(parsedMusic);
-                } else {
-                    setMusicList(initialMusicList);
+                 if (Array.isArray(parsedMusic)) {
+                    setCaregiverMusicList(parsedMusic);
                 }
             } catch {
-                setMusicList(initialMusicList);
+                setCaregiverMusicList([]);
             }
         } else {
-            setMusicList(initialMusicList);
+            setCaregiverMusicList([]);
         }
     }, [MUSIC_STORAGE_KEY]);
 
-    const handlePlay = (sound: { name: string, id: number }) => {
-        setNowPlaying(sound.name);
+    const handlePlay = (soundName: string) => {
+        setNowPlaying(soundName);
         toast({
             title: "Now Playing",
-            description: `The sound "${sound.name}" has started.`,
+            description: `The sound "${soundName}" has started.`,
         });
     }
 
@@ -66,24 +67,47 @@ export function MusicTherapy() {
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {musicList.map((sound) => (
-                        <Button 
-                            key={sound.id}
-                            variant="outline"
-                            className="h-32 text-lg rounded-xl shadow-md transition-transform hover:scale-105 hover:bg-accent/50 flex-col gap-2"
-                            onClick={() => handlePlay(sound)}
-                        >
-                            <Music className="h-10 w-10 text-primary" />
-                            {sound.name}
-                        </Button>
-                    ))}
-                    {musicList.length === 0 && (
-                        <p className="text-muted-foreground text-center col-span-full py-8">
-                            Your caregiver hasn't added any custom music yet.
-                        </p>
-                    )}
-                </div>
+                <Tabs defaultValue="calm">
+                    <TabsList className="grid w-full grid-cols-2">
+                        <TabsTrigger value="calm">Calming Sounds</TabsTrigger>
+                        <TabsTrigger value="caregiver">From Your Caregiver</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="calm" className="mt-4">
+                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {defaultSounds.map((sound) => (
+                                <Button 
+                                    key={sound.id}
+                                    variant="outline"
+                                    className="h-32 text-lg rounded-xl shadow-md transition-transform hover:scale-105 hover:bg-accent/50 flex-col gap-2"
+                                    onClick={() => handlePlay(sound.name)}
+                                >
+                                    {sound.icon}
+                                    {sound.name}
+                                </Button>
+                            ))}
+                        </div>
+                    </TabsContent>
+                    <TabsContent value="caregiver" className="mt-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {caregiverMusicList.map((sound) => (
+                                <Button 
+                                    key={sound.id}
+                                    variant="outline"
+                                    className="h-32 text-lg rounded-xl shadow-md transition-transform hover:scale-105 hover:bg-accent/50 flex-col gap-2"
+                                    onClick={() => handlePlay(sound.name)}
+                                >
+                                    <Star className="h-10 w-10 text-yellow-400" />
+                                    {sound.name}
+                                </Button>
+                            ))}
+                            {caregiverMusicList.length === 0 && (
+                                <p className="text-muted-foreground text-center col-span-full py-8">
+                                    Your caregiver hasn't added any custom music or sounds for you yet.
+                                </p>
+                            )}
+                        </div>
+                    </TabsContent>
+                </Tabs>
                  <div className="mt-6 text-center text-muted-foreground">
                     <p>Audio playback is simulated for this demonstration.</p>
                 </div>
