@@ -1,9 +1,10 @@
 
+
 'use client';
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Brain, Pill, Camera, MessageSquare, Calendar, Sun, Moon, Utensils, ArrowRight, Music, PhoneCall, HeartPulse, PlusCircle, Trash2, Album, Edit, Save, X, Users, Smile } from "lucide-react";
+import { Brain, Pill, Camera, MessageSquare, Calendar, Sun, Moon, Utensils, ArrowRight, Music, PhoneCall, HeartPulse, PlusCircle, Trash2, Album, Edit, Save, X, Users, Smile, Star } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { AiCompanion } from "./ai-companion";
@@ -11,6 +12,7 @@ import { patient as initialPatient } from "@/lib/data";
 import { Input } from '../ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { MoodTracker } from './mood-tracker';
+import { MessageBoard } from './message-board';
 
 const PATIENT_STORAGE_KEY = 'neuro-ai-patient-data';
 
@@ -262,6 +264,8 @@ export function PatientDashboard() {
             </div>
           </CardHeader>
         </Card>
+
+        <MessageBoard patientId={patientId} />
 
          <Card className="shadow-xl rounded-2xl">
             <CardHeader>

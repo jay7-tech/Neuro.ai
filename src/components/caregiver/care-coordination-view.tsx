@@ -7,9 +7,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { PlusCircle, Trash2, Sun, Moon, Utensils, HeartPulse, Brain, Edit, Save, X } from 'lucide-react';
+import { PlusCircle, Trash2, Sun, Moon, Utensils, HeartPulse, Brain, Edit, Save, X, MessageSquare } from 'lucide-react';
 import { FamilyTreeView } from '@/components/shared/family-tree-view';
 import { MemoryLaneView } from '@/components/shared/memory-lane-view';
+import { Textarea } from '../ui/textarea';
 
 
 type PlanItem = {
@@ -45,10 +46,12 @@ const initialMedications: Medication[] = [
 export function CareCoordinationView({ patientId }: { patientId: string }) {
     const DAILY_PLAN_STORAGE_KEY = `neuro-ai-${patientId}-daily-plan`;
     const MEDICATIONS_STORAGE_KEY = `neuro-ai-${patientId}-medications`;
+    const MESSAGE_BOARD_KEY = `neuro-ai-${patientId}-message-board`;
 
     const { toast } = useToast();
     const [medications, setMedications] = useState<Medication[]>([]);
     const [dailyPlan, setDailyPlan] = useState<PlanItem[]>([]);
+    const [message, setMessage] = useState('');
     
     const [isEditingPlan, setIsEditingPlan] = useState(false);
     const [planBeforeEdit, setPlanBeforeEdit] = useState<PlanItem[]>([]);
@@ -93,7 +96,12 @@ export function CareCoordinationView({ patientId }: { patientId: string }) {
         } else {
             setMedications(initialMedications);
         }
-    }, [patientId, DAILY_PLAN_STORAGE_KEY, MEDICATIONS_STORAGE_KEY]);
+
+        const storedMessage = localStorage.getItem(MESSAGE_BOARD_KEY);
+        if (storedMessage) {
+            setMessage(storedMessage);
+        }
+    }, [patientId, DAILY_PLAN_STORAGE_KEY, MEDICATIONS_STORAGE_KEY, MESSAGE_BOARD_KEY]);
 
     const saveDailyPlan = (plan: PlanItem[]) => {
         const planToSave = plan.map(item => ({
@@ -110,6 +118,14 @@ export function CareCoordinationView({ patientId }: { patientId: string }) {
     const saveMedications = (meds: Medication[]) => {
         localStorage.setItem(MEDICATIONS_STORAGE_KEY, JSON.stringify(meds));
         setMedications(meds);
+    }
+
+    const saveMessage = () => {
+        localStorage.setItem(MESSAGE_BOARD_KEY, message);
+        toast({
+            title: "Message Saved",
+            description: "Your message for the patient has been updated.",
+        });
     }
 
 
@@ -195,6 +211,26 @@ export function CareCoordinationView({ patientId }: { patientId: string }) {
         <div className="space-y-6">
             <h1 className="text-3xl font-bold font-headline">Care Coordination</h1>
             <p className="text-muted-foreground">Manage the patient's daily routine, memories, family contacts, and medications.</p>
+            
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2"><MessageSquare/> Message for Patient</CardTitle>
+                    <CardDescription>Leave a short, encouraging message that will be displayed on the patient's dashboard.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <Textarea 
+                        placeholder="E.g., Hi Mom! Thinking of you today. Hope you have a wonderful day!"
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                        rows={3}
+                        className="text-base"
+                    />
+                    <div className="flex justify-end">
+                        <Button onClick={saveMessage}><Save className="mr-2 h-4 w-4"/> Save Message</Button>
+                    </div>
+                </CardContent>
+            </Card>
+
             <Tabs defaultValue="planner">
                 <TabsList className="grid w-full grid-cols-4 max-w-2xl">
                     <TabsTrigger value="planner">Daily Planner</TabsTrigger>
