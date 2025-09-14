@@ -118,6 +118,7 @@ export function MemoryLaneView({ isCaregiverView = false, patientId }: { isCareg
     const handleDelete = (id: number) => {
         const newMemories = memories.filter(m => m.id !== id);
         saveMemories(newMemories);
+        setEditingMemory(null);
         toast({ title: "Memory Deleted", description: "The memory has been removed from your album.", variant: "destructive" });
     };
 
