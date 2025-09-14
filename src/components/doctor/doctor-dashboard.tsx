@@ -2,31 +2,29 @@
 "use client";
 import { useState, useEffect, useCallback } from 'react';
 import { SidebarProvider, Sidebar, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarInset, SidebarTrigger, SidebarHeader } from '@/components/ui/sidebar';
-import { Home, ListTodo, BarChart2, Users, ChevronDown } from 'lucide-react';
-import { DashboardView } from './dashboard-view';
-import { CareCoordinationView } from './care-coordination-view';
-import { PatientMonitoringView } from './patient-monitoring-view';
+import { Home, ListTodo, BarChart2, Users, ChevronDown, FileText } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
 import { Button } from '../ui/button';
+import { PatientsView } from './patients-view';
+import { ClinicalNotesView } from './clinical-notes-view';
+import { patient as mockPatientData } from '@/lib/data';
 
 const AppIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6 text-primary">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6 text-primary">
         <path d="M12 2a10 10 0 0 0-10 10c0 5 4.5 9 10 9s10-4 10-9A10 10 0 0 0 12 2Z"/>
         <path d="M12 12a5 5 0 0 0-5 5"/>
         <path d="M12 7a5 5 0 0 1 5 5"/>
     </svg>
 )
 
-type View = 'dashboard' | 'coordination' | 'monitoring';
+type View = 'patients' | 'notes';
 export type Patient = { id: string, name: string };
 
+const PATIENTS_STORAGE_KEY = 'neuro-ai-doctor-patients';
+const ACTIVE_PATIENT_STORAGE_KEY = 'neuro-ai-doctor-active-patient';
 
-const PATIENTS_STORAGE_KEY = 'neuro-ai-caregiver-patients';
-const ACTIVE_PATIENT_STORAGE_KEY = 'neuro-ai-caregiver-active-patient';
-
-
-export function CaregiverDashboard() {
-  const [activeView, setActiveView] = useState<View>('dashboard');
+export function DoctorDashboard() {
+  const [activeView, setActiveView] = useState<View>('patients');
   const [patients, setPatients] = useState<Patient[]>([]);
   const [activePatient, setActivePatient] = useState<Patient | null>(null);
 
@@ -58,27 +56,20 @@ export function CaregiverDashboard() {
     } else {
       localStorage.removeItem(ACTIVE_PATIENT_STORAGE_KEY);
     }
-    // Force a re-render of the views by briefly switching and coming back
     const currentView = activeView;
-    setActiveView('dashboard');
+    setActiveView('patients');
     setTimeout(() => setActiveView(currentView), 0);
   };
 
-
   const renderView = () => {
-    if (!activePatient) {
-        return <DashboardView addPatient={addPatient} changeActivePatient={changeActivePatient} patients={patients} activePatient={activePatient} />;
-    }
-
     switch (activeView) {
-      case 'dashboard':
-        return <DashboardView addPatient={addPatient} changeActivePatient={changeActivePatient} patients={patients} activePatient={activePatient} />;
-      case 'coordination':
-        return <CareCoordinationView patientId={activePatient.id} key={activePatient.id} />;
-      case 'monitoring':
-        return <PatientMonitoringView patientId={activePatient.id} key={activePatient.id} />;
+      case 'patients':
+        return <PatientsView addPatient={addPatient} changeActivePatient={changeActivePatient} patients={patients} activePatient={activePatient} />;
+      case 'notes':
+        if (!activePatient) return <PatientsView addPatient={addPatient} changeActivePatient={changeActivePatient} patients={patients} activePatient={activePatient} />;
+        return <ClinicalNotesView patient={activePatient} key={activePatient.id} />;
       default:
-        return <DashboardView addPatient={addPatient} changeActivePatient={changeActivePatient} patients={patients} activePatient={activePatient} />;
+        return <PatientsView addPatient={addPatient} changeActivePatient={changeActivePatient} patients={patients} activePatient={activePatient} />;
     }
   };
 
@@ -89,12 +80,12 @@ export function CaregiverDashboard() {
             <div className="flex items-center gap-2 p-2">
                 <AppIcon />
                 <h2 className="font-bold font-headline text-lg group-data-[collapsible=icon]:hidden">
-                    Caregiver Menu
+                    Doctor Menu
                 </h2>
             </div>
         </SidebarHeader>
         <SidebarContent>
-          <div className="p-2">
+           <div className="p-2">
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <Button variant="outline" className="w-full justify-between group-data-[collapsible=icon]:hidden">
@@ -119,13 +110,10 @@ export function CaregiverDashboard() {
           </div>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton onClick={() => setActiveView('dashboard')} isActive={activeView === 'dashboard'} tooltip="Dashboard"><Home />Dashboard</SidebarMenuButton>
+              <SidebarMenuButton onClick={() => setActiveView('patients')} isActive={activeView === 'patients'} tooltip="Patients"><Users />Patients</SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton onClick={() => setActiveView('coordination')} isActive={activeView === 'coordination'} tooltip="Care Coordination" disabled={!activePatient}><ListTodo />Care Coordination</SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton onClick={() => setActiveView('monitoring')} isActive={activeView === 'monitoring'} tooltip="Patient Monitoring" disabled={!activePatient}><BarChart2 />Patient Monitoring</SidebarMenuButton>
+              <SidebarMenuButton onClick={() => setActiveView('notes')} isActive={activeView === 'notes'} tooltip="Clinical Notes" disabled={!activePatient}><FileText />Clinical Notes</SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarContent>
@@ -134,7 +122,7 @@ export function CaregiverDashboard() {
         <div className="p-4 md:p-8">
             <div className="md:hidden mb-4 flex justify-between">
                 <SidebarTrigger />
-                {activePatient && (
+                 {activePatient && (
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="outline">

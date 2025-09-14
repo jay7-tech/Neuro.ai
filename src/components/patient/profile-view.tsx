@@ -17,9 +17,9 @@ import { Textarea } from '../ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { useTheme } from '../app/theme-provider';
 
-const PATIENT_STORAGE_KEY = 'neuro-ai-patient-data';
 
 export function ProfileView() {
+    const PATIENT_STORAGE_KEY = 'neuro-ai-patient-data';
     const { toast } = useToast();
     const [patient, setPatient] = useState(initialPatient);
     const [isEditing, setIsEditing] = useState(false);
@@ -260,7 +260,7 @@ export function ProfileView() {
                                         max={20}
                                         step={1}
                                         value={[textSize]}
-                                        onValue-commit={v => setTextSize(v[0])}
+                                        onValueChange={(v) => setTextSize(v[0])}
                                     />
                                     <span className="text-sm">Large</span>
                                 </div>

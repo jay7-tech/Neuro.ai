@@ -1,21 +1,30 @@
+
 'use client';
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Bell, Images, ListTodo, UserPlus, Lightbulb, Loader2 } from "lucide-react";
+import { Bell, Images, ListTodo, UserPlus, Lightbulb, Loader2, Users } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { getCaregiverTip } from '@/ai/flows/caregiver-tips';
+import type { Patient } from './caregiver-dashboard';
+import { patient as mockPatientData } from '@/lib/data';
 
-export function DashboardView() {
-  const caregiverId = "C-ABCDE12";
+type DashboardViewProps = {
+    addPatient: (patient: Patient) => void;
+    changeActivePatient: (patient: Patient) => void;
+    patients: Patient[];
+    activePatient: Patient | null;
+}
+
+export function DashboardView({ addPatient, changeActivePatient, patients, activePatient }: DashboardViewProps) {
   const { toast } = useToast();
-  const [patientId, setPatientId] = useState('');
+  const [patientIdInput, setPatientIdInput] = useState('');
   const [tip, setTip] = useState('');
   const [loadingTip, setLoadingTip] = useState(true);
 
   const handleLink = () => {
-    if (!patientId.trim()) {
+    if (!patientIdInput.trim()) {
         toast({
             title: "Patient ID Required",
             description: "Please enter a valid Patient ID to link accounts.",
@@ -23,11 +32,21 @@ export function DashboardView() {
         });
         return;
     }
+    
+    // In a real app, you'd fetch patient details from a backend.
+    // For this demo, we'll use a mock name based on the ID.
+    const newPatient: Patient = {
+        id: patientIdInput.trim(),
+        name: mockPatientData.name // for simplicity, let's assume it's always John Doe
+    }
+
+    addPatient(newPatient);
+
     toast({
-        title: "Patient Linked",
-        description: "You are now successfully linked to the patient's account.",
+        title: "Patient Added",
+        description: `You can now manage ${newPatient.name}.`,
     })
-    setPatientId('');
+    setPatientIdInput('');
   }
 
   const fetchTip = async () => {
@@ -52,22 +71,32 @@ export function DashboardView() {
   return (
     <div className="space-y-6">
         <h1 className="text-3xl font-bold font-headline">Caregiver Dashboard</h1>
-        <p className="text-muted-foreground">Welcome back! Your Caregiver ID is <span className="font-bold text-foreground">{caregiverId}</span>. Share this with patients if needed.</p>
+        
+        {!activePatient ? (
+            <Card className='border-primary'>
+                <CardHeader>
+                    <CardTitle>Welcome, Caregiver!</CardTitle>
+                    <CardDescription>To get started, please add a patient to your list and select them.</CardDescription>
+                </CardHeader>
+            </Card>
+        ) : (
+             <p className="text-muted-foreground">You are currently managing <span className="font-bold text-foreground">{activePatient.name}</span>. Use the sidebar to navigate.</p>
+        )}
         
         <div className="grid lg:grid-cols-2 gap-6">
             <Card>
                 <CardHeader>
-                    <CardTitle className="flex items-center gap-2"><UserPlus />Link to a Patient</CardTitle>
-                    <CardDescription>Enter the Patient's ID to link your accounts and start coordinating care.</CardDescription>
+                    <CardTitle className="flex items-center gap-2"><UserPlus />Add a New Patient</CardTitle>
+                    <CardDescription>Enter the Patient's ID to add them to your managed list.</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <div className="flex gap-2 max-w-sm">
                         <Input 
                             placeholder="Patient ID (e.g., P-12345XYZ)" 
-                            value={patientId}
-                            onChange={(e) => setPatientId(e.target.value)}
+                            value={patientIdInput}
+                            onChange={(e) => setPatientIdInput(e.target.value)}
                         />
-                        <Button onClick={handleLink}>Link Account</Button>
+                        <Button onClick={handleLink}>Add Patient</Button>
                     </div>
                 </CardContent>
             </Card>
@@ -96,10 +125,11 @@ export function DashboardView() {
         </div>
 
 
-        <Card>
+       {activePatient && (
+         <Card>
             <CardHeader>
-                <CardTitle>Quick Overview</CardTitle>
-                <CardDescription>A summary of the linked patient's current setup.</CardDescription>
+                <CardTitle>Quick Overview for {activePatient.name}</CardTitle>
+                <CardDescription>A summary of the selected patient's current setup.</CardDescription>
             </CardHeader>
             <CardContent className="grid md:grid-cols-3 gap-4">
                  <div className="p-4 bg-muted rounded-lg space-y-2">
@@ -119,6 +149,7 @@ export function DashboardView() {
                 </div>
             </CardContent>
         </Card>
+       )}
     </div>
   )
 }

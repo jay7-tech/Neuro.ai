@@ -44,9 +44,9 @@ type Memory = {
     hint: string;
 };
 
-const MEMORIES_STORAGE_KEY = 'neuro-ai-memories';
 
-export function MemoryLaneView({ isCaregiverView = false }: { isCaregiverView?: boolean }) {
+export function MemoryLaneView({ isCaregiverView = false, patientId }: { isCaregiverView?: boolean, patientId: string }) {
+    const MEMORIES_STORAGE_KEY = `neuro-ai-${patientId}-memories`;
     const { toast } = useToast();
     const [memories, setMemories] = useState<Memory[]>([]);
     const [editingMemory, setEditingMemory] = useState<Memory | null>(null);
@@ -62,7 +62,7 @@ export function MemoryLaneView({ isCaregiverView = false }: { isCaregiverView?: 
         } else {
             setMemories(initialMemories);
         }
-    }, []);
+    }, [MEMORIES_STORAGE_KEY]);
 
     const saveMemories = (newMemories: Memory[], oldMemoriesState?: Memory[]) => {
         setMemories(newMemories);
@@ -247,5 +247,3 @@ function EditMemoryView({ memory, onSave, onCancel }: { memory: Memory, onSave: 
         </Card>
     );
 }
-
-    

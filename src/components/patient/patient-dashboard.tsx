@@ -1,3 +1,4 @@
+
 'use client';
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
@@ -12,8 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { MoodTracker } from './mood-tracker';
 
 const PATIENT_STORAGE_KEY = 'neuro-ai-patient-data';
-const DAILY_PLAN_STORAGE_KEY = 'neuro-ai-daily-plan';
-const MEDICATIONS_STORAGE_KEY = 'neuro-ai-medications';
+
 
 type PlanItem = {
     id: number;
@@ -79,6 +79,10 @@ const tools = [
 
 export function PatientDashboard() {
   const [patientData, setPatientData] = useState(initialPatient);
+  const patientId = patientData.id;
+  const DAILY_PLAN_STORAGE_KEY = `neuro-ai-${patientId}-daily-plan`;
+  const MEDICATIONS_STORAGE_KEY = `neuro-ai-${patientId}-medications`;
+
   const [dailyPlan, setDailyPlan] = useState<PlanItem[]>([]);
   const [medications, setMedications] = useState<Medication[]>([]);
   
@@ -105,8 +109,10 @@ export function PatientDashboard() {
     if (storedData) {
         setPatientData(JSON.parse(storedData));
     }
+  }, []);
 
-    const storedPlan = localStorage.getItem(DAILY_PLAN_STORAGE_KEY);
+  useEffect(() => {
+     const storedPlan = localStorage.getItem(DAILY_PLAN_STORAGE_KEY);
     if (storedPlan) {
         try {
             const parsedPlan = JSON.parse(storedPlan).map((item: any) => ({
@@ -131,7 +137,7 @@ export function PatientDashboard() {
     } else {
         setMedications(initialMedications);
     }
-  }, []);
+  }, [patientId, DAILY_PLAN_STORAGE_KEY, MEDICATIONS_STORAGE_KEY])
 
   const saveDailyPlan = (plan: PlanItem[]) => {
         const planToSave = plan.map(item => ({
@@ -265,7 +271,7 @@ export function PatientDashboard() {
                 <CardDescription>Let your caregiver know how your day is going.</CardDescription>
             </CardHeader>
             <CardContent>
-                <MoodTracker />
+                <MoodTracker patientId={patientId} />
             </CardContent>
         </Card>
 

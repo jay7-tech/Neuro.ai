@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { User, Shield } from 'lucide-react';
+import { User, Shield, Stethoscope } from 'lucide-react';
 import { AppHeader } from '@/components/app/header';
 
 export default function SelectionPage() {
@@ -29,7 +29,7 @@ export default function SelectionPage() {
         <main className="container flex flex-col items-center justify-center text-center">
           <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-4">Choose Your Role</h1>
           <p className="text-lg text-muted-foreground mb-12">Please select which dashboard you would like to proceed to.</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl">
             <Link href="/patient" className="flex">
                 <Card className="w-full hover:shadow-xl hover:border-primary/50 transition-all cursor-pointer flex flex-col items-center justify-center text-center p-8 rounded-2xl">
                     <User className="h-20 w-20 text-primary mb-6" />
@@ -42,6 +42,13 @@ export default function SelectionPage() {
                     <Shield className="h-20 w-20 text-primary mb-6" />
                     <CardTitle className="text-3xl">Caregiver</CardTitle>
                     <CardDescription className="mt-2 text-base">Access patient monitoring, care coordination, and daily planning tools.</CardDescription>
+                </Card>
+            </Link>
+            <Link href="/doctor" className="flex">
+                <Card className="w-full hover:shadow-xl hover:border-primary/50 transition-all cursor-pointer flex flex-col items-center justify-center text-center p-8 rounded-2xl">
+                    <Stethoscope className="h-20 w-20 text-primary mb-6" />
+                    <CardTitle className="text-3xl">Doctor</CardTitle>
+                    <CardDescription className="mt-2 text-base">Access clinical dashboards, patient charts, and medical notes.</CardDescription>
                 </Card>
             </Link>
           </div>

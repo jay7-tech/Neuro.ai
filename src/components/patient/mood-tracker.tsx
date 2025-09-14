@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from "react";
@@ -12,15 +13,14 @@ type MoodLogEntry = {
     mood: Mood;
 }
 
-const MOOD_LOG_KEY = 'neuro-ai-mood-log';
-
 const moods: { mood: Mood, icon: JSX.Element, color: string }[] = [
     { mood: 'Happy', icon: <Smile className="h-12 w-12" />, color: 'text-green-500' },
     { mood: 'Okay', icon: <Meh className="h-12 w-12" />, color: 'text-yellow-500' },
     { mood: 'Sad', icon: <Frown className="h-12 w-12" />, color: 'text-red-500' },
 ]
 
-export function MoodTracker() {
+export function MoodTracker({ patientId }: { patientId: string }) {
+    const MOOD_LOG_KEY = `neuro-ai-${patientId}-mood-log`;
     const { toast } = useToast();
     const [selectedMood, setSelectedMood] = useState<Mood | null>(null);
     const [hasLoggedToday, setHasLoggedToday] = useState(false);
@@ -34,7 +34,7 @@ export function MoodTracker() {
             setSelectedMood(todayEntry.mood);
             setHasLoggedToday(true);
         }
-    }, [])
+    }, [MOOD_LOG_KEY])
 
     const handleMoodSelect = (mood: Mood) => {
         if (hasLoggedToday) {

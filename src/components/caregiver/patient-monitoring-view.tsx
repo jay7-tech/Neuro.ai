@@ -1,3 +1,4 @@
+
 'use client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -7,7 +8,7 @@ import { MoodChart } from "../shared/mood-chart";
 import { useEffect, useState } from "react";
 import { mockPatientLocation, type PatientLocation } from "@/lib/data";
 
-export function PatientMonitoringView() {
+export function PatientMonitoringView({ patientId }: { patientId: string }) {
     const [patientLocation, setPatientLocation] = useState<PatientLocation | null>(null);
 
     useEffect(() => {
@@ -73,7 +74,7 @@ export function PatientMonitoringView() {
                     </CardHeader>
                     <CardContent>
                         <div className="h-[300px] w-full">
-                            <MoodChart />
+                            <MoodChart patientId={patientId} />
                         </div>
                     </CardContent>
                 </Card>

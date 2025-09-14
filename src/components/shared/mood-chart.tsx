@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -17,8 +18,6 @@ type MoodLogEntry = {
     date: string; // YYYY-MM-DD
     mood: Mood;
 }
-
-const MOOD_LOG_KEY = 'neuro-ai-mood-log';
 
 const moodToValue = {
     'Happy': 3,
@@ -47,7 +46,8 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export function MoodChart() {
+export function MoodChart({ patientId }: { patientId: string }) {
+    const MOOD_LOG_KEY = `neuro-ai-${patientId}-mood-log`;
     const [chartData, setChartData] = React.useState([]);
 
     React.useEffect(() => {
@@ -69,7 +69,7 @@ export function MoodChart() {
         });
 
         setChartData(data as any);
-    }, []);
+    }, [MOOD_LOG_KEY]);
 
 
   if (chartData.length === 0) {

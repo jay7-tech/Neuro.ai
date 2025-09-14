@@ -12,9 +12,6 @@ import { FamilyTreeView } from '@/components/shared/family-tree-view';
 import { MemoryLaneView } from '@/components/shared/memory-lane-view';
 
 
-const DAILY_PLAN_STORAGE_KEY = 'neuro-ai-daily-plan';
-const MEDICATIONS_STORAGE_KEY = 'neuro-ai-medications';
-
 type PlanItem = {
     id: number;
     time: string;
@@ -45,7 +42,10 @@ const initialMedications: Medication[] = [
 ];
 
 
-export function CareCoordinationView() {
+export function CareCoordinationView({ patientId }: { patientId: string }) {
+    const DAILY_PLAN_STORAGE_KEY = `neuro-ai-${patientId}-daily-plan`;
+    const MEDICATIONS_STORAGE_KEY = `neuro-ai-${patientId}-medications`;
+
     const { toast } = useToast();
     const [medications, setMedications] = useState<Medication[]>([]);
     const [dailyPlan, setDailyPlan] = useState<PlanItem[]>([]);
@@ -93,7 +93,7 @@ export function CareCoordinationView() {
         } else {
             setMedications(initialMedications);
         }
-    }, []);
+    }, [patientId, DAILY_PLAN_STORAGE_KEY, MEDICATIONS_STORAGE_KEY]);
 
     const saveDailyPlan = (plan: PlanItem[]) => {
         const planToSave = plan.map(item => ({
@@ -339,10 +339,10 @@ export function CareCoordinationView() {
                     </Card>
                 </TabsContent>
                 <TabsContent value="memory-lane" className="mt-4">
-                   <MemoryLaneView isCaregiverView={true} />
+                   <MemoryLaneView isCaregiverView={true} patientId={patientId} />
                 </TabsContent>
                  <TabsContent value="family-tree" className="mt-4">
-                    <FamilyTreeView isCaregiverView={true} />
+                    <FamilyTreeView isCaregiverView={true} patientId={patientId} />
                 </TabsContent>
             </Tabs>
         </div>

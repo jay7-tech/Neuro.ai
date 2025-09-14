@@ -34,8 +34,6 @@ type FamilyTree = {
     children: FamilyMember[];
 };
 
-const FAMILY_TREE_STORAGE_KEY = 'neuro-ai-family-tree';
-
 const getInitialFamilyTree = (): FamilyTree => {
     const spouse = { ...initialFamilyTreeData.spouse, id: Date.now() };
     const children = initialFamilyTreeData.children.map((child, index) => ({
@@ -45,7 +43,8 @@ const getInitialFamilyTree = (): FamilyTree => {
     return { spouse, children };
 };
 
-function loadAndValidateFamilyTree(): FamilyTree {
+function loadAndValidateFamilyTree(patientId: string): FamilyTree {
+    const FAMILY_TREE_STORAGE_KEY = `neuro-ai-${patientId}-family-tree`;
     const storedData = typeof window !== 'undefined' ? localStorage.getItem(FAMILY_TREE_STORAGE_KEY) : null;
 
     if (storedData) {
@@ -93,14 +92,15 @@ function loadAndValidateFamilyTree(): FamilyTree {
 }
 
 
-export function FamilyTreeView({ isCaregiverView = false }: { isCaregiverView?: boolean }) {
+export function FamilyTreeView({ isCaregiverView = false, patientId }: { isCaregiverView?: boolean, patientId: string }) {
+    const FAMILY_TREE_STORAGE_KEY = `neuro-ai-${patientId}-family-tree`;
     const { toast } = useToast();
     const [familyTree, setFamilyTree] = useState<FamilyTree | null>(null);
     const [editingMember, setEditingMember] = useState<FamilyMember | null>(null);
 
     useEffect(() => {
-        setFamilyTree(loadAndValidateFamilyTree());
-    }, []);
+        setFamilyTree(loadAndValidateFamilyTree(patientId));
+    }, [patientId]);
 
     const saveFamilyTree = (newFamilyTree: FamilyTree) => {
         const oldFamilyTree = familyTree; // Keep a reference to revert if save fails
@@ -368,5 +368,3 @@ function EditFamilyMemberView({ member, onSave, onCancel, onDelete, isSpouse }: 
         </Card>
     );
 }
-
-    
