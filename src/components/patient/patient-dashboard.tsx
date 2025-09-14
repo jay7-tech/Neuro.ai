@@ -12,7 +12,7 @@ import { patient as initialPatient } from "@/lib/data";
 import { Input } from '../ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { MoodTracker } from './mood-tracker';
-import { MessageBoard } from './message-board';
+import { CaregiverChat } from './caregiver-chat';
 
 const PATIENT_STORAGE_KEY = 'neuro-ai-patient-data';
 
@@ -265,7 +265,7 @@ export function PatientDashboard() {
           </CardHeader>
         </Card>
 
-        <MessageBoard patientId={patientId} />
+        <CaregiverChat patientId={patientId} />
 
          <Card className="shadow-xl rounded-2xl">
             <CardHeader>
