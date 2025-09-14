@@ -1,15 +1,18 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Bell, Images, ListTodo, UserPlus } from "lucide-react";
+import { Bell, Images, ListTodo, UserPlus, Lightbulb, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { getCaregiverTip } from '@/ai/flows/caregiver-tips';
 
 export function DashboardView() {
   const caregiverId = "C-ABCDE12";
   const { toast } = useToast();
   const [patientId, setPatientId] = useState('');
+  const [tip, setTip] = useState('');
+  const [loadingTip, setLoadingTip] = useState(true);
 
   const handleLink = () => {
     if (!patientId.trim()) {
@@ -27,26 +30,72 @@ export function DashboardView() {
     setPatientId('');
   }
 
+  const fetchTip = async () => {
+    setLoadingTip(true);
+    try {
+        const topics = ['Communication', 'Daily Activities', 'Safety', 'Managing Frustration', 'Self-Care'];
+        const randomTopic = topics[Math.floor(Math.random() * topics.length)];
+        const result = await getCaregiverTip({ topic: randomTopic });
+        setTip(result.tip);
+    } catch (error) {
+        console.error("Failed to fetch caregiver tip:", error);
+        setTip("Could not load a tip right now. Remember to take a deep breath and be kind to yourself.");
+    } finally {
+        setLoadingTip(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchTip();
+  }, []);
+
   return (
     <div className="space-y-6">
         <h1 className="text-3xl font-bold font-headline">Caregiver Dashboard</h1>
         <p className="text-muted-foreground">Welcome back! Your Caregiver ID is <span className="font-bold text-foreground">{caregiverId}</span>. Share this with patients if needed.</p>
-        <Card>
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2"><UserPlus />Link to a Patient</CardTitle>
-                <CardDescription>Enter the Patient's ID to link your accounts and start coordinating care.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <div className="flex gap-2 max-w-sm">
-                    <Input 
-                        placeholder="Patient ID (e.g., P-12345XYZ)" 
-                        value={patientId}
-                        onChange={(e) => setPatientId(e.target.value)}
-                    />
-                    <Button onClick={handleLink}>Link Account</Button>
-                </div>
-            </CardContent>
-        </Card>
+        
+        <div className="grid lg:grid-cols-2 gap-6">
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2"><UserPlus />Link to a Patient</CardTitle>
+                    <CardDescription>Enter the Patient's ID to link your accounts and start coordinating care.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="flex gap-2 max-w-sm">
+                        <Input 
+                            placeholder="Patient ID (e.g., P-12345XYZ)" 
+                            value={patientId}
+                            onChange={(e) => setPatientId(e.target.value)}
+                        />
+                        <Button onClick={handleLink}>Link Account</Button>
+                    </div>
+                </CardContent>
+            </Card>
+
+             <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2"><Lightbulb /> AI Caregiver Assistant</CardTitle>
+                    <CardDescription>A daily tip to help you on your caregiving journey.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    {loadingTip ? (
+                        <div className="flex items-center gap-2 text-muted-foreground">
+                            <Loader2 className="h-5 w-5 animate-spin" />
+                            <span>Getting a helpful tip for you...</span>
+                        </div>
+                    ) : (
+                         <p className="text-base italic p-4 bg-accent/50 rounded-lg border-l-4 border-accent-foreground/50">
+                            {tip}
+                        </p>
+                    )}
+                    <Button variant="secondary" onClick={fetchTip} disabled={loadingTip}>
+                        Get a New Tip
+                    </Button>
+                </CardContent>
+            </Card>
+        </div>
+
+
         <Card>
             <CardHeader>
                 <CardTitle>Quick Overview</CardTitle>

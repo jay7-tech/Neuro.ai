@@ -1,16 +1,15 @@
-
-
 'use client';
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Brain, Pill, Camera, MessageSquare, Calendar, Sun, Moon, Utensils, ArrowRight, Music, PhoneCall, HeartPulse, PlusCircle, Trash2, Album, Edit, Save, X, Users } from "lucide-react";
+import { Brain, Pill, Camera, MessageSquare, Calendar, Sun, Moon, Utensils, ArrowRight, Music, PhoneCall, HeartPulse, PlusCircle, Trash2, Album, Edit, Save, X, Users, Smile } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { AiCompanion } from "./ai-companion";
 import { patient as initialPatient } from "@/lib/data";
 import { Input } from '../ui/input';
 import { useToast } from '@/hooks/use-toast';
+import { MoodTracker } from './mood-tracker';
 
 const PATIENT_STORAGE_KEY = 'neuro-ai-patient-data';
 const DAILY_PLAN_STORAGE_KEY = 'neuro-ai-daily-plan';
@@ -256,6 +255,18 @@ export function PatientDashboard() {
               </div>
             </div>
           </CardHeader>
+        </Card>
+
+         <Card className="shadow-xl rounded-2xl">
+            <CardHeader>
+                <CardTitle className="text-2xl flex items-center gap-2">
+                    <Smile /> How are you feeling?
+                </CardTitle>
+                <CardDescription>Let your caregiver know how your day is going.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <MoodTracker />
+            </CardContent>
         </Card>
 
         <Card className="shadow-xl rounded-2xl">

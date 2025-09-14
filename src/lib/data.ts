@@ -1,4 +1,3 @@
-
 export const patient = {
     name: 'John Doe',
     id: 'P-12345XYZ',
@@ -35,4 +34,16 @@ export const familyTree = {
     ]
 }
 
-    
+export type PatientLocation = {
+    status: 'home' | 'away';
+    address: string;
+    mapImage: string;
+    lastUpdated: string;
+}
+
+export const mockPatientLocation: PatientLocation = {
+    status: 'home',
+    address: '123 Memory Lane, Sunnyvale, CA',
+    mapImage: 'https://picsum.photos/seed/maphome/800/600',
+    lastUpdated: '2 minutes ago'
+}
