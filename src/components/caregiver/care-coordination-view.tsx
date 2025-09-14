@@ -7,12 +7,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { PlusCircle, Trash2, Sun, Moon, Utensils, HeartPulse, Brain, Edit, Save, X, MessageSquare, SendHorizonal, Star } from 'lucide-react';
+import { PlusCircle, Trash2, Sun, Moon, Utensils, HeartPulse, Brain, Edit, Save, X, MessageSquare, SendHorizonal, Star, Music } from 'lucide-react';
 import { FamilyTreeView } from '@/components/shared/family-tree-view';
 import { MemoryLaneView } from '@/components/shared/memory-lane-view';
 import { ScrollArea } from '../ui/scroll-area';
-import { Skeleton } from '../ui/skeleton';
-
 
 type PlanItem = {
     id: number;
@@ -37,6 +35,11 @@ type ChatMessage = {
     timestamp: string;
 }
 
+type MusicItem = {
+    id: number;
+    name: string;
+}
+
 const initialDailyPlan = [
   { id: 1, time: '08:00', task: 'Wake up and get dressed', icon: <Sun className="h-6 w-6 text-primary" />, notes: '', iconName: 'Sun' },
   { id: 2, time: '09:00', task: 'Eat breakfast & take pills', icon: <Utensils className="h-6 w-6 text-primary" />, notes: '', iconName: 'Utensils' },
@@ -50,15 +53,25 @@ const initialMedications: Medication[] = [
     { id: 2, name: 'Namenda', dose: '1 tablet', time: '20:00' },
 ];
 
+const initialMusic: MusicItem[] = [
+    { id: 1, name: "Calm Piano" },
+    { id: 2, name: "Ocean Waves" },
+    { id: 3, name: "Gentle Wind" },
+    { id: 4, name: "Forest Leaves" },
+    { id: 5, name: "Cozy Cafe" },
+];
+
 
 export function CareCoordinationView({ patientId }: { patientId: string }) {
     const DAILY_PLAN_STORAGE_KEY = `neuro-ai-${patientId}-daily-plan`;
     const MEDICATIONS_STORAGE_KEY = `neuro-ai-${patientId}-medications`;
+    const MUSIC_STORAGE_KEY = `neuro-ai-${patientId}-music`;
     const CHAT_STORAGE_KEY = `neuro-ai-${patientId}-chat`;
 
     const { toast } = useToast();
     const [medications, setMedications] = useState<Medication[]>([]);
     const [dailyPlan, setDailyPlan] = useState<PlanItem[]>([]);
+    const [musicList, setMusicList] = useState<MusicItem[]>([]);
     const [chat, setChat] = useState<ChatMessage[]>([]);
     const [newMessage, setNewMessage] = useState('');
     const chatViewportRef = useRef<HTMLDivElement>(null);
@@ -68,6 +81,9 @@ export function CareCoordinationView({ patientId }: { patientId: string }) {
 
     const [isEditingMeds, setIsEditingMeds] = useState(false);
     const [medsBeforeEdit, setMedsBeforeEdit] = useState<Medication[]>([]);
+
+    const [isEditingMusic, setIsEditingMusic] = useState(false);
+    const [musicBeforeEdit, setMusicBeforeEdit] = useState<MusicItem[]>([]);
 
     const getIcon = (iconName: string) => {
         const iconMap: { [key: string]: JSX.Element } = {
@@ -81,7 +97,6 @@ export function CareCoordinationView({ patientId }: { patientId: string }) {
     };
 
     useEffect(() => {
-        // Load Daily Plan
         const storedPlan = localStorage.getItem(DAILY_PLAN_STORAGE_KEY);
         if (storedPlan) {
             try {
@@ -90,21 +105,24 @@ export function CareCoordinationView({ patientId }: { patientId: string }) {
             } catch { setDailyPlan(initialDailyPlan); }
         } else { setDailyPlan(initialDailyPlan); }
 
-        // Load Medications
         const storedMeds = localStorage.getItem(MEDICATIONS_STORAGE_KEY);
         if (storedMeds) {
             try { setMedications(JSON.parse(storedMeds)); } 
             catch { setMedications(initialMedications); }
         } else { setMedications(initialMedications); }
+        
+        const storedMusic = localStorage.getItem(MUSIC_STORAGE_KEY);
+        if (storedMusic) {
+            try { setMusicList(JSON.parse(storedMusic)); } 
+            catch { setMusicList(initialMusic); }
+        } else { setMusicList(initialMusic); }
 
-        // Load Chat
         const storedChat = localStorage.getItem(CHAT_STORAGE_KEY);
         if (storedChat) {
             try { setChat(JSON.parse(storedChat)); }
             catch { setChat([]); }
         } else { setChat([]); }
         
-        // Listen for storage changes from other tabs/windows
         const handleStorageChange = (event: StorageEvent) => {
             if (event.key === CHAT_STORAGE_KEY && event.newValue) {
                 setChat(JSON.parse(event.newValue));
@@ -113,7 +131,7 @@ export function CareCoordinationView({ patientId }: { patientId: string }) {
         window.addEventListener('storage', handleStorageChange);
         return () => window.removeEventListener('storage', handleStorageChange);
 
-    }, [patientId, DAILY_PLAN_STORAGE_KEY, MEDICATIONS_STORAGE_KEY, CHAT_STORAGE_KEY]);
+    }, [patientId, DAILY_PLAN_STORAGE_KEY, MEDICATIONS_STORAGE_KEY, CHAT_STORAGE_KEY, MUSIC_STORAGE_KEY]);
 
      useEffect(() => {
         const viewport = chatViewportRef.current;
@@ -134,6 +152,11 @@ export function CareCoordinationView({ patientId }: { patientId: string }) {
         setMedications(meds);
     }
     
+    const saveMusicList = (music: MusicItem[]) => {
+        localStorage.setItem(MUSIC_STORAGE_KEY, JSON.stringify(music));
+        setMusicList(music);
+    }
+
     const handleSendMessage = (e: React.FormEvent) => {
         e.preventDefault();
         if (!newMessage.trim()) return;
@@ -150,7 +173,6 @@ export function CareCoordinationView({ patientId }: { patientId: string }) {
         setNewMessage('');
     }
 
-    // Daily Plan handlers
     const handlePlanChange = (index: number, field: 'task' | 'time' | 'notes', value: string) => { const updatedPlan = [...dailyPlan]; if(updatedPlan[index]) { (updatedPlan[index] as any)[field] = value; setDailyPlan(updatedPlan); }};
     const handleAddPlanItem = () => { setDailyPlan([...dailyPlan, { id: Date.now(), time: '12:00', task: 'New Task', icon: getIcon('Brain'), notes: '', iconName: 'Brain' }]); };
     const handleRemovePlanItem = (id: number) => { setDailyPlan(dailyPlan.filter(item => item.id !== id)); };
@@ -158,7 +180,6 @@ export function CareCoordinationView({ patientId }: { patientId: string }) {
     const handleSavePlan = () => { setIsEditingPlan(false); saveDailyPlan(dailyPlan); toast({ title: "Patient's Plan Saved!", description: "The patient's daily plan has been updated." }); };
     const handleCancelPlan = () => { setDailyPlan(planBeforeEdit); setIsEditingPlan(false); };
 
-    // Medication handlers
     const handleMedicationChange = (index: number, field: 'name' | 'dose' | 'time', value: string) => { const updatedMeds = [...medications]; updatedMeds[index] = { ...updatedMeds[index], [field]: value }; setMedications(updatedMeds); };
     const handleAddMedication = () => { setMedications([...medications, { id: Date.now(), name: '', dose: '', time: '' }]); };
     const handleRemoveMedication = (id: number) => { setMedications(medications.filter(med => med.id !== id)); };
@@ -166,16 +187,24 @@ export function CareCoordinationView({ patientId }: { patientId: string }) {
     const handleSaveMedications = () => { setIsEditingMeds(false); saveMedications(medications); toast({ title: "Patient's Medications Saved!", description: "The patient's medication schedule has been updated." }); };
     const handleCancelMeds = () => { setMedications(medsBeforeEdit); setIsEditingMeds(false); };
 
+    const handleMusicChange = (index: number, value: string) => { const updatedMusic = [...musicList]; updatedMusic[index] = { ...updatedMusic[index], name: value }; setMusicList(updatedMusic); };
+    const handleAddMusicItem = () => { setMusicList([...musicList, { id: Date.now(), name: 'New Song or Sound' }]); };
+    const handleRemoveMusicItem = (id: number) => { setMusicList(musicList.filter(item => item.id !== id)); };
+    const handleEditMusic = () => { setMusicBeforeEdit(JSON.parse(JSON.stringify(musicList))); setIsEditingMusic(true); };
+    const handleSaveMusic = () => { setIsEditingMusic(false); saveMusicList(musicList); toast({ title: "Patient's Music Saved!", description: "The patient's music list has been updated." }); };
+    const handleCancelMusic = () => { setMusicList(musicBeforeEdit); setIsEditingMusic(false); };
+
     return (
         <div className="space-y-6">
             <h1 className="text-3xl font-bold font-headline">Care Coordination</h1>
             <p className="text-muted-foreground">Manage the patient's daily routine, memories, family contacts, and medications.</p>
             
             <Tabs defaultValue="chat">
-                <TabsList className="grid w-full grid-cols-5 max-w-2xl">
+                <TabsList className="grid w-full grid-cols-6 max-w-4xl">
                     <TabsTrigger value="chat">Chat with Patient</TabsTrigger>
                     <TabsTrigger value="planner">Daily Planner</TabsTrigger>
                     <TabsTrigger value="meds">Medications</TabsTrigger>
+                    <TabsTrigger value="music">Music Therapy</TabsTrigger>
                     <TabsTrigger value="memory-lane">Memory Lane</TabsTrigger>
                     <TabsTrigger value="family-tree">Family Tree</TabsTrigger>
                 </TabsList>
@@ -309,6 +338,45 @@ export function CareCoordinationView({ patientId }: { patientId: string }) {
                                         </li>
                                     ))}
                                     {medications.length === 0 && <p className="text-muted-foreground text-center p-4">No medications found.</p>}
+                                </ul>
+                           )}
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+                 <TabsContent value="music" className="mt-4">
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between">
+                            <div>
+                                <CardTitle>Manage Music Therapy</CardTitle>
+                                <CardDescription>Add, edit, or remove songs and sounds from the patient's list.</CardDescription>
+                            </div>
+                            {!isEditingMusic && <Button variant="outline" size="icon" onClick={handleEditMusic}><Edit className="h-4 w-4" /></Button>}
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                           {isEditingMusic ? (
+                                <>
+                                {musicList.map((item, index) => (
+                                    <div key={item.id} className="flex gap-2 items-center p-2 rounded-lg bg-secondary/50">
+                                        <Music className="h-5 w-5 text-primary" />
+                                        <Input placeholder="Song or Sound Name" value={item.name} onChange={(e) => handleMusicChange(index, e.target.value)} className="bg-background font-semibold" />
+                                        <Button variant="ghost" size="icon" onClick={() => handleRemoveMusicItem(item.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                                    </div>
+                                ))}
+                                <Button variant="outline" onClick={handleAddMusicItem} className="w-full"><PlusCircle className="mr-2 h-4 w-4" /> Add Song/Sound</Button>
+                                <div className="flex justify-end gap-2">
+                                    <Button variant="ghost" onClick={handleCancelMusic}><X className="mr-2 h-4 w-4"/>Cancel</Button>
+                                    <Button onClick={handleSaveMusic}><Save className="mr-2 h-4 w-4"/>Save Music List</Button>
+                                </div>
+                                </>
+                           ) : (
+                                <ul className="space-y-2">
+                                    {musicList.map(item => (
+                                        <li key={item.id} className="p-3 rounded-lg bg-secondary/50 flex items-center gap-3">
+                                            <Music className="h-5 w-5 text-primary" />
+                                            <p className="font-semibold">{item.name}</p>
+                                        </li>
+                                    ))}
+                                    {musicList.length === 0 && <p className="text-muted-foreground text-center p-4">No music or sounds added yet.</p>}
                                 </ul>
                            )}
                         </CardContent>
