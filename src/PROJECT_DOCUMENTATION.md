@@ -153,4 +153,129 @@ All backend AI logic is handled by Genkit flows defined in `src/ai/flows/`. Thes
   - **Used In**: `MedicineIdentifier` component.
 
 ---
+
+## 5. UI and Feature Guide (Page by Page)
+
+This section provides a detailed breakdown of every page, component, and interactive element in the application.
+
+### a. Login Page (`/`)
+
+- **File**: `src/app/page.tsx`
+- **Purpose**: To provide a mock sign-in screen. It does not perform real authentication but simulates a login flow.
+- **UI Elements & Functionality**:
+    - **App Icon & Title**: Displays the "Neuro-AI" brand.
+    - **Email Address Input**: A standard text field for the user to enter an email.
+    - **Password Input**: A password field.
+    - **Continue Button**:
+        - **Action**: Triggers the `handleLogin` function.
+        - **Logic**: It performs a basic check to see if the email and password fields are filled. If not, it shows an error toast. If they are, it simulates a successful login by showing a success toast, setting an `isLoggedIn` flag in `localStorage`, and redirecting the user to the `/selection` page.
+    - **Session Check**: On page load, an effect checks if `isLoggedIn` is already `true` in `localStorage`. If it is, the user is automatically redirected to the `/selection` page, skipping the login screen.
+
+### b. Role Selection Page (`/selection`)
+
+- **File**: `src/app/selection/page.tsx`
+- **Purpose**: To allow the user to choose their role for the session.
+- **UI Elements & Functionality**:
+    - **Patient Card**:
+        - **Icon**: `User` icon.
+        - **Action**: A large, clickable card that navigates the user to the `/patient` dashboard.
+    - **Caregiver Card**:
+        - **Icon**: `Shield` icon.
+        - **Action**: A large, clickable card that navigates the user to the `/caregiver` dashboard.
+    - **Header**: A simple header with the app name that links back to the login page.
+
+### c. Patient Dashboard (`/patient`)
+
+- **File**: `src/components/patient/patient-dashboard.tsx`
+- **Purpose**: The central hub for the patient, providing access to all tools and daily information.
+- **UI Elements & Functionality**:
+    - **Profile Header**:
+        - **Patient Image & Name**: Displays the patient's photo and a "Hi, [Name]!" greeting.
+        - **View Full Profile Button**: Navigates to `/patient/profile` where the user can view and edit their detailed information.
+    - **Tools to Help Grid**:
+        - **Functionality**: A grid of large, clickable cards, each linking to a different feature page (e.g., Cognitive Games, Identify Medicine).
+        - **Icons**: Each tool has a unique icon (`Brain`, `Camera`, etc.) for easy visual identification.
+    - **AI Companion**:
+        - **Component**: `src/components/patient/ai-companion.tsx`
+        - **Input Field**: Allows the patient to type a question.
+        - **Send Button**: Submits the question to the `answerQuestion` AI flow.
+        - **Conversation Area**: Displays the chat history between the user and the AI. It automatically scrolls to the newest message.
+    - **Call for Help Button**:
+        - **Icon**: `PhoneCall`.
+        - **Action**: A large, prominent button. When clicked, it attempts to initiate a phone call to the primary caregiver's phone number stored in the patient's data (`tel:<phone_number>`).
+    - **"Your Day" (Daily Planner)**:
+        - **Functionality**: Displays the list of daily tasks. The data is loaded from `localStorage` (`neuro-ai-daily-plan`), so it is always in sync with the caregiver's edits.
+        - **Edit Button (`Pencil` icon)**: Toggles the editing mode for the planner.
+        - **In Edit Mode**:
+            - **Inputs**: Task description and time become editable fields.
+            - **Delete Button (`Trash2` icon)**: Appears next to each task, allowing the user to remove it.
+            - **Add New Task Button**: Adds a new, blank task to the list.
+            - **Save Button**: Saves the current state of the plan to `localStorage`.
+            - **Cancel Button**: Discards all changes and reverts to the last saved state.
+    - **"Medication" Reminders**:
+        - **Functionality**: Displays the list of medications and their scheduled times. This data is also loaded from and saved to `localStorage` (`neuro-ai-medications`).
+        - **Edit Button (`Pencil` icon)**: Toggles editing mode for the medication list.
+        - **In Edit Mode**:
+            - **Inputs**: Medicine name, dose, and time become editable.
+            - **Delete Button (`Trash2` icon)**: Allows removal of a medication.
+            - **Add Medication Button**: Adds a new, blank medication entry.
+            - **Save Button**: Saves the medication list to `localStorage`.
+            - **Cancel Button**: Reverts any changes.
+
+### d. Caregiver Dashboard (`/caregiver`)
+
+- **File**: `src/components/caregiver/caregiver-dashboard.tsx`
+- **Purpose**: The central hub for the caregiver, providing tools to manage and monitor the patient.
+- **UI Elements & Functionality**:
+    - **Sidebar Navigation**:
+        - **Component**: `src/components/ui/sidebar.tsx`
+        - **Functionality**: A collapsible navigation menu. On larger screens, it can be collapsed to show only icons. On mobile, it appears as an off-canvas sheet.
+        - **Menu Buttons**:
+            - **Dashboard**: Switches the main view to `DashboardView`.
+            - **Care Coordination**: Switches to `CareCoordinationView`.
+            - **Patient Monitoring**: Switches to `PatientMonitoringView`.
+    - **Dashboard View (`/src/components/caregiver/dashboard-view.tsx`)**:
+        - **Caregiver ID**: Displays the static caregiver ID.
+        - **Link to a Patient**:
+            - **Input Field**: For entering the patient's ID.
+            - **Link Account Button**: On click, it validates that the input is not empty and shows a toast message (mock success).
+        - **Quick Overview**: Displays static summary cards about the patient's plan, medication, and memories.
+    - **Patient Monitoring View (`/src/components/caregiver/patient-monitoring-view.tsx`)**:
+        - **Purpose**: A placeholder for future monitoring features.
+        - **UI Elements**: Shows a card for "Recent Alerts" (currently static) and "Patient Location" with a placeholder map image.
+    - **Care Coordination View (`/src/components/caregiver/care-coordination-view.tsx`)**:
+        - **Purpose**: The main interface for managing the patient's data. It uses a tabbed layout.
+        - **Tabs**:
+            - **Daily Planner**:
+                - **Functionality**: Identical to the patient's "Your Day" planner. It reads from and writes to the same `neuro-ai-daily-plan` key in `localStorage`, ensuring complete synchronization. It includes full add, edit, and delete capabilities.
+            - **Medications**:
+                - **Functionality**: Identical to the patient's "Medication" list. It reads from and writes to `neuro-ai-medications` in `localStorage`, ensuring any changes are reflected on the patient's dashboard.
+            - **Memory Lane**:
+                - **Component**: `src/components/shared/memory-lane-view.tsx`
+                - **Functionality**: Allows the caregiver to add, edit, and delete memories (photos and stories) for the patient. Changes are saved to `neuro-ai-memories` and are visible to the patient.
+            - **Family Tree**:
+                - **Component**: `src/components/shared/family-tree-view.tsx`
+                - **Functionality**: Allows the caregiver to add, edit, and delete members of the patient's family tree. Changes are saved to `neuro-ai-family-tree` and are visible to the patient.
+
+### e. Patient Feature Pages
+
+- **Cognitive Games Landing Page (`/patient/games`)**:
+    - **Purpose**: A menu to select a cognitive game.
+    - **UI**: A grid of clickable cards, one for each game (`Memory Match`, `Color Match`, etc.).
+- **Memory Match Game (`/patient/games/memory-match`)**:
+    - **Component**: `src/components/patient/cognitive-game.tsx`
+    - **Gameplay**: The user clicks cards to flip them, trying to find matching pairs of icons.
+    - **AI Integration**: After a game is won, the `adjustGameDifficulty` flow is called. It analyzes the number of moves and time taken to recommend a new difficulty (`easy`, `medium`, or `hard`) for the next round and provides an encouraging message.
+    - **Play Again Button**: Starts a new game at the difficulty level recommended by the AI.
+- **Medicine Identifier (`/patient/med-identifier`)**:
+    - **Component**: `src/components/patient/medicine-identifier.tsx`
+    - **Upload Photo Button**: Opens a file dialog for the user to select an image of a medicine pack.
+    - **Identify This Medicine Button**:
+        - **Action**: Takes the uploaded photo (as a data URI) and sends it to the `identifyMedicine` AI flow.
+        - **Result**: Displays the medicine name, usage, confidence level, and other details returned by the AI in an alert box.
+- **Family Tree & Memory Lane (`/patient/family-tree`, `/patient/memory-lane`)**:
+    - **Components**: `.../shared/family-tree-view.tsx` and `.../shared/memory-lane-view.tsx`.
+    - **Functionality**: These pages provide a larger, more focused view for the patient to interact with their family tree and memories. The functionality is identical to the one in the caregiver dashboard, including adding, editing (by clicking the `Pencil` icon on hover), and deleting items. All data is synced via `localStorage`.
+
+---
 This document provides a foundational understanding of the Neuro-AI project. It is designed to be a living document that can be updated as the application evolves.
