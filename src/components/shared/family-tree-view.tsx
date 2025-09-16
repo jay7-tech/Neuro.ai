@@ -1,4 +1,3 @@
-
 'use client';
 import { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,6 +19,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import images from "@/lib/placeholder-images.json";
 
 type FamilyMember = {
     id: number;
@@ -133,7 +133,7 @@ export function FamilyTreeView({ isCaregiverView = false, patientId }: { isCareg
             id: Date.now(),
             name: "",
             relation: "",
-            photo: "https://picsum.photos/400/400",
+            photo: images.family.newMember.src,
             quote: ""
         };
         setEditingMember(newMember);

@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useRef, useEffect } from "react";
@@ -20,20 +19,21 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import images from "@/lib/placeholder-images.json";
 
 
 const initialMemories = [
     {
         id: 1,
-        image: "https://picsum.photos/seed/family1/600/400",
+        image: images.memories.familyBeach.src,
         story: "This photo was taken during our family trip to the beach in 2012. Remember how much fun we had building sandcastles? The sun was warm and the ocean was so blue.",
-        hint: "family beach"
+        hint: images.memories.familyBeach.hint
     },
     {
         id: 2,
-        image: "https://picsum.photos/seed/family2/600/400",
+        image: images.memories.birthdayParty.src,
         story: "This was at Grandma's 70th birthday party. All the family was there, and we had that amazing chocolate cake.",
-        hint: "birthday party"
+        hint: images.memories.birthdayParty.hint
     },
 ];
 
@@ -91,9 +91,9 @@ export function MemoryLaneView({ isCaregiverView = false, patientId }: { isCareg
     const handleAddNew = () => {
         const newMemory: Memory = {
             id: Date.now(),
-            image: "https://picsum.photos/600/400",
+            image: images.memories.newMemory.src,
             story: "",
-            hint: "new memory"
+            hint: images.memories.newMemory.hint
         };
         setEditingMemory(newMemory);
     };

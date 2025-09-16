@@ -1,7 +1,9 @@
+import images from './placeholder-images.json';
+
 export const patient = {
     name: 'John Doe',
     id: 'P-12345XYZ',
-    photo: 'https://picsum.photos/id/1005/200/200',
+    photo: images.patient.johnDoe.src,
     age: 78,
     bloodGroup: 'O+',
     address: '123 Memory Lane, Suite 101, Sunnyvale, CA 94086',
@@ -25,12 +27,12 @@ export const familyTree = {
         id: 1, // Added for consistency, will be replaced by unique ID logic
         name: 'Jane Doe',
         relation: 'Wife',
-        photo: 'https://picsum.photos/id/1027/200/200',
+        photo: images.family.janeDoe.src,
         quote: '"Through thick and thin, for all these years. I love you more every day."'
     },
     children: [
-        { id: 2, name: 'Peter Doe', relation: 'Son', photo: 'https://picsum.photos/id/64/200/200', quote: '"Dad, you taught me everything I know about being strong and kind."' },
-        { id: 3, name: 'Mary Doe', relation: 'Daughter', photo: 'https://picsum.photos/id/1011/200/200', quote: '"Remember our fishing trips? Those are my favorite memories, Dad."' },
+        { id: 2, name: 'Peter Doe', relation: 'Son', photo: images.family.peterDoe.src, quote: '"Dad, you taught me everything I know about being strong and kind."' },
+        { id: 3, name: 'Mary Doe', relation: 'Daughter', photo: images.family.maryDoe.src, quote: '"Remember our fishing trips? Those are my favorite memories, Dad."' },
     ]
 }
 
@@ -44,6 +46,6 @@ export type PatientLocation = {
 export const mockPatientLocation: PatientLocation = {
     status: 'home',
     address: '123 Memory Lane, Sunnyvale, CA',
-    mapImage: 'https://picsum.photos/seed/maphome/800/600',
+    mapImage: images.location.mapHome.src,
     lastUpdated: '2 minutes ago'
 }

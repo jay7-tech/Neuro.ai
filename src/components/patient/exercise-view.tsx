@@ -1,43 +1,28 @@
-
 'use client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dumbbell, HeartPulse, Mails } from "lucide-react";
 import Image from "next/image";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import images from '@/lib/placeholder-images.json';
 
 const exercises = [
     {
         name: "Chair Yoga",
         description: "Gentle yoga poses done while sitting on a chair.",
         icon: <Dumbbell className="h-12 w-12 text-primary" />,
-        images: [
-            { src: "https://picsum.photos/seed/yoga1/600/400", alt: "Seated mountain pose", hint: "person yoga" },
-            { src: "https://picsum.photos/seed/yoga2/600/400", alt: "Seated forward bend", hint: "person yoga" },
-            { src: "https://picsum.photos/seed/yoga3/600/400", alt: "Seated cat-cow stretch", hint: "person yoga" },
-            { src: "https://picsum.photos/seed/yoga4/600/400", alt: "Seated twist", hint: "person yoga" },
-        ]
+        images: images.exercises.yoga
     },
     {
         name: "Gentle Stretching",
         description: "Simple stretches to improve flexibility and reduce stiffness.",
         icon: <HeartPulse className="h-12 w-12 text-primary" />,
-        images: [
-            { src: "https://picsum.photos/seed/stretch1/600/400", alt: "Neck stretch", hint: "person stretching" },
-            { src: "https://picsum.photos/seed/stretch2/600/400", alt: "Shoulder rolls", hint: "person stretching" },
-            { src: "https://picsum.photos/seed/stretch3/600/400", alt: "Wrist and finger stretch", hint: "person stretching" },
-            { src: "https://picsum.photos/seed/stretch4/600/400", alt: "Ankle rotations", hint: "person stretching" },
-        ]
+        images: images.exercises.stretching
     },
     {
         name: "Seated Strength",
         description: "Simple strength exercises using light weights or resistance bands.",
         icon: <Dumbbell className="h-12 w-12 text-primary" />,
-        images: [
-            { src: "https://picsum.photos/seed/strength1/600/400", alt: "Bicep curls with light weights", hint: "person lifting weights" },
-            { src: "https://picsum.photos/seed/strength2/600/400", alt: "Overhead press with light weights", hint: "person lifting weights" },
-            { src: "https://picsum.photos/seed/strength3/600/400", alt: "Seated row with resistance band", hint: "person resistance band" },
-            { src: "https://picsum.photos/seed/strength4/600/400", alt: "Leg extension with ankle weights", hint: "person ankle weights" },
-        ]
+        images: images.exercises.strength
     }
 ]
 
