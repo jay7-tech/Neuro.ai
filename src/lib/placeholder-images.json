@@ -1,14 +1,14 @@
 {
   "patient": {
     "johnDoe": {
-      "src": "https://storage.googleapis.com/aifirebase-demo-images/neuro-ai/patient-photo.jpg",
+      "src": "https://storage.googleapis.com/aifirebase-demo-images/neuro-ai/patient-photo-2.jpg",
       "alt": "Portrait of John Doe",
       "hint": "person portrait"
     }
   },
   "family": {
     "janeDoe": {
-      "src": "https://picsum.photos/seed/familySpouse/400/400",
+      "src": "https://storage.googleapis.com/aifirebase-demo-images/neuro-ai/spouse-photo.jpg",
       "alt": "Portrait of Jane Doe",
       "hint": "person portrait"
     },
