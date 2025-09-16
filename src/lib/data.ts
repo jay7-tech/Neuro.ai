@@ -1,4 +1,6 @@
+
 import images from './placeholder-images.json';
+import type { FamilyMember } from '@/components/shared/family-tree-view';
 
 export const patient = {
     name: 'John Doe',
@@ -22,19 +24,33 @@ export const patient = {
     ]
 };
 
-export const familyTree = {
-    spouse: {
-        id: 1, // Added for consistency, will be replaced by unique ID logic
+export const initialFamilyMembers: FamilyMember[] = [
+    {
+        id: 1,
         name: 'Jane Doe',
         relation: 'Wife',
         photo: images.family.janeDoe.src,
-        quote: '"Through thick and thin, for all these years. I love you more every day."'
+        message: '"Through thick and thin, for all these years. I love you more every day."',
+        hint: images.family.janeDoe.hint
     },
-    children: [
-        { id: 2, name: 'Peter Doe', relation: 'Son', photo: images.family.peterDoe.src, quote: '"Dad, you taught me everything I know about being strong and kind."' },
-        { id: 3, name: 'Mary Doe', relation: 'Daughter', photo: images.family.maryDoe.src, quote: '"Remember our fishing trips? Those are my favorite memories, Dad."' },
-    ]
-}
+    { 
+        id: 2, 
+        name: 'Peter Doe', 
+        relation: 'Son', 
+        photo: images.family.peterDoe.src, 
+        message: '"Dad, you taught me everything I know about being strong and kind."',
+        hint: images.family.peterDoe.hint
+    },
+    { 
+        id: 3, 
+        name: 'Mary Doe', 
+        relation: 'Daughter', 
+        photo: images.family.maryDoe.src, 
+        message: '"Remember our fishing trips? Those are my favorite memories, Dad."',
+        hint: images.family.maryDoe.hint
+    },
+]
+
 
 export type PatientLocation = {
     status: 'home' | 'away';
@@ -49,3 +65,5 @@ export const mockPatientLocation: PatientLocation = {
     mapImage: images.location.mapHome.src,
     lastUpdated: '2 minutes ago'
 }
+
+    

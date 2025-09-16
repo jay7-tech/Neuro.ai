@@ -1,7 +1,8 @@
+
 'use client';
 import { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { familyTree as initialFamilyTreeData } from "@/lib/data";
+import { initialFamilyMembers } from "@/lib/data";
 import { Users, Heart, PlusCircle, Edit, Save, X, Trash2, Upload } from "lucide-react";
 import Image from "next/image";
 import { Button } from "../ui/button";
@@ -21,268 +22,26 @@ import {
 } from "@/components/ui/alert-dialog";
 import images from "@/lib/placeholder-images.json";
 
-type FamilyMember = {
+export type FamilyMember = {
     id: number;
     name: string;
     relation: string;
     photo: string;
-    quote: string;
+    message: string;
+    hint: string;
 };
 
-type FamilyTree = {
-    spouse: FamilyMember;
-    children: FamilyMember[];
-};
-
-const getInitialFamilyTree = (): FamilyTree => {
-    const spouse = { ...initialFamilyTreeData.spouse, id: Date.now() };
-    const children = initialFamilyTreeData.children.map((child, index) => ({
-        ...child,
-        id: Date.now() + index + 1
-    }));
-    return { spouse, children };
-};
-
-function loadAndValidateFamilyTree(patientId: string): FamilyTree {
-    const FAMILY_TREE_STORAGE_KEY = `neuro-ai-${patientId}-family-tree`;
-    const storedData = typeof window !== 'undefined' ? localStorage.getItem(FAMILY_TREE_STORAGE_KEY) : null;
-
-    if (storedData) {
-        try {
-            const parsedData = JSON.parse(storedData) as FamilyTree;
-            let dataWasModified = false;
-            const existingIds = new Set<number>();
-
-            if (!parsedData.spouse || typeof parsedData.spouse.id !== 'number') {
-                parsedData.spouse = { ...initialFamilyTreeData.spouse, id: Date.now() };
-                dataWasModified = true;
-            }
-            existingIds.add(parsedData.spouse.id);
-
-            if (!Array.isArray(parsedData.children)) {
-                 parsedData.children = [];
-                 dataWasModified = true;
-            }
-
-            parsedData.children = parsedData.children.map((child, index) => {
-                const newId = Date.now() + index + 100;
-                if (!child || typeof child.id !== 'number' || existingIds.has(child.id)) {
-                    dataWasModified = true;
-                    const fallbackChild = getInitialFamilyTree().children[index] || { name: '', relation: '', photo: '', quote: ''};
-                    const newChildData = child ? { ...child, id: newId } : { ...fallbackChild, id: newId };
-                    existingIds.add(newId);
-                    return newChildData;
-                }
-                existingIds.add(child.id);
-                return child;
-            });
-            
-            if (dataWasModified) {
-                 localStorage.setItem(FAMILY_TREE_STORAGE_KEY, JSON.stringify(parsedData));
-            }
-
-            return parsedData;
-
-        } catch (error) {
-            console.error("Failed to parse family tree from local storage, using initial data.", error);
-            return getInitialFamilyTree();
-        }
-    }
-    return getInitialFamilyTree();
-}
-
-
-export function FamilyTreeView({ isCaregiverView = false, patientId }: { isCaregiverView?: boolean, patientId: string }) {
-    const FAMILY_TREE_STORAGE_KEY = `neuro-ai-${patientId}-family-tree`;
-    const { toast } = useToast();
-    const [familyTree, setFamilyTree] = useState<FamilyTree | null>(null);
-    const [editingMember, setEditingMember] = useState<FamilyMember | null>(null);
-
-    useEffect(() => {
-        setFamilyTree(loadAndValidateFamilyTree(patientId));
-    }, [patientId]);
-
-    const saveFamilyTree = (newFamilyTree: FamilyTree) => {
-        const oldFamilyTree = familyTree; // Keep a reference to revert if save fails
-        try {
-            setFamilyTree(newFamilyTree);
-            localStorage.setItem(FAMILY_TREE_STORAGE_KEY, JSON.stringify(newFamilyTree));
-        } catch (error) {
-            if (error instanceof DOMException && (error.name === 'QuotaExceededError' || error.name === 'NS_ERROR_DOM_QUOTA_REACHED')) {
-                 toast({
-                    title: "Failed to Save",
-                    description: "The photo you uploaded is too large. Please choose a smaller file.",
-                    variant: "destructive",
-                });
-                // Revert to the old state to avoid inconsistent UI
-                if(oldFamilyTree) {
-                    setFamilyTree(oldFamilyTree);
-                }
-            } else {
-                toast({
-                    title: "An unexpected error occurred.",
-                    description: "Your changes could not be saved.",
-                    variant: "destructive",
-                });
-            }
-        }
-    };
-
-    const handleAddNew = () => {
-        const newMember: FamilyMember = {
-            id: Date.now(),
-            name: "",
-            relation: "",
-            photo: images.family.newMember.src,
-            quote: ""
-        };
-        setEditingMember(newMember);
-    };
-
-    const handleSave = (memberToSave: FamilyMember) => {
-        if (!familyTree) return;
-
-        let newFamilyTree: FamilyTree;
-        
-        // Check if it's a new member by seeing if the ID exists in children
-        const isNewMember = !familyTree.children.some(c => c.id === memberToSave.id) && familyTree.spouse.id !== memberToSave.id;
-
-        if (familyTree.spouse.id === memberToSave.id) {
-            // Editing the spouse
-            newFamilyTree = { ...familyTree, spouse: memberToSave };
-        } else {
-            const childIndex = familyTree.children.findIndex(c => c.id === memberToSave.id);
-            const updatedChildren = [...familyTree.children];
-            
-            if (childIndex > -1) {
-                // Editing an existing child
-                updatedChildren[childIndex] = memberToSave;
-            } else {
-                // Adding a new child
-                updatedChildren.push(memberToSave);
-            }
-            newFamilyTree = { ...familyTree, children: updatedChildren };
-        }
-        
-        saveFamilyTree(newFamilyTree);
-        setEditingMember(null);
-        toast({ title: "Family Member Saved!", description: "The family member's details have been saved." });
-    };
-
-    const handleDelete = (id: number) => {
-        if (!familyTree) return;
-
-        // Prevent deleting the spouse
-        if (familyTree.spouse.id === id) {
-            toast({ title: "Cannot Delete Spouse", description: "This member cannot be deleted.", variant: "destructive" });
-            return;
-        }
-        const newFamilyTree = {
-            ...familyTree,
-            children: familyTree.children.filter(c => c.id !== id)
-        };
-        saveFamilyTree(newFamilyTree);
-        setEditingMember(null); // Close the edit view after deletion
-        toast({ title: "Family Member Deleted", variant: "destructive" });
-    };
-
-    if (!familyTree) {
-        return <div>Loading family tree...</div>;
-    }
-
-    const { spouse, children } = familyTree;
-    
-    if (editingMember) {
-        return <EditFamilyMemberView 
-            member={editingMember} 
-            onSave={handleSave} 
-            onCancel={() => setEditingMember(null)} 
-            onDelete={handleDelete}
-            isSpouse={familyTree.spouse.id === editingMember.id}
-        />;
-    }
-
-    return (
-        <div className="space-y-8">
-            {!isCaregiverView && (
-                <div className="text-center md:text-left flex flex-col md:flex-row justify-between items-center gap-4">
-                    <div>
-                        <h1 className="text-4xl font-bold font-headline flex items-center justify-center md:justify-start gap-3"><Users /> My Family</h1>
-                        <p className="text-lg text-muted-foreground">The people who love you most.</p>
-                    </div>
-                    <Button onClick={handleAddNew}>
-                        <PlusCircle className="mr-2 h-4 w-4" /> Add New Member
-                    </Button>
-                </div>
-            )}
-             {isCaregiverView && (
-                <Card>
-                    <CardHeader className="flex-row items-center justify-between">
-                         <div>
-                            <CardTitle>Manage Family Tree</CardTitle>
-                            <CardDescription>View and edit the patient's family members.</CardDescription>
-                        </div>
-                        <Button onClick={handleAddNew}>
-                            <PlusCircle className="mr-2 h-4 w-4" /> Add Member
-                        </Button>
-                    </CardHeader>
-                </Card>
-             )}
-            
-            <Card className="shadow-2xl rounded-2xl overflow-hidden max-w-lg mx-auto border-2 border-primary/30 relative group">
-                <div className="flex flex-col md:flex-row items-center">
-                    <div className="w-full md:w-2/5">
-                        <Image src={spouse.photo} alt={spouse.name} width={400} height={400} className="object-cover w-full h-full" data-ai-hint="person portrait" />
-                    </div>
-                    <div className="w-full md:w-3/5 p-6">
-                        <CardHeader className="p-0">
-                            <CardTitle className="text-3xl">{spouse.name}</CardTitle>
-                            <CardDescription className="text-lg flex items-center gap-2"><Heart className="text-destructive" /> {spouse.relation}</CardDescription>
-                        </CardHeader>
-                        <CardContent className="p-0 pt-4">
-                            <blockquote className="text-base italic border-l-4 pl-4">
-                                {spouse.quote}
-                            </blockquote>
-                        </CardContent>
-                    </div>
-                </div>
-                 <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Button variant="outline" size="icon" onClick={() => setEditingMember(spouse)}>
-                        <Edit className="h-4 w-4" />
-                    </Button>
-                </div>
-            </Card>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6">
-                {children.map(child => (
-                    <Card key={child.id} className="shadow-xl rounded-2xl overflow-hidden border relative group">
-                         <div className="aspect-square w-full overflow-hidden">
-                            <Image src={child.photo} alt={child.name} width={400} height={400} className="w-full h-full object-cover" data-ai-hint="person portrait" />
-                        </div>
-                        <div className="p-6">
-                            <CardHeader className="p-0">
-                                <CardTitle className="text-2xl">{child.name}</CardTitle>
-                                <CardDescription className="text-md">{child.relation}</CardDescription>
-                            </CardHeader>
-                            <CardContent className="p-0 pt-4">
-                                <blockquote className="text-base italic border-l-4 pl-4">
-                                    {child.quote}
-                                </blockquote>
-                            </CardContent>
-                        </div>
-                        <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Button variant="outline" size="icon" onClick={() => setEditingMember(child)}>
-                                <Edit className="h-4 w-4" />
-                            </Button>
-                        </div>
-                    </Card>
-                ))}
-            </div>
-        </div>
-    )
-}
-
-function EditFamilyMemberView({ member, onSave, onCancel, onDelete, isSpouse }: { member: FamilyMember, onSave: (member: FamilyMember) => void, onCancel: () => void, onDelete: (id: number) => void, isSpouse: boolean }) {
+function EditFamilyMemberView({ 
+    member, 
+    onSave, 
+    onCancel, 
+    onDelete,
+}: { 
+    member: FamilyMember;
+    onSave: (member: FamilyMember) => void;
+    onCancel: () => void;
+    onDelete: (id: number) => void;
+}) {
     const [currentMember, setCurrentMember] = useState(member);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -308,12 +67,12 @@ function EditFamilyMemberView({ member, onSave, onCancel, onDelete, isSpouse }: 
     return (
         <Card className="max-w-2xl mx-auto shadow-2xl">
             <CardHeader>
-                <CardTitle>{member.name ? `Edit ${member.name}`: "Add a New Family Member"}</CardTitle>
+                <CardTitle>{member.name ? `Edit ${member.name}`: "Add New Family Member"}</CardTitle>
                 <CardDescription>Update the details for the family member.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
                 <div className="aspect-square w-full rounded-lg overflow-hidden border mx-auto max-w-sm">
-                    <Image src={currentMember.photo} alt="Family member photo" width={400} height={400} className="w-full h-full object-cover" />
+                    <Image src={currentMember.photo} alt="Family member photo" width={400} height={400} className="w-full h-full object-cover" data-ai-hint={currentMember.hint} />
                 </div>
                 <Input type="file" accept="image/*" className="hidden" ref={fileInputRef} onChange={handleFileChange} />
                 <Button variant="outline" className="w-full" onClick={() => fileInputRef.current?.click()}>
@@ -328,14 +87,18 @@ function EditFamilyMemberView({ member, onSave, onCancel, onDelete, isSpouse }: 
                     <label htmlFor="relation">Relation</label>
                     <Input id="relation" value={currentMember.relation} onChange={(e) => handleFieldChange('relation', e.target.value)} />
                 </div>
+                 <div className="space-y-2">
+                    <label htmlFor="hint">Image Hint</label>
+                    <Input id="hint" value={currentMember.hint} onChange={(e) => handleFieldChange('hint', e.target.value)} />
+                </div>
 
                 <div>
-                    <label htmlFor="quote">Quote or Memory</label>
+                    <label htmlFor="message">Message or Memory</label>
                     <Textarea
-                        id="quote"
-                        value={currentMember.quote}
-                        onChange={(e) => handleFieldChange('quote', e.target.value)}
-                        placeholder="A special quote or memory..."
+                        id="message"
+                        value={currentMember.message}
+                        onChange={(e) => handleFieldChange('message', e.target.value)}
+                        placeholder="A special message or memory..."
                         rows={3}
                         className="text-base"
                     />
@@ -343,7 +106,7 @@ function EditFamilyMemberView({ member, onSave, onCancel, onDelete, isSpouse }: 
                 <div className="flex justify-between pt-4">
                      <AlertDialog>
                         <AlertDialogTrigger asChild>
-                           { !isSpouse && <Button variant="destructive"><Trash2 className="mr-2 h-4 w-4" /> Delete</Button>}
+                           <Button variant="destructive"><Trash2 className="mr-2 h-4 w-4" /> Delete</Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                             <AlertDialogHeader>
@@ -368,3 +131,153 @@ function EditFamilyMemberView({ member, onSave, onCancel, onDelete, isSpouse }: 
         </Card>
     );
 }
+
+
+export function FamilyTreeView({ isCaregiverView = false, patientId }: { isCaregiverView?: boolean, patientId: string }) {
+    const FAMILY_TREE_STORAGE_KEY = `neuro-ai-${patientId}-family-tree`;
+    const { toast } = useToast();
+    const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([]);
+    const [editingMember, setEditingMember] = useState<FamilyMember | null>(null);
+
+    useEffect(() => {
+        const storedData = localStorage.getItem(FAMILY_TREE_STORAGE_KEY);
+        if (storedData) {
+            try {
+                const parsedData = JSON.parse(storedData);
+                if (Array.isArray(parsedData)) {
+                    setFamilyMembers(parsedData);
+                } else {
+                     setFamilyMembers(initialFamilyMembers);
+                }
+            } catch {
+                setFamilyMembers(initialFamilyMembers);
+            }
+        } else {
+            setFamilyMembers(initialFamilyMembers);
+        }
+    }, [FAMILY_TREE_STORAGE_KEY]);
+
+    const saveFamilyTree = (newFamilyTree: FamilyMember[], oldFamilyTreeState?: FamilyMember[]) => {
+        try {
+            localStorage.setItem(FAMILY_TREE_STORAGE_KEY, JSON.stringify(newFamilyTree));
+            setFamilyMembers(newFamilyTree);
+        } catch (error) {
+             if (error instanceof DOMException && (error.name === 'QuotaExceededError' || error.name === 'NS_ERROR_DOM_QUOTA_REACHED')) {
+                 toast({
+                    title: "Failed to Save",
+                    description: "The photo you uploaded is too large. Please choose a smaller file.",
+                    variant: "destructive",
+                });
+                if(oldFamilyTreeState) setFamilyMembers(oldFamilyTreeState);
+            } else {
+                toast({
+                    title: "An unexpected error occurred.",
+                    description: "Your changes could not be saved.",
+                    variant: "destructive",
+                });
+                if(oldFamilyTreeState) setFamilyMembers(oldFamilyTreeState);
+            }
+        }
+    };
+
+    const handleAddNew = () => {
+        const newMember: FamilyMember = {
+            id: Date.now(),
+            name: "",
+            relation: "",
+            photo: images.family.newMember.src,
+            message: "",
+            hint: images.family.newMember.hint
+        };
+        setEditingMember(newMember);
+    };
+
+    const handleSave = (memberToSave: FamilyMember) => {
+        const oldFamilyMembers = [...familyMembers];
+        let newFamilyMembers;
+
+        const memberIndex = familyMembers.findIndex(m => m.id === memberToSave.id);
+
+        if (memberIndex > -1) {
+            newFamilyMembers = [...familyMembers];
+            newFamilyMembers[memberIndex] = memberToSave;
+        } else {
+            newFamilyMembers = [memberToSave, ...familyMembers];
+        }
+        
+        saveFamilyTree(newFamilyMembers, oldFamilyMembers);
+        setEditingMember(null);
+        toast({ title: "Family Member Saved!", description: "The family member's details have been saved." });
+    };
+
+    const handleDelete = (id: number) => {
+        const newFamilyMembers = familyMembers.filter(m => m.id !== id);
+        saveFamilyTree(newFamilyMembers);
+        setEditingMember(null);
+        toast({ title: "Family Member Deleted", variant: "destructive" });
+    };
+    
+    if (editingMember) {
+        return <EditFamilyMemberView 
+            member={editingMember} 
+            onSave={handleSave} 
+            onCancel={() => setEditingMember(null)} 
+            onDelete={handleDelete}
+        />;
+    }
+
+    return (
+        <div className="space-y-8">
+            <Card className="shadow-lg">
+                <CardHeader className="flex-row items-center justify-between">
+                    <div>
+                        <CardTitle className="text-3xl font-bold font-headline flex items-center gap-3">
+                            <Users /> {isCaregiverView ? "Manage Family Tree" : "My Family"}
+                        </CardTitle>
+                        <CardDescription className="text-lg">
+                            {isCaregiverView ? "Add or edit the patient's family members." : "The people who love you most."}
+                        </CardDescription>
+                    </div>
+                    <Button onClick={handleAddNew}>
+                        <PlusCircle className="mr-2 h-4 w-4" /> Add Member
+                    </Button>
+                </CardHeader>
+            </Card>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pt-6">
+                {familyMembers.map(member => (
+                    <Card key={member.id} className="shadow-xl rounded-2xl overflow-hidden border relative group">
+                         <div className="aspect-square w-full overflow-hidden">
+                            <Image src={member.photo} alt={member.name} width={400} height={400} className="w-full h-full object-cover" data-ai-hint={member.hint} />
+                        </div>
+                        <div className="p-6">
+                            <CardHeader className="p-0">
+                                <CardTitle className="text-2xl">{member.name}</CardTitle>
+                                <CardDescription className="text-md flex items-center gap-2">
+                                    <Heart className="text-destructive h-4 w-4" /> {member.relation}
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent className="p-0 pt-4">
+                                <blockquote className="text-base italic border-l-4 pl-4">
+                                    {member.message}
+                                </blockquote>
+                            </CardContent>
+                        </div>
+                        <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button variant="outline" size="icon" onClick={() => setEditingMember(member)}>
+                                <Edit className="h-4 w-4" />
+                            </Button>
+                        </div>
+                    </Card>
+                ))}
+                 {familyMembers.length === 0 && (
+                    <p className="text-muted-foreground text-center col-span-full py-8">
+                        No family members have been added yet. Click "Add Member" to begin.
+                    </p>
+                )}
+            </div>
+        </div>
+    )
+}
+
+    
