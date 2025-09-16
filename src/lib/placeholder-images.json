@@ -13,12 +13,12 @@
       "hint": "person portrait"
     },
     "peterDoe": {
-      "src": "https://picsum.photos/seed/familySon/400/400",
+      "src": "https://storage.googleapis.com/aifirebase-demo-images/neuro-ai/son-photo.jpg",
       "alt": "Portrait of Peter Doe",
       "hint": "person portrait"
     },
     "maryDoe": {
-      "src": "https://picsum.photos/seed/familyDaughter/400/400",
+      "src": "https://storage.googleapis.com/aifirebase-demo-images/neuro-ai/daughter-photo.jpg",
       "alt": "Portrait of Mary Doe",
       "hint": "person portrait"
     },
@@ -30,12 +30,12 @@
   },
   "memories": {
     "familyBeach": {
-      "src": "https://picsum.photos/seed/memory1/600/400",
+      "src": "https://storage.googleapis.com/aifirebase-demo-images/neuro-ai/memory-beach.jpg",
       "alt": "Family at the beach",
       "hint": "family beach"
     },
     "birthdayParty": {
-      "src": "https://picsum.photos/seed/memory2/600/400",
+      "src": "https://storage.googleapis.com/aifirebase-demo-images/neuro-ai/memory-birthday.jpg",
       "alt": "Birthday party celebration",
       "hint": "birthday party"
     },
@@ -47,27 +47,27 @@
   },
   "exercises": {
     "yoga": [
-      { "src": "https://picsum.photos/seed/yoga1/600/400", "alt": "Seated mountain pose", "hint": "person yoga" },
-      { "src": "https://picsum.photos/seed/yoga2/600/400", "alt": "Seated forward bend", "hint": "person yoga" },
-      { "src": "https://picsum.photos/seed/yoga3/600/400", "alt": "Seated cat-cow stretch", "hint": "person yoga" },
-      { "src": "https://picsum.photos/seed/yoga4/600/400", "alt": "Seated twist", "hint": "person yoga" }
+      { "src": "https://storage.googleapis.com/aifirebase-demo-images/neuro-ai/exercise-yoga-1.jpg", "alt": "Seated mountain pose", "hint": "person yoga" },
+      { "src": "https://storage.googleapis.com/aifirebase-demo-images/neuro-ai/exercise-yoga-2.jpg", "alt": "Seated forward bend", "hint": "person yoga" },
+      { "src": "https://storage.googleapis.com/aifirebase-demo-images/neuro-ai/exercise-yoga-3.jpg", "alt": "Seated cat-cow stretch", "hint": "person yoga" },
+      { "src": "https://storage.googleapis.com/aifirebase-demo-images/neuro-ai/exercise-yoga-4.jpg", "alt": "Seated twist", "hint": "person yoga" }
     ],
     "stretching": [
-      { "src": "https://picsum.photos/seed/stretch1/600/400", "alt": "Neck stretch", "hint": "person stretching" },
-      { "src": "https://picsum.photos/seed/stretch2/600/400", "alt": "Shoulder rolls", "hint": "person stretching" },
-      { "src": "https://picsum.photos/seed/stretch3/600/400", "alt": "Wrist and finger stretch", "hint": "person stretching" },
-      { "src": "https://picsum.photos/seed/stretch4/600/400", "alt": "Ankle rotations", "hint": "person stretching" }
+      { "src": "https://storage.googleapis.com/aifirebase-demo-images/neuro-ai/exercise-stretching-1.jpg", "alt": "Neck stretch", "hint": "person stretching" },
+      { "src": "https://storage.googleapis.com/aifirebase-demo-images/neuro-ai/exercise-stretching-2.jpg", "alt": "Shoulder rolls", "hint": "person stretching" },
+      { "src": "https://storage.googleapis.com/aifirebase-demo-images/neuro-ai/exercise-stretching-3.jpg", "alt": "Wrist and finger stretch", "hint": "person stretching" },
+      { "src": "https://storage.googleapis.com/aifirebase-demo-images/neuro-ai/exercise-stretching-4.jpg", "alt": "Ankle rotations", "hint": "person stretching" }
     ],
     "strength": [
-      { "src": "https://picsum.photos/seed/strength1/600/400", "alt": "Bicep curls with light weights", "hint": "person lifting weights" },
-      { "src": "https://picsum.photos/seed/strength2/600/400", "alt": "Overhead press with light weights", "hint": "person lifting weights" },
-      { "src": "https://picsum.photos/seed/strength3/600/400", "alt": "Seated row with resistance band", "hint": "person resistance band" },
-      { "src": "https://picsum.photos/seed/strength4/600/400", "alt": "Leg extension with ankle weights", "hint": "person ankle weights" }
+      { "src": "https://storage.googleapis.com/aifirebase-demo-images/neuro-ai/exercise-strength-1.jpg", "alt": "Bicep curls with light weights", "hint": "person lifting weights" },
+      { "src": "https://storage.googleapis.com/aifirebase-demo-images/neuro-ai/exercise-strength-2.jpg", "alt": "Overhead press with light weights", "hint": "person lifting weights" },
+      { "src": "https://storage.googleapis.com/aifirebase-demo-images/neuro-ai/exercise-strength-3.jpg", "alt": "Seated row with resistance band", "hint": "person resistance band" },
+      { "src": "https://storage.googleapis.com/aifirebase-demo-images/neuro-ai/exercise-strength-4.jpg", "alt": "Leg extension with ankle weights", "hint": "person ankle weights" }
     ]
   },
   "location": {
     "mapHome": {
-      "src": "https://picsum.photos/seed/maphome/800/600",
+      "src": "https://storage.googleapis.com/aifirebase-demo-images/neuro-ai/location-map.jpg",
       "alt": "Map showing patient is at home",
       "hint": "street map"
     }
