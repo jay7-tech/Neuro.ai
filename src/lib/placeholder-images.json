@@ -9,7 +9,7 @@
   },
   "family": {
     "janeDoe": {
-      "src": "https://storage.googleapis.com/aifirebase-static-content/studio-classic-green-circle.jpeg",
+      "src": "https://storage.googleapis.com/aifirebase-demo-images/neuro-ai/wife-photo.jpg",
       "alt": "Portrait of Jane Doe",
       "hint": "person portrait"
     },
