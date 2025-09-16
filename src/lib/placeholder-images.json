@@ -2,73 +2,73 @@
 {
   "patient": {
     "johnDoe": {
-      "src": "https://picsum.photos/seed/patient/150/150",
+      "src": "https://placehold.co/150x150/E0E7FF/4A69C4?text=Patient",
       "alt": "Portrait of John Doe",
       "hint": "person portrait"
     }
   },
   "family": {
     "janeDoe": {
-      "src": "https://picsum.photos/seed/wife/400/400",
+      "src": "https://placehold.co/400x400/E0E7FF/4A69C4?text=Wife",
       "alt": "Portrait of Jane Doe",
       "hint": "person portrait"
     },
     "peterDoe": {
-      "src": "https://picsum.photos/seed/son/400/400",
+      "src": "https://placehold.co/400x400/E0E7FF/4A69C4?text=Son",
       "alt": "Portrait of Peter Doe",
       "hint": "person portrait"
     },
     "maryDoe": {
-      "src": "https://picsum.photos/seed/daughter/400/400",
+      "src": "https://placehold.co/400x400/E0E7FF/4A69C4?text=Daughter",
       "alt": "Portrait of Mary Doe",
       "hint": "person portrait"
     },
     "newMember": {
-      "src": "https://picsum.photos/seed/newFamily/400/400",
+      "src": "https://placehold.co/400x400/E0E7FF/4A69C4?text=New+Member",
       "alt": "Placeholder for a new family member",
       "hint": "person placeholder"
     }
   },
   "memories": {
     "familyBeach": {
-      "src": "https://picsum.photos/seed/beach/600/400",
+      "src": "https://placehold.co/600x400/E0E7FF/4A69C4?text=Memory+1",
       "alt": "Family at the beach",
       "hint": "family beach"
     },
     "birthdayParty": {
-      "src": "https://picsum.photos/seed/birthday/600/400",
+      "src": "https://placehold.co/600x400/E0E7FF/4A69C4?text=Memory+2",
       "alt": "Birthday party celebration",
       "hint": "birthday party"
     },
     "newMemory": {
-      "src": "https://picsum.photos/seed/newMemory/600/400",
+      "src": "https://placehold.co/600x400/E0E7FF/4A69C4?text=New+Memory",
       "alt": "Placeholder for a new memory",
-      "hint": "new memory"
+      "hint": "placeholder"
     }
   },
   "exercises": {
     "yoga": [
-      { "src": "https://picsum.photos/seed/yoga1/600/400", "alt": "Seated mountain pose", "hint": "person yoga" },
-      { "src": "https://picsum.photos/seed/yoga2/600/400", "alt": "Seated forward bend", "hint": "person yoga" },
-      { "src": "https://picsum.photos/seed/yoga3/600/400", "alt": "Seated cat-cow stretch", "hint": "person yoga" },
-      { "src": "https://picsum.photos/seed/yoga4/600/400", "alt": "Seated twist", "hint": "person yoga" }
+      { "src": "https://placehold.co/600x400/E0E7FF/4A69C4?text=Yoga+Step+1", "alt": "Seated mountain pose", "hint": "person yoga" },
+      { "src": "https://placehold.co/600x400/E0E7FF/4A69C4?text=Yoga+Step+2", "alt": "Seated forward bend", "hint": "person yoga" },
+      { "src": "https://placehold.co/600x400/E0E7FF/4A69C4?text=Yoga+Step+3", "alt": "Seated cat-cow stretch", "hint": "person yoga" },
+      { "src": "https://placehold.co/600x400/E0E7FF/4A69C4?text=Yoga+Step+4", "alt": "Seated twist", "hint": "person yoga" }
     ],
     "stretching": [
-      { "src": "https://picsum.photos/seed/stretch1/600/400", "alt": "Neck stretch", "hint": "person stretching" },
-      { "src": "https://picsum.photos/seed/stretch2/600/400", "alt": "Shoulder rolls", "hint": "person stretching" },
-      { "src": "https://picsum.photos/seed/stretch3/600/400", "alt": "Wrist and finger stretch", "hint": "person stretching" },
-      { "src": "https://picsum.photos/seed/stretch4/600/400", "alt": "Ankle rotations", "hint": "person stretching" }
+      { "src": "https://placehold.co/600x400/E0E7FF/4A69C4?text=Stretch+1", "alt": "Neck stretch", "hint": "person stretching" },
+      { "src": "https://placehold.co/600x400/E0E7FF/4A69C4?text=Stretch+2", "alt": "Shoulder rolls", "hint": "person stretching" },
+      { "src": "https://placehold.co/600x400/E0E7FF/4A69C4?text=Stretch+3", "alt": "Wrist and finger stretch", "hint": "person stretching" },
+      { "src": "https://placehold.co/600x400/E0E7FF/4A69C4?text=Stretch+4", "alt": "Ankle rotations", "hint": "person stretching" }
     ],
     "strength": [
-      { "src": "https://picsum.photos/seed/strength1/600/400", "alt": "Bicep curls with light weights", "hint": "person lifting weights" },
-      { "src": "https://picsum.photos/seed/strength2/600/400", "alt": "Overhead press with light weights", "hint": "person lifting weights" },
-      { "src": "https://picsum.photos/seed/strength3/600/400", "alt": "Seated row with resistance band", "hint": "person resistance band" },
-      { "src": "https://picsum.photos/seed/strength4/600/400", "alt": "Leg extension with ankle weights", "hint": "person ankle weights" }
+      { "src": "https://placehold.co/600x400/E0E7FF/4A69C4?text=Strength+1", "alt": "Bicep curls with light weights", "hint": "person lifting weights" },
+      { "src": "https://placehold.co/600x400/E0E7FF/4A69C4?text=Strength+2", "alt": "Overhead press with light weights", "hint": "person lifting weights" },
+      { "src": "https://placehold.co/600x400/E0E7FF/4A69C4?text=Strength+3", "alt": "Seated row with resistance band", "hint": "person resistance band" },
+      { "src": "https://placehold.co/600x400/E0E7FF/4A69C4?text=Strength+4", "alt": "Leg extension with ankle weights", "hint": "person ankle weights" }
     ]
   },
   "location": {
     "mapHome": {
-      "src": "https://picsum.photos/seed/map/800/600",
+      "src": "https://placehold.co/800x600/E0E7FF/4A69C4?text=Map",
       "alt": "Map showing patient is at home",
       "hint": "street map"
     }
