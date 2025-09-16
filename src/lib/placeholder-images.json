@@ -9,7 +9,7 @@
   },
   "family": {
     "janeDoe": {
-      "src": "https://i.ibb.co/M2g33p5/spouse.jpg",
+      "src": "https://storage.googleapis.com/aifirebase-static-content/studio-classic-green-circle.jpeg",
       "alt": "Portrait of Jane Doe",
       "hint": "person portrait"
     },
@@ -74,5 +74,3 @@
     }
   }
 }
-
-    
