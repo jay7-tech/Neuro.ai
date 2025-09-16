@@ -1,8 +1,7 @@
-
 {
   "patient": {
     "johnDoe": {
-      "src": "https://i.ibb.co/9H3M2Xm/patient-photo.jpg",
+      "src": "https://storage.googleapis.com/aifirebase-demo-images/neuro-ai/patient-photo.jpg",
       "alt": "Portrait of John Doe",
       "hint": "person portrait"
     }
