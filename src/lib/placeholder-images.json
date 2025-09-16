@@ -2,7 +2,7 @@
 {
   "patient": {
     "johnDoe": {
-      "src": "https://storage.googleapis.com/aifirebase-demo-images/neuro-ai/patient-photo.jpg",
+      "src": "https://i.ibb.co/Cbc3f9k/pexels-tima-miroshnichenko-6609515.jpg",
       "alt": "Portrait of John Doe",
       "hint": "person portrait"
     }
@@ -19,7 +19,7 @@
       "hint": "person portrait"
     },
     "maryDoe": {
-      "src": "https://storage.googleapis.com/aifirebase-demo-images/neuro-ai/daughter-photo.jpg",
+      "src": "https://i.ibb.co/dM3y5sT/daughter-photo.jpg",
       "alt": "Portrait of Mary Doe",
       "hint": "person portrait"
     },
