@@ -1,4 +1,3 @@
-
 'use client';
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
@@ -98,7 +97,17 @@ export function PatientDashboard() {
             </CardContent>
         </Card>
 
-        <CaregiverChat patientId={patientId} />
+        <Card className="shadow-xl rounded-2xl">
+            <CardHeader>
+                <CardTitle className="text-2xl flex items-center gap-2">
+                    <MessageSquare /> AI Companion
+                </CardTitle>
+                <CardDescription>Have a question? Ask your AI companion.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <AiCompanion />
+            </CardContent>
+        </Card>
 
         <Card className="shadow-xl rounded-2xl">
             <CardHeader>
@@ -112,17 +121,7 @@ export function PatientDashboard() {
             </CardContent>
         </Card>
 
-        <Card className="shadow-xl rounded-2xl">
-            <CardHeader>
-                <CardTitle className="text-2xl flex items-center gap-2">
-                    <MessageSquare /> AI Companion
-                </CardTitle>
-                <CardDescription>Have a question? Ask your AI companion.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <AiCompanion />
-            </CardContent>
-        </Card>
+        <CaregiverChat patientId={patientId} />
       </div>
     </div>
   );
