@@ -23,12 +23,20 @@ export function CaregiverChat({ patientId }: { patientId: string }) {
     useEffect(() => {
         const storedChat = localStorage.getItem(CHAT_STORAGE_KEY);
         if (storedChat) {
-            setConversation(JSON.parse(storedChat));
+            try {
+                setConversation(JSON.parse(storedChat));
+            } catch {
+                setConversation([]);
+            }
         }
 
         const handleStorageChange = (event: StorageEvent) => {
             if (event.key === CHAT_STORAGE_KEY && event.newValue) {
-                setConversation(JSON.parse(event.newValue));
+                try {
+                    setConversation(JSON.parse(event.newValue));
+                } catch {
+                     // handle broken json
+                }
             }
         };
 
