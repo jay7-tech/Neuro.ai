@@ -1,3 +1,4 @@
+
 import Link from "next/link";
 
 const AppIcon = () => (
@@ -8,8 +9,7 @@ const AppIcon = () => (
     </svg>
 )
 
-
-export function AppHeader({ role }: { role: 'Patient' | 'Caregiver' }) {
+export function AppHeader({ role }: { role: 'Patient' | 'Caregiver' | 'Doctor' }) {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-card/80 backdrop-blur-sm">
       <div className="container flex h-16 items-center">
