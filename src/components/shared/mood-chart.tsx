@@ -12,36 +12,42 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card"
+import type { MoodLogEntry } from "../patient/mood-tracker"
 
-type Mood = 'Happy' | 'Okay' | 'Sad';
-type MoodLogEntry = {
-    date: string; // YYYY-MM-DD
-    mood: Mood;
-}
 
 const moodToValue = {
-    'Happy': 3,
-    'Okay': 2,
-    'Sad': 1,
+    'Very Good': 5,
+    'Good': 4,
+    'Okay': 3,
+    'Bad': 2,
+    'Very Bad': 1,
     'No Data': 0,
 }
 
-const valueToMood = ['No Data', 'Sad', 'Okay', 'Happy'];
+const valueToMood = ['No Data', 'Very Bad', 'Bad', 'Okay', 'Good', 'Very Good'];
 
 const chartConfig = {
   mood: {
     label: "Mood",
   },
-  happy: {
-    label: "Happy",
+  'very good': {
+    label: "Very Good",
+    color: "hsl(var(--chart-1))",
+  },
+  good: {
+    label: "Good",
     color: "hsl(var(--chart-2))",
   },
   okay: {
     label: "Okay",
+    color: "hsl(var(--chart-3))",
+  },
+  bad: {
+    label: "Bad",
     color: "hsl(var(--chart-4))",
   },
-  sad: {
-    label: "Sad",
+  'very bad': {
+    label: "Very Bad",
     color: "hsl(var(--chart-5))",
   },
 } satisfies ChartConfig
@@ -59,11 +65,13 @@ export function MoodChart({ patientId }: { patientId: string }) {
             const logEntry = log.find(entry => entry.date === dateString);
             
             const moodValue = logEntry ? moodToValue[logEntry.mood] : 0;
-            const moodColor = logEntry ? (chartConfig as any)[logEntry.mood.toLowerCase()]?.color : 'hsl(var(--muted))'
+            const moodColorKey = logEntry ? logEntry.mood.toLowerCase().replace(' ', '') : 'no-data';
+            const moodColor = logEntry ? (chartConfig as any)[moodColorKey]?.color : 'hsl(var(--muted))';
 
             return {
                 date: format(date, "EEE"), // e.g., "Mon"
                 mood: moodValue,
+                note: logEntry?.note,
                 fill: moodColor
             };
         });
@@ -97,8 +105,8 @@ export function MoodChart({ patientId }: { patientId: string }) {
         <YAxis
           dataKey="mood"
           type="number"
-          domain={[0, 3]}
-          ticks={[1, 2, 3]}
+          domain={[0, 5]}
+          ticks={[1, 2, 3, 4, 5]}
           tickFormatter={(value) => valueToMood[value]}
           tickMargin={10}
           axisLine={false}
@@ -107,8 +115,12 @@ export function MoodChart({ patientId }: { patientId: string }) {
         <ChartTooltip
           cursor={false}
           content={<ChartTooltipContent 
-            labelKey="mood"
-            formatter={(value) => valueToMood[Number(value)]}
+            formatter={(value, name, props) => (
+                <div className="flex flex-col gap-1">
+                   <span>{valueToMood[Number(value)]}</span>
+                   {props.payload.note && <span className="text-xs text-muted-foreground italic">&quot;{props.payload.note}&quot;</span>}
+                </div>
+            )}
             indicator="dot"
             hideLabel
           />}
