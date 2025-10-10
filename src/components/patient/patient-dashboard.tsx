@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Brain, Camera, MessageSquare, Music, PhoneCall, HeartPulse, Album, ArrowRight, Users, Smile, Star } from "lucide-react";
+import { Brain, Camera, Music, PhoneCall, HeartPulse, Album, ArrowRight, Users, Smile, Bot } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { AiCompanion } from "./ai-companion";
@@ -100,7 +100,7 @@ export function PatientDashboard() {
         <Card className="shadow-xl rounded-2xl">
             <CardHeader>
                 <CardTitle className="text-2xl flex items-center gap-2">
-                    <MessageSquare /> AI Companion
+                    <Bot /> AI Companion
                 </CardTitle>
                 <CardDescription>Have a question? Ask your AI companion.</CardDescription>
             </CardHeader>
