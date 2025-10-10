@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { SendHorizonal } from 'lucide-react';
+import { SendHorizonal, Bot } from 'lucide-react';
 import { answerQuestion, type AnswerQuestionOutput } from '@/ai/flows/ai-companion';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '../ui/skeleton';
@@ -43,7 +43,10 @@ export function AiCompanion() {
 
   return (
     <div className="flex flex-col h-[400px]">
-      <ScrollArea className="flex-grow p-4 border rounded-lg mb-4" viewportRef={viewportRef}>
+      <ScrollArea className="flex-grow p-4 border rounded-lg mb-4 relative" viewportRef={viewportRef}>
+         <div className="absolute inset-0 flex items-center justify-center -z-10">
+            <Bot className="h-32 w-32 text-muted/20" />
+        </div>
         <div className="space-y-4">
           {conversation.length === 0 && (
             <div className="text-center text-muted-foreground p-8">
