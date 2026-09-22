@@ -62,3 +62,4 @@ This project is built on a modern, robust, and scalable technology stack chosen 
 ---
 
 For a complete and exhaustive breakdown of every feature, component, and data structure, please refer to the [PROJECT_DOCUMENTATION.md](PROJECT_DOCUMENTATION.md) file.
+Jay
