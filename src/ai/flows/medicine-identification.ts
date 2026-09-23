@@ -1,66 +1,32 @@
-'use server';
+import { z } from 'genkit';
+import { getAi, withTimeout } from '@/ai/genkit';
+import { AppError } from '@/server/errors';
 
-/**
- * @fileOverview Medicine identification AI agent.
- *
- * - identifyMedicine - A function that handles the medicine identification process.
- * - IdentifyMedicineInput - The input type for the identifyMedicine function.
- * - IdentifyMedicineOutput - The return type for the identifyMedicine function.
- */
-
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
-
-const IdentifyMedicineInputSchema = z.object({
-  photoDataUri: z
-    .string()
-    .describe(
-      "A photo of a tablet pack, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
-    ),
+export const IdentifyMedicineOutput = z.object({
+  medicineName: z.string().describe('Brand or generic name printed on the pack'),
+  strength: z.string().optional().describe('Strength printed on the pack, e.g. "5 mg"'),
+  confidence: z.number().min(0).max(1),
+  usage: z.string().describe('What this medicine is typically used for, in plain language'),
+  expiryDate: z.string().optional().describe('Expiry date if visible, YYYY-MM or YYYY-MM-DD'),
 });
-export type IdentifyMedicineInput = z.infer<typeof IdentifyMedicineInputSchema>;
+export type IdentifyMedicineOutput = z.infer<typeof IdentifyMedicineOutput>;
 
-const IdentifyMedicineOutputSchema = z.object({
-  medicineName: z.string().describe('The identified name of the medicine.'),
-  confidenceLevel: z
-    .number()
-    .describe('The confidence level of the identification (0-1).'),
-  usage: z.string().describe('The typical use or purpose of the medicine.'),
-  recommendedFor: z.string().describe('Who the medicine is generally recommended for.'),
-  isForPatient: z.boolean().describe('Whether this medicine is likely prescribed for a dementia patient.'),
-  expiryDate: z.string().optional().describe('The expiry date found on the tablet pack, if visible (YYYY-MM-DD).')
-});
-export type IdentifyMedicineOutput = z.infer<typeof IdentifyMedicineOutputSchema>;
-
-export async function identifyMedicine(
-  input: IdentifyMedicineInput
-): Promise<IdentifyMedicineOutput> {
-  return identifyMedicineFlow(input);
+/** Vision call only; the safety cross-check against the prescription list lives in the service layer. */
+export async function identifyMedicine(photoDataUri: string): Promise<IdentifyMedicineOutput> {
+  const ai = getAi();
+  if (!ai) throw new AppError('UNAVAILABLE', 'Medicine identification needs GEMINI_API_KEY to be configured');
+  const { output } = await withTimeout(
+    ai.generate({
+      prompt: [
+        { media: { url: photoDataUri } },
+        {
+          text: 'You are a pharmacist. Read the medicine name, strength and expiry date printed on this tablet pack. Do not guess: if text is unreadable, lower the confidence.',
+        },
+      ],
+      output: { schema: IdentifyMedicineOutput },
+    }),
+    25_000,
+  );
+  if (!output) throw new AppError('UNAVAILABLE', 'Could not read the medicine pack');
+  return output;
 }
-
-const prompt = ai.definePrompt({
-  name: 'identifyMedicinePrompt',
-  input: {schema: IdentifyMedicineInputSchema},
-  output: {schema: IdentifyMedicineOutputSchema},
-  prompt: `You are an expert pharmacist specializing in identifying medicine from photos of tablet packs.
-
-You will use this information to identify the medicine in the photo, and provide a confidence level, its usage, who it's for, its relevance to a dementia patient and the expiry date if visible.
-
-Use the following as the primary source of information about the medicine.
-
-Photo: {{media url=photoDataUri}}
-
-Identify the medicine and provide the requested information.`,
-});
-
-const identifyMedicineFlow = ai.defineFlow(
-  {
-    name: 'identifyMedicineFlow',
-    inputSchema: IdentifyMedicineInputSchema,
-    outputSchema: IdentifyMedicineOutputSchema,
-  },
-  async input => {
-    const {output} = await prompt(input);
-    return output!;
-  }
-);

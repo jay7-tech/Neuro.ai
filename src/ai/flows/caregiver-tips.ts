@@ -1,48 +1,50 @@
-'use server';
-/**
- * @fileOverview An AI agent to provide tips for caregivers.
- *
- * - getCaregiverTip - A function that returns a helpful tip.
- * - GetCaregiverTipInput - The input type for the getCaregiverTip function.
- * - GetCaregiverTipOutput - The return type for the getCaregiverTip function.
- */
+import { z } from 'genkit';
+import { getAi, withTimeout } from '@/ai/genkit';
+import { logger } from '@/server/logger';
 
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+export type TipTopic = 'Communication' | 'Daily Activities' | 'Safety' | 'Managing Frustration' | 'Self-Care';
 
-const GetCaregiverTipInputSchema = z.object({
-  topic: z.string().describe('The topic for the tip (e.g., communication, daily activities, safety).'),
-});
-export type GetCaregiverTipInput = z.infer<typeof GetCaregiverTipInputSchema>;
+/** Curated tips used when the LLM is unavailable. */
+const FALLBACK: Record<TipTopic, string[]> = {
+  Communication: [
+    'Ask one simple question at a time and offer two choices ("tea or juice?") instead of open questions.',
+    'Approach from the front, make eye contact and say your name before you start talking.',
+  ],
+  'Daily Activities': [
+    'Keep the same order for morning tasks every day — routine reduces decisions, and fewer decisions means less anxiety.',
+    'Break tasks into single steps and hand over one item at a time.',
+  ],
+  Safety: [
+    'Label cupboards with pictures and words, and keep a night light on the route to the bathroom.',
+    'Remove trip hazards like loose rugs; most falls at home happen on the way to the bathroom at night.',
+  ],
+  'Managing Frustration': [
+    'Respond to the feeling, not the facts: "You seem worried" works better than correcting what they said.',
+    'If agitation builds, change the scene — a short walk or favourite song often resets the mood.',
+  ],
+  'Self-Care': [
+    'Schedule a 15-minute break for yourself every day, and treat it like a medication — non-negotiable.',
+    'Ask a family member to take one fixed task each week; small, predictable help prevents burnout.',
+  ],
+};
 
-const GetCaregiverTipOutputSchema = z.object({
-  tip: z.string().describe('A practical, empathetic tip for the caregiver.'),
-});
-export type GetCaregiverTipOutput = z.infer<typeof GetCaregiverTipOutputSchema>;
+const Output = z.object({ tip: z.string().max(500) });
 
-export async function getCaregiverTip(input: GetCaregiverTipInput): Promise<GetCaregiverTipOutput> {
-  return getCaregiverTipFlow(input);
-}
-
-const prompt = ai.definePrompt({
-  name: 'getCaregiverTipPrompt',
-  input: {schema: GetCaregiverTipInputSchema},
-  output: {schema: GetCaregiverTipOutputSchema},
-  prompt: `You are an expert AI assistant for caregivers of individuals with dementia. Your tone is supportive, empathetic, and practical.
-
-Provide one concise, actionable tip for a caregiver on the following topic: {{{topic}}}.
-
-The tip should be easy to understand and implement. Frame it in a positive and encouraging way.`,
-});
-
-const getCaregiverTipFlow = ai.defineFlow(
-  {
-    name: 'getCaregiverTipFlow',
-    inputSchema: GetCaregiverTipInputSchema,
-    outputSchema: GetCaregiverTipOutputSchema,
-  },
-  async input => {
-    const {output} = await prompt(input);
-    return output!;
+export async function getCaregiverTip(topic: TipTopic): Promise<{ tip: string; source: 'llm' | 'curated' }> {
+  const ai = getAi();
+  if (ai) {
+    try {
+      const { output } = await withTimeout(
+        ai.generate({
+          prompt: `You support family caregivers of people with dementia. Give ONE concise, practical, encouraging tip (max 2 sentences) about: ${topic}.`,
+          output: { schema: Output },
+        }),
+      );
+      if (output?.tip) return { tip: output.tip, source: 'llm' };
+    } catch (err) {
+      logger.warn({ err }, 'caregiver tip LLM call failed');
+    }
   }
-);
+  const options = FALLBACK[topic];
+  return { tip: options[Math.floor(Math.random() * options.length)], source: 'curated' };
+}
