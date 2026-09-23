@@ -23,7 +23,13 @@ const code = (e: unknown) => (e instanceof AppError ? e.code : e);
 async function setup() {
   const pu = await makeUser('patient');
   const cg = await makeUser('caregiver');
-  const p = await makePatient([[pu, 'patient'], [cg, 'caregiver']], { homeLat: 12.9716, homeLng: 77.5946, geofenceRadiusM: 300 });
+  const p = await makePatient(
+    [
+      [pu, 'patient'],
+      [cg, 'caregiver'],
+    ],
+    { homeLat: 12.9716, homeLng: 77.5946, geofenceRadiusM: 300 },
+  );
   return { pu, cg, p };
 }
 
@@ -31,7 +37,15 @@ describe('medication adherence', () => {
   it('records doses idempotently and only for real schedule slots', async () => {
     const { pu, cg, p } = await setup();
     const yesterday = addDays(localDate(new Date(), TZ), -1);
-    const m = await createMedication(db(), cg, p.id, { name: 'Memantine', dosage: '10 mg', instructions: null, times: ['08:00'], daysOfWeek: [0, 1, 2, 3, 4, 5, 6], startDate: yesterday, endDate: null });
+    const m = await createMedication(db(), cg, p.id, {
+      name: 'Memantine',
+      dosage: '10 mg',
+      instructions: null,
+      times: ['08:00'],
+      daysOfWeek: [0, 1, 2, 3, 4, 5, 6],
+      startDate: yesterday,
+      endDate: null,
+    });
     const slot = zonedToUtc(yesterday, '08:00', TZ).toISOString();
 
     await recordDose(db(), pu, p.id, { medicationId: m.id, scheduledFor: slot, status: 'skipped' });
@@ -41,20 +55,33 @@ describe('medication adherence', () => {
     expect(rows[0].status).toBe('taken');
 
     const bogus = zonedToUtc(yesterday, '08:07', TZ).toISOString();
-    await expect(recordDose(db(), pu, p.id, { medicationId: m.id, scheduledFor: bogus, status: 'taken' })).rejects.toSatisfy((e) => code(e) === 'BAD_REQUEST');
+    await expect(
+      recordDose(db(), pu, p.id, { medicationId: m.id, scheduledFor: bogus, status: 'taken' }),
+    ).rejects.toSatisfy((e) => code(e) === 'BAD_REQUEST');
   });
 
   it('marks overdue doses missed, alerts once, and is safe to re-run', async () => {
     const { cg, p } = await setup();
     const yesterday = addDays(localDate(new Date(), TZ), -1);
-    await createMedication(db(), cg, p.id, { name: 'Donepezil', dosage: '5 mg', instructions: null, times: ['09:00', '21:00'], daysOfWeek: [0, 1, 2, 3, 4, 5, 6], startDate: yesterday, endDate: null });
+    await createMedication(db(), cg, p.id, {
+      name: 'Donepezil',
+      dosage: '5 mg',
+      instructions: null,
+      times: ['09:00', '21:00'],
+      daysOfWeek: [0, 1, 2, 3, 4, 5, 6],
+      startDate: yesterday,
+      endDate: null,
+    });
 
     const job = missedDoseJob(60, 48);
     const now = zonedToUtc(localDate(new Date(), TZ), '00:30', TZ); // after both of yesterday's slots + grace
     expect(await runOnce(db(), job, now)).toBe('ran');
     expect(await runOnce(db(), job, now)).toBe('ran');
 
-    const missed = await db().select().from(doseEvents).where(and(eq(doseEvents.patientId, p.id), eq(doseEvents.status, 'missed')));
+    const missed = await db()
+      .select()
+      .from(doseEvents)
+      .where(and(eq(doseEvents.patientId, p.id), eq(doseEvents.status, 'missed')));
     expect(missed).toHaveLength(2);
     const open = await listAlerts(db(), cg, p.id, { status: 'open', limit: 10 });
     expect(open.filter((a) => a.type === 'missed_dose')).toHaveLength(2);
@@ -67,7 +94,15 @@ describe('medication adherence', () => {
   it("returns today's doses with state and names", async () => {
     const { pu, cg, p } = await setup();
     const today = localDate(new Date(), TZ);
-    await createMedication(db(), cg, p.id, { name: 'Amlodipine', dosage: '5 mg', instructions: null, times: ['00:00', '23:59'], daysOfWeek: [0, 1, 2, 3, 4, 5, 6], startDate: today, endDate: null });
+    await createMedication(db(), cg, p.id, {
+      name: 'Amlodipine',
+      dosage: '5 mg',
+      instructions: null,
+      times: ['00:00', '23:59'],
+      daysOfWeek: [0, 1, 2, 3, 4, 5, 6],
+      startDate: today,
+      endDate: null,
+    });
     const r = await todaysDoses(db(), pu, p.id, 60);
     expect(r.doses.map((d) => d.name)).toEqual(['Amlodipine', 'Amlodipine']);
     expect(r.doses.at(-1)?.state).toBe('upcoming');
@@ -77,14 +112,27 @@ describe('medication adherence', () => {
 describe('advisory-locked jobs', () => {
   it('runs a job on only one of several concurrent workers', async () => {
     let runs = 0;
-    const job = { name: 'test-job', intervalMs: 1000, run: async () => { runs += 1; await new Promise((r) => setTimeout(r, 200)); } };
+    const job = {
+      name: 'test-job',
+      intervalMs: 1000,
+      run: async () => {
+        runs += 1;
+        await new Promise((r) => setTimeout(r, 200));
+      },
+    };
     const results = await Promise.all([runOnce(db(), job), runOnce(db(), job), runOnce(db(), job)]);
     expect(runs).toBe(1);
     expect(results.filter((r) => r === 'skipped')).toHaveLength(2);
   });
 
   it('records failures without crashing the worker', async () => {
-    const job = { name: 'boom', intervalMs: 1000, run: async () => { throw new Error('kaboom'); } };
+    const job = {
+      name: 'boom',
+      intervalMs: 1000,
+      run: async () => {
+        throw new Error('kaboom');
+      },
+    };
     expect(await runOnce(db(), job)).toBe('failed');
   });
 });
@@ -99,7 +147,9 @@ describe('alerts', () => {
 
     await updateAlertStatus(db(), cg, p.id, first!.id, 'resolved');
     expect(await raiseAlert(db(), a)).not.toBeNull();
-    await expect(updateAlertStatus(db(), cg, p.id, first!.id, 'acknowledged')).rejects.toSatisfy((e) => code(e) === 'CONFLICT');
+    await expect(updateAlertStatus(db(), cg, p.id, first!.id, 'acknowledged')).rejects.toSatisfy(
+      (e) => code(e) === 'CONFLICT',
+    );
   });
 });
 
@@ -114,7 +164,10 @@ describe('geofence', () => {
     expect((await listAlerts(db(), cg, p.id, { status: 'open', limit: 10 }))[0].type).toBe('geofence_exit');
 
     await reportLocation(db(), pu, p.id, { lat: 12.9716, lng: 77.5946, accuracyM: 10 });
-    const open = await db().select().from(alerts).where(and(eq(alerts.patientId, p.id), eq(alerts.status, 'open')));
+    const open = await db()
+      .select()
+      .from(alerts)
+      .where(and(eq(alerts.patientId, p.id), eq(alerts.status, 'open')));
     expect(open).toHaveLength(0);
   });
 });
@@ -139,7 +192,14 @@ describe('messaging', () => {
 describe('games', () => {
   it('stores performance and recommends promotion after sustained success', async () => {
     const { pu, p } = await setup();
-    const round = { game: 'color_match' as const, difficulty: 'easy' as const, score: 10, maxScore: 10, mistakes: 0, durationMs: 20_000 };
+    const round = {
+      game: 'color_match' as const,
+      difficulty: 'easy' as const,
+      score: 10,
+      maxScore: 10,
+      mistakes: 0,
+      durationMs: 20_000,
+    };
     await recordSession(db(), pu, p.id, round);
     await recordSession(db(), pu, p.id, round);
     const third = await recordSession(db(), pu, p.id, round);
@@ -156,10 +216,12 @@ describe('realtime bus', () => {
     const received: string[] = [];
     listener.on('notification', (m) => received.push(JSON.parse(m.payload!).type));
 
-    await db().transaction(async (tx) => {
-      await publish(tx, '00000000-0000-0000-0000-000000000000', 'message.created');
-      tx.rollback();
-    }).catch(() => undefined);
+    await db()
+      .transaction(async (tx) => {
+        await publish(tx, '00000000-0000-0000-0000-000000000000', 'message.created');
+        tx.rollback();
+      })
+      .catch(() => undefined);
     await db().transaction(async (tx) => publish(tx, '00000000-0000-0000-0000-000000000000', 'alert.created'));
 
     await new Promise((r) => setTimeout(r, 200));

@@ -19,7 +19,13 @@ export type GameProps = { level: Level; onFinish: (o: Outcome) => void };
  * submit the result, and show the server's recommendation for the next round.
  * Individual games only implement play and call onFinish.
  */
-export function GameShell({ patientId, game, title, instructions, children }: {
+export function GameShell({
+  patientId,
+  game,
+  title,
+  instructions,
+  children,
+}: {
   patientId: string;
   game: Game;
   title: string;
@@ -55,8 +61,16 @@ export function GameShell({ patientId, game, title, instructions, children }: {
   return (
     <div className="mx-auto flex max-w-3xl flex-col items-center gap-6">
       <div className="flex w-full items-center justify-between">
-        <Button asChild variant="ghost"><Link href="/patient/games"><ArrowLeft className="mr-2 h-4 w-4" /> All games</Link></Button>
-        {level && <Badge variant="secondary" className="text-sm capitalize">Level: {level}</Badge>}
+        <Button asChild variant="ghost">
+          <Link href="/patient/games">
+            <ArrowLeft className="mr-2 h-4 w-4" /> All games
+          </Link>
+        </Button>
+        {level && (
+          <Badge variant="secondary" className="text-sm capitalize">
+            Level: {level}
+          </Badge>
+        )}
       </div>
       <div className="text-center">
         <h1 className="text-3xl font-bold md:text-4xl">{title}</h1>
@@ -70,21 +84,31 @@ export function GameShell({ patientId, game, title, instructions, children }: {
           <CardContent className="space-y-4 p-6 text-center">
             <Star className="mx-auto h-12 w-12 text-yellow-500" />
             <p className="text-2xl font-bold">Well played!</p>
-            <p className="text-lg">You scored {result.session.score} of {result.session.maxScore}.</p>
+            <p className="text-lg">
+              You scored {result.session.score} of {result.session.maxScore}.
+            </p>
             <p className="text-muted-foreground">{result.recommendation.message}</p>
             {result.recommendation.change !== 'hold' && (
               <p className="flex items-center justify-center gap-2 font-medium">
-                {result.recommendation.change === 'promote' ? <TrendingUp className="h-5 w-5 text-emerald-600" /> : <TrendingDown className="h-5 w-5" />}
+                {result.recommendation.change === 'promote' ? (
+                  <TrendingUp className="h-5 w-5 text-emerald-600" />
+                ) : (
+                  <TrendingDown className="h-5 w-5" />
+                )}
                 Next round: <span className="capitalize">{result.recommendation.level}</span>
               </p>
             )}
-            <Button size="lg" className="w-full" onClick={playAgain}>Play again</Button>
+            <Button size="lg" className="w-full" onClick={playAgain}>
+              Play again
+            </Button>
           </CardContent>
         </Card>
       ) : record.isPending ? (
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       ) : (
-        <div key={`${round}-${level}`} className="w-full">{children({ level, onFinish })}</div>
+        <div key={`${round}-${level}`} className="w-full">
+          {children({ level, onFinish })}
+        </div>
       )}
     </div>
   );

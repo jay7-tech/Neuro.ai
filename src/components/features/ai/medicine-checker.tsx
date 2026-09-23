@@ -39,23 +39,57 @@ export function MedicineChecker({ patientId }: { patientId: string }) {
   return (
     <Card className="mx-auto max-w-2xl rounded-2xl shadow-xl">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-2xl"><Camera /> Is this my medicine?</CardTitle>
-        <CardDescription>Take a photo of the tablet pack. I&apos;ll check it against your prescriptions.</CardDescription>
+        <CardTitle className="flex items-center gap-2 text-2xl">
+          <Camera /> Is this my medicine?
+        </CardTitle>
+        <CardDescription>
+          Take a photo of the tablet pack. I&apos;ll check it against your prescriptions.
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <input ref={input} type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => onFile(e.target.files?.[0])} />
-        <Button size="lg" className="h-16 w-full text-lg" onClick={() => input.current?.click()} disabled={check.isPending}>
-          {check.isPending ? <Loader2 className="mr-2 h-6 w-6 animate-spin" /> : <Upload className="mr-2 h-6 w-6" />} {check.isPending ? 'Checking…' : 'Take or choose a photo'}
+        <input
+          ref={input}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          className="hidden"
+          onChange={(e) => onFile(e.target.files?.[0])}
+        />
+        <Button
+          size="lg"
+          className="h-16 w-full text-lg"
+          onClick={() => input.current?.click()}
+          disabled={check.isPending}
+        >
+          {check.isPending ? <Loader2 className="mr-2 h-6 w-6 animate-spin" /> : <Upload className="mr-2 h-6 w-6" />}{' '}
+          {check.isPending ? 'Checking…' : 'Take or choose a photo'}
         </Button>
-        {preview && <Image src={preview} alt="Medicine pack" width={640} height={480} className="max-h-64 w-full rounded-xl object-contain" unoptimized />}
-        {check.isError && <Alert variant="destructive"><AlertDescription>{errorMessage(check.error)}</AlertDescription></Alert>}
+        {preview && (
+          <Image
+            src={preview}
+            alt="Medicine pack"
+            width={640}
+            height={480}
+            className="max-h-64 w-full rounded-xl object-contain"
+            unoptimized
+          />
+        )}
+        {check.isError && (
+          <Alert variant="destructive">
+            <AlertDescription>{errorMessage(check.error)}</AlertDescription>
+          </Alert>
+        )}
         {r && r.verdict === 'matches_prescription' && (
           <Alert className="border-emerald-400 bg-emerald-50 dark:bg-emerald-950/40">
             <CheckCircle2 className="h-5 w-5 text-emerald-600" />
             <AlertTitle className="text-xl">Yes — this is your {r.matchedMedication!.name}</AlertTitle>
             <AlertDescription className="text-base">
               {r.matchedMedication!.dosage}, taken at {r.matchedMedication!.times.join(' and ')}.
-              {r.expired && <b className="mt-2 block text-destructive">The pack looks expired ({r.identified.expiryDate}). Please ask your caregiver.</b>}
+              {r.expired && (
+                <b className="mt-2 block text-destructive">
+                  The pack looks expired ({r.identified.expiryDate}). Please ask your caregiver.
+                </b>
+              )}
             </AlertDescription>
           </Alert>
         )}
@@ -63,14 +97,18 @@ export function MedicineChecker({ patientId }: { patientId: string }) {
           <Alert variant="destructive">
             <ShieldAlert className="h-5 w-5" />
             <AlertTitle className="text-xl">This is not on your medicine list</AlertTitle>
-            <AlertDescription className="text-base">It looks like {r.identified.medicineName}. Please don&apos;t take it — ask your caregiver first.</AlertDescription>
+            <AlertDescription className="text-base">
+              It looks like {r.identified.medicineName}. Please don&apos;t take it — ask your caregiver first.
+            </AlertDescription>
           </Alert>
         )}
         {r && r.verdict === 'uncertain' && (
           <Alert>
             <HelpCircle className="h-5 w-5" />
             <AlertTitle className="text-xl">I can&apos;t read the pack clearly</AlertTitle>
-            <AlertDescription className="text-base">Try again with the name facing the camera in good light.</AlertDescription>
+            <AlertDescription className="text-base">
+              Try again with the name facing the camera in good light.
+            </AlertDescription>
           </Alert>
         )}
       </CardContent>

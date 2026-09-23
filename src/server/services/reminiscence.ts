@@ -28,24 +28,45 @@ type Insert<R extends Resource> = Omit<(typeof TABLES)[R]['table']['$inferInsert
 type Keyed = PgTable & { id: typeof familyMembers.id; patientId: typeof familyMembers.patientId };
 const t = (r: Resource) => TABLES[r].table as unknown as Keyed;
 
-export async function listResource<R extends Resource>(db: Executor, actor: Actor, patientId: string, r: R): Promise<Row<R>[]> {
+export async function listResource<R extends Resource>(
+  db: Executor,
+  actor: Actor,
+  patientId: string,
+  r: R,
+): Promise<Row<R>[]> {
   await requireAccess(db, actor, patientId, 'reminiscence:read');
   const table = t(r);
   return (await db.select().from(table).where(eq(table.patientId, patientId)).orderBy(TABLES[r].order)) as Row<R>[];
 }
 
-export async function createResource<R extends Resource>(db: Database, actor: Actor, patientId: string, r: R, input: Insert<R>) {
+export async function createResource<R extends Resource>(
+  db: Database,
+  actor: Actor,
+  patientId: string,
+  r: R,
+  input: Insert<R>,
+) {
   await requireAccess(db, actor, patientId, 'reminiscence:write');
   return db.transaction(async (tx) => {
     const extra = r === 'memories' ? { createdBy: actor.user.id } : {};
-    const [row] = (await tx.insert(t(r)).values({ ...input, ...extra, patientId } as never).returning()) as Row<R>[];
+    const [row] = (await tx
+      .insert(t(r))
+      .values({ ...input, ...extra, patientId } as never)
+      .returning()) as Row<R>[];
     await audit(tx, actor, { patientId, action: `${r}.created`, entity: r, entityId: (row as { id: string }).id });
     await publish(tx, patientId, 'reminiscence.changed');
     return row;
   });
 }
 
-export async function updateResource<R extends Resource>(db: Database, actor: Actor, patientId: string, r: R, id: string, input: Insert<R>) {
+export async function updateResource<R extends Resource>(
+  db: Database,
+  actor: Actor,
+  patientId: string,
+  r: R,
+  id: string,
+  input: Insert<R>,
+) {
   await requireAccess(db, actor, patientId, 'reminiscence:write');
   return db.transaction(async (tx) => {
     const table = t(r);
@@ -65,7 +86,10 @@ export async function deleteResource(db: Database, actor: Actor, patientId: stri
   await requireAccess(db, actor, patientId, 'reminiscence:write');
   await db.transaction(async (tx) => {
     const table = t(r);
-    const rows = await tx.delete(table).where(and(eq(table.id, id), eq(table.patientId, patientId))).returning({ id: table.id });
+    const rows = await tx
+      .delete(table)
+      .where(and(eq(table.id, id), eq(table.patientId, patientId)))
+      .returning({ id: table.id });
     if (!rows.length) throw notFound('Item');
     await audit(tx, actor, { patientId, action: `${r}.deleted`, entity: r, entityId: id });
     await publish(tx, patientId, 'reminiscence.changed');

@@ -1,4 +1,3 @@
-
 {
   "patient": {
     "johnDoe": {
@@ -48,22 +47,70 @@
   },
   "exercises": {
     "yoga": [
-      { "src": "https://placehold.co/600x400/E0E7FF/4A69C4?text=Yoga+Step+1", "alt": "Seated mountain pose", "hint": "person yoga" },
-      { "src": "https://placehold.co/600x400/E0E7FF/4A69C4?text=Yoga+Step+2", "alt": "Seated forward bend", "hint": "person yoga" },
-      { "src": "https://placehold.co/600x400/E0E7FF/4A69C4?text=Yoga+Step+3", "alt": "Seated cat-cow stretch", "hint": "person yoga" },
-      { "src": "https://placehold.co/600x400/E0E7FF/4A69C4?text=Yoga+Step+4", "alt": "Seated twist", "hint": "person yoga" }
+      {
+        "src": "https://placehold.co/600x400/E0E7FF/4A69C4?text=Yoga+Step+1",
+        "alt": "Seated mountain pose",
+        "hint": "person yoga"
+      },
+      {
+        "src": "https://placehold.co/600x400/E0E7FF/4A69C4?text=Yoga+Step+2",
+        "alt": "Seated forward bend",
+        "hint": "person yoga"
+      },
+      {
+        "src": "https://placehold.co/600x400/E0E7FF/4A69C4?text=Yoga+Step+3",
+        "alt": "Seated cat-cow stretch",
+        "hint": "person yoga"
+      },
+      {
+        "src": "https://placehold.co/600x400/E0E7FF/4A69C4?text=Yoga+Step+4",
+        "alt": "Seated twist",
+        "hint": "person yoga"
+      }
     ],
     "stretching": [
-      { "src": "https://placehold.co/600x400/E0E7FF/4A69C4?text=Stretch+1", "alt": "Neck stretch", "hint": "person stretching" },
-      { "src": "https://placehold.co/600x400/E0E7FF/4A69C4?text=Stretch+2", "alt": "Shoulder rolls", "hint": "person stretching" },
-      { "src": "https://placehold.co/600x400/E0E7FF/4A69C4?text=Stretch+3", "alt": "Wrist and finger stretch", "hint": "person stretching" },
-      { "src": "https://placehold.co/600x400/E0E7FF/4A69C4?text=Stretch+4", "alt": "Ankle rotations", "hint": "person stretching" }
+      {
+        "src": "https://placehold.co/600x400/E0E7FF/4A69C4?text=Stretch+1",
+        "alt": "Neck stretch",
+        "hint": "person stretching"
+      },
+      {
+        "src": "https://placehold.co/600x400/E0E7FF/4A69C4?text=Stretch+2",
+        "alt": "Shoulder rolls",
+        "hint": "person stretching"
+      },
+      {
+        "src": "https://placehold.co/600x400/E0E7FF/4A69C4?text=Stretch+3",
+        "alt": "Wrist and finger stretch",
+        "hint": "person stretching"
+      },
+      {
+        "src": "https://placehold.co/600x400/E0E7FF/4A69C4?text=Stretch+4",
+        "alt": "Ankle rotations",
+        "hint": "person stretching"
+      }
     ],
     "strength": [
-      { "src": "https://placehold.co/600x400/E0E7FF/4A69C4?text=Strength+1", "alt": "Bicep curls with light weights", "hint": "person lifting weights" },
-      { "src": "https://placehold.co/600x400/E0E7FF/4A69C4?text=Strength+2", "alt": "Overhead press with light weights", "hint": "person lifting weights" },
-      { "src": "https://placehold.co/600x400/E0E7FF/4A69C4?text=Strength+3", "alt": "Seated row with resistance band", "hint": "person resistance band" },
-      { "src": "https://placehold.co/600x400/E0E7FF/4A69C4?text=Strength+4", "alt": "Leg extension with ankle weights", "hint": "person ankle weights" }
+      {
+        "src": "https://placehold.co/600x400/E0E7FF/4A69C4?text=Strength+1",
+        "alt": "Bicep curls with light weights",
+        "hint": "person lifting weights"
+      },
+      {
+        "src": "https://placehold.co/600x400/E0E7FF/4A69C4?text=Strength+2",
+        "alt": "Overhead press with light weights",
+        "hint": "person lifting weights"
+      },
+      {
+        "src": "https://placehold.co/600x400/E0E7FF/4A69C4?text=Strength+3",
+        "alt": "Seated row with resistance band",
+        "hint": "person resistance band"
+      },
+      {
+        "src": "https://placehold.co/600x400/E0E7FF/4A69C4?text=Strength+4",
+        "alt": "Leg extension with ankle weights",
+        "hint": "person ankle weights"
+      }
     ]
   },
   "location": {

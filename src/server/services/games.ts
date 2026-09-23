@@ -6,7 +6,14 @@ import { performance, recommend, PROMOTE_WINDOW } from '../domain/difficulty';
 import { publish } from '../realtime/bus';
 import { requireAccess } from './access';
 
-type SessionInput = { game: GameType; difficulty: Difficulty; score: number; maxScore: number; mistakes: number; durationMs: number };
+type SessionInput = {
+  game: GameType;
+  difficulty: Difficulty;
+  score: number;
+  maxScore: number;
+  mistakes: number;
+  durationMs: number;
+};
 
 async function recentAtLevel(db: Executor, patientId: string, game: GameType, level: Difficulty) {
   const rows = await db
@@ -39,7 +46,10 @@ export async function recordSession(db: Database, actor: Actor, patientId: strin
   await requireAccess(db, actor, patientId, 'game:play');
   const perf = performance(input);
   return db.transaction(async (tx) => {
-    const [row] = await tx.insert(gameSessions).values({ ...input, patientId, performance: perf }).returning();
+    const [row] = await tx
+      .insert(gameSessions)
+      .values({ ...input, patientId, performance: perf })
+      .returning();
     const next = recommend(input.difficulty, await recentAtLevel(tx, patientId, input.game, input.difficulty));
     await publish(tx, patientId, 'game.completed', row.id);
     return { session: row, recommendation: next };

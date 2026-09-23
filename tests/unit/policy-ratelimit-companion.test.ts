@@ -105,8 +105,19 @@ describe('contracts', () => {
   });
 
   it('deduplicates and sorts medication times, and validates date order', () => {
-    expect(MedicationInput.parse({ name: 'X', dosage: '1', times: ['20:00', '08:00', '08:00'], startDate: '2026-09-01' }).times).toEqual(['08:00', '20:00']);
-    expect(MedicationInput.safeParse({ name: 'X', dosage: '1', times: ['08:00'], startDate: '2026-09-10', endDate: '2026-09-01' }).success).toBe(false);
+    expect(
+      MedicationInput.parse({ name: 'X', dosage: '1', times: ['20:00', '08:00', '08:00'], startDate: '2026-09-01' })
+        .times,
+    ).toEqual(['08:00', '20:00']);
+    expect(
+      MedicationInput.safeParse({
+        name: 'X',
+        dosage: '1',
+        times: ['08:00'],
+        startDate: '2026-09-10',
+        endDate: '2026-09-01',
+      }).success,
+    ).toBe(false);
   });
 
   it('enforces a password policy', () => {

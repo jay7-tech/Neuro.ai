@@ -40,6 +40,7 @@ export async function makePatient(members: [Actor, CareRole][], over: Partial<ty
     .insert(patients)
     .values({ displayName: 'Test Patient', timezone: 'Asia/Kolkata', ...over })
     .returning();
-  for (const [a, role] of members) await getDb().insert(careTeamMembers).values({ patientId: p.id, userId: a.user.id, role });
+  for (const [a, role] of members)
+    await getDb().insert(careTeamMembers).values({ patientId: p.id, userId: a.user.id, role });
   return p;
 }

@@ -52,7 +52,11 @@ export async function runOnce(db: Database, job: Job, now = new Date()): Promise
     } catch (err) {
       await tx
         .update(jobRuns)
-        .set({ lastFinishedAt: new Date(), lastStatus: 'error', lastError: String((err as Error)?.message ?? err).slice(0, 1000) })
+        .set({
+          lastFinishedAt: new Date(),
+          lastStatus: 'error',
+          lastError: String((err as Error)?.message ?? err).slice(0, 1000),
+        })
         .where(sql`${jobRuns.name} = ${job.name}`);
       log.error({ err, durationMs: Date.now() - started }, 'job failed');
       return 'failed' as const;

@@ -17,15 +17,20 @@ export async function patientSummary(db: Executor, actor: Actor, patientId: stri
     adherence(db, actor, patientId, 30, graceMinutes),
     moodAnalytics(db, actor, patientId, 30),
     gameStats(db, actor, patientId, 30),
-    db.select({ n: count() }).from(alerts).where(and(eq(alerts.patientId, patientId), eq(alerts.status, 'open'))),
+    db
+      .select({ n: count() })
+      .from(alerts)
+      .where(and(eq(alerts.patientId, patientId), eq(alerts.status, 'open'))),
   ]);
 
   const flags: string[] = [];
-  if (adh.adherenceRate !== null && adh.adherenceRate < 0.8) flags.push(`Medication adherence ${Math.round(adh.adherenceRate * 100)}% (target ≥ 80%)`);
+  if (adh.adherenceRate !== null && adh.adherenceRate < 0.8)
+    flags.push(`Medication adherence ${Math.round(adh.adherenceRate * 100)}% (target ≥ 80%)`);
   if (mood.decline.status === 'decline') flags.push(`Mood dropped ${mood.decline.drop} points vs. 2-week baseline`);
   if (mood.trend.direction === 'declining') flags.push('Mood trending downward over 30 days');
   const perf = games.weekly.map((w) => w.avgPerformance);
-  if (perf.length >= 3 && perf.at(-1)! < perf[0] - 0.15) flags.push('Cognitive game performance declining week over week');
+  if (perf.length >= 3 && perf.at(-1)! < perf[0] - 0.15)
+    flags.push('Cognitive game performance declining week over week');
 
   return {
     adherence: { rate: adh.adherenceRate, onTimeRate: adh.onTimeRate, streakDays: adh.streakDays, daily: adh.daily },

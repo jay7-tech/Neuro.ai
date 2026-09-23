@@ -4,7 +4,14 @@ import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { LogOut, Moon, Sun, UserRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { api } from '@/lib/api-client';
 import { useTheme } from './theme-provider';
 
@@ -31,7 +38,9 @@ export function UserMenu({ name, email, roleLabel }: { name: string; email: stri
       <DropdownMenuContent align="end" className="w-60">
         <DropdownMenuLabel>
           <p className="truncate">{name}</p>
-          <p className="truncate text-xs font-normal text-muted-foreground">{email} · {roleLabel}</p>
+          <p className="truncate text-xs font-normal text-muted-foreground">
+            {email} · {roleLabel}
+          </p>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>

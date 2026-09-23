@@ -25,7 +25,9 @@ export function TeamPage() {
             <CardTitle>Join another care team</CardTitle>
             <CardDescription>Have an invite code for someone else? Enter it here.</CardDescription>
           </CardHeader>
-          <CardContent><JoinTeamForm /></CardContent>
+          <CardContent>
+            <JoinTeamForm />
+          </CardContent>
         </Card>
         {user.role === 'caregiver' && (
           <Card>
@@ -33,7 +35,9 @@ export function TeamPage() {
               <CardTitle>Add another patient</CardTitle>
               <CardDescription>You&apos;ll be their first caregiver.</CardDescription>
             </CardHeader>
-            <CardContent><PatientForm onSaved={() => qc.invalidateQueries({ queryKey: ['me'] })} /></CardContent>
+            <CardContent>
+              <PatientForm onSaved={() => qc.invalidateQueries({ queryKey: ['me'] })} />
+            </CardContent>
           </Card>
         )}
       </div>

@@ -3,7 +3,16 @@
 import { createContext, useContext, useState } from 'react';
 import Link from 'next/link';
 import { Loader2, Siren } from 'lucide-react';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useSos } from '@/hooks/api';
@@ -26,7 +35,15 @@ export function usePatientContext(): Ctx {
  * Deliberately simple chrome for patients: large type, one always-visible help
  * button, nothing that requires remembering where things are.
  */
-export function PatientShell({ user, patientId, children }: { user: SessionUser; patientId: string; children: React.ReactNode }) {
+export function PatientShell({
+  user,
+  patientId,
+  children,
+}: {
+  user: SessionUser;
+  patientId: string;
+  children: React.ReactNode;
+}) {
   const live = usePatientEvents(patientId);
   const sos = useSos(patientId);
   const { toast } = useToast();
@@ -39,15 +56,26 @@ export function PatientShell({ user, patientId, children }: { user: SessionUser;
     });
 
   return (
-    <PatientContext.Provider value={{ patientId, name: user.name, meId: user.id, requestHelp: () => setConfirming(true) }}>
+    <PatientContext.Provider
+      value={{ patientId, name: user.name, meId: user.id, requestHelp: () => setConfirming(true) }}
+    >
       <div className="min-h-screen bg-background">
         <header className="sticky top-0 z-40 border-b bg-card/90 backdrop-blur">
           <div className="container flex h-20 items-center gap-4">
-            <Link href="/patient" className="flex items-center gap-2 text-xl font-bold"><LogoMark className="h-8 w-8" /> Neuro-AI</Link>
+            <Link href="/patient" className="flex items-center gap-2 text-xl font-bold">
+              <LogoMark className="h-8 w-8" /> Neuro-AI
+            </Link>
             <LiveDot state={live} />
             <div className="ml-auto flex items-center gap-2">
-              <Button size="lg" variant="destructive" className="h-14 px-6 text-lg" onClick={() => setConfirming(true)} disabled={sos.isPending}>
-                {sos.isPending ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Siren className="mr-2 h-6 w-6" />} Help
+              <Button
+                size="lg"
+                variant="destructive"
+                className="h-14 px-6 text-lg"
+                onClick={() => setConfirming(true)}
+                disabled={sos.isPending}
+              >
+                {sos.isPending ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Siren className="mr-2 h-6 w-6" />}{' '}
+                Help
               </Button>
               <UserMenu name={user.name} email={user.email} roleLabel="Patient" />
             </div>
@@ -59,11 +87,15 @@ export function PatientShell({ user, patientId, children }: { user: SessionUser;
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="text-2xl">Call your care team for help?</AlertDialogTitle>
-            <AlertDialogDescription className="text-lg">Everyone on your care team will get an urgent alert.</AlertDialogDescription>
+            <AlertDialogDescription className="text-lg">
+              Everyone on your care team will get an urgent alert.
+            </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel className="h-12 text-lg">No, I&apos;m okay</AlertDialogCancel>
-            <AlertDialogAction className="h-12 bg-destructive text-lg hover:bg-destructive/90" onClick={sendSos}>Yes, get help</AlertDialogAction>
+            <AlertDialogAction className="h-12 bg-destructive text-lg hover:bg-destructive/90" onClick={sendSos}>
+              Yes, get help
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -73,6 +105,8 @@ export function PatientShell({ user, patientId, children }: { user: SessionUser;
 
 export function BackLink() {
   return (
-    <Button asChild variant="outline" size="lg" className="mb-6"><Link href="/patient">← Back to my day</Link></Button>
+    <Button asChild variant="outline" size="lg" className="mb-6">
+      <Link href="/patient">← Back to my day</Link>
+    </Button>
   );
 }

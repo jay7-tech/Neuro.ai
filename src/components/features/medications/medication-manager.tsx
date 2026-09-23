@@ -61,16 +61,46 @@ function MedicationForm({ patientId, med, onDone }: { patientId: string; med?: M
     <Form {...form}>
       <form onSubmit={onSubmit} className="space-y-4">
         <div className="grid gap-4 sm:grid-cols-2">
-          <FormField control={form.control} name="name" render={({ field }) => (
-            <FormItem><FormLabel>Medicine</FormLabel><FormControl><Input placeholder="Donepezil" {...field} /></FormControl><FormMessage /></FormItem>
-          )} />
-          <FormField control={form.control} name="dosage" render={({ field }) => (
-            <FormItem><FormLabel>Dosage</FormLabel><FormControl><Input placeholder="5 mg tablet" {...field} /></FormControl><FormMessage /></FormItem>
-          )} />
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Medicine</FormLabel>
+                <FormControl>
+                  <Input placeholder="Donepezil" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="dosage"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Dosage</FormLabel>
+                <FormControl>
+                  <Input placeholder="5 mg tablet" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
-        <FormField control={form.control} name="instructions" render={({ field }) => (
-          <FormItem><FormLabel>Instructions</FormLabel><FormControl><Input placeholder="With food" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
-        )} />
+        <FormField
+          control={form.control}
+          name="instructions"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Instructions</FormLabel>
+              <FormControl>
+                <Input placeholder="With food" {...field} value={field.value ?? ''} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <div>
           <FormLabel>Times</FormLabel>
           <div className="mt-2 flex flex-wrap gap-2">
@@ -78,38 +108,82 @@ function MedicationForm({ patientId, med, onDone }: { patientId: string; med?: M
               <div key={f.id} className="flex items-center gap-1">
                 <Input type="time" className="w-32" {...form.register(`times.${i}.value`)} />
                 {times.fields.length > 1 && (
-                  <Button type="button" variant="ghost" size="icon" onClick={() => times.remove(i)} aria-label="Remove time"><X className="h-4 w-4" /></Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => times.remove(i)}
+                    aria-label="Remove time"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
                 )}
               </div>
             ))}
-            <Button type="button" variant="outline" size="sm" onClick={() => times.append({ value: '20:00' })}><Plus className="mr-1 h-3 w-3" /> Time</Button>
+            <Button type="button" variant="outline" size="sm" onClick={() => times.append({ value: '20:00' })}>
+              <Plus className="mr-1 h-3 w-3" /> Time
+            </Button>
           </div>
-          <p className="mt-1 text-sm text-destructive">{form.formState.errors.times?.message ?? form.formState.errors.times?.root?.message}</p>
+          <p className="mt-1 text-sm text-destructive">
+            {form.formState.errors.times?.message ?? form.formState.errors.times?.root?.message}
+          </p>
         </div>
-        <FormField control={form.control} name="daysOfWeek" render={({ field }) => (
-          <FormItem>
-            <FormLabel>Days</FormLabel>
-            <div className="flex flex-wrap gap-1">
-              {WEEKDAYS.map((d, i) => {
-                const on = field.value?.includes(i);
-                return (
-                  <Button key={d} type="button" size="sm" variant={on ? 'default' : 'outline'} aria-pressed={on}
-                    onClick={() => field.onChange(on ? field.value!.filter((x) => x !== i) : [...(field.value ?? []), i])}>
-                    {d}
-                  </Button>
-                );
-              })}
-            </div>
-            <FormMessage />
-          </FormItem>
-        )} />
+        <FormField
+          control={form.control}
+          name="daysOfWeek"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Days</FormLabel>
+              <div className="flex flex-wrap gap-1">
+                {WEEKDAYS.map((d, i) => {
+                  const on = field.value?.includes(i);
+                  return (
+                    <Button
+                      key={d}
+                      type="button"
+                      size="sm"
+                      variant={on ? 'default' : 'outline'}
+                      aria-pressed={on}
+                      onClick={() =>
+                        field.onChange(on ? field.value!.filter((x) => x !== i) : [...(field.value ?? []), i])
+                      }
+                    >
+                      {d}
+                    </Button>
+                  );
+                })}
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <div className="grid gap-4 sm:grid-cols-2">
-          <FormField control={form.control} name="startDate" render={({ field }) => (
-            <FormItem><FormLabel>Start</FormLabel><FormControl><Input type="date" {...field} /></FormControl><FormMessage /></FormItem>
-          )} />
-          <FormField control={form.control} name="endDate" render={({ field }) => (
-            <FormItem><FormLabel>End (optional)</FormLabel><FormControl><Input type="date" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
-          )} />
+          <FormField
+            control={form.control}
+            name="startDate"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Start</FormLabel>
+                <FormControl>
+                  <Input type="date" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="endDate"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>End (optional)</FormLabel>
+                <FormControl>
+                  <Input type="date" {...field} value={field.value ?? ''} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
         <Button type="submit" disabled={form.formState.isSubmitting}>
           {form.formState.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Save
@@ -129,10 +203,16 @@ export function MedicationManager({ patientId, canEdit }: { patientId: string; c
     <Card>
       <CardHeader className="flex flex-row items-start justify-between gap-4">
         <div>
-          <CardTitle className="flex items-center gap-2"><Pill /> Medications</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Pill /> Medications
+          </CardTitle>
           <CardDescription>Recurring schedules. Discontinuing keeps the dose history for reports.</CardDescription>
         </div>
-        {canEdit && <Button onClick={() => setEditing('new')}><Plus className="mr-2 h-4 w-4" /> Add</Button>}
+        {canEdit && (
+          <Button onClick={() => setEditing('new')}>
+            <Plus className="mr-2 h-4 w-4" /> Add
+          </Button>
+        )}
       </CardHeader>
       <CardContent>
         <QueryState query={meds}>
@@ -144,18 +224,38 @@ export function MedicationManager({ patientId, canEdit }: { patientId: string; c
                 {list.map((m) => (
                   <li key={m.id} className="flex flex-wrap items-center gap-3 py-3">
                     <div className="min-w-0 flex-1">
-                      <p className="font-semibold">{m.name} <span className="font-normal text-muted-foreground">· {m.dosage}</span></p>
+                      <p className="font-semibold">
+                        {m.name} <span className="font-normal text-muted-foreground">· {m.dosage}</span>
+                      </p>
                       <p className="text-sm text-muted-foreground">
                         {m.daysOfWeek.length === 7 ? 'Every day' : m.daysOfWeek.map((d) => WEEKDAYS[d]).join(', ')}
                         {m.instructions && ` · ${m.instructions}`}
                       </p>
                     </div>
-                    <div className="flex gap-1">{m.times.map((t) => <Badge key={t} variant="outline" className="font-mono">{t}</Badge>)}</div>
+                    <div className="flex gap-1">
+                      {m.times.map((t) => (
+                        <Badge key={t} variant="outline" className="font-mono">
+                          {t}
+                        </Badge>
+                      ))}
+                    </div>
                     {canEdit && (
                       <div className="flex">
-                        <Button variant="ghost" size="icon" onClick={() => setEditing(m)} aria-label={`Edit ${m.name}`}><Pencil className="h-4 w-4" /></Button>
-                        <Button variant="ghost" size="icon" aria-label={`Discontinue ${m.name}`}
-                          onClick={() => discontinue.mutate(m.id, { onSuccess: () => toast({ title: `${m.name} discontinued` }), onError: (e) => toast({ title: 'Failed', description: errorMessage(e), variant: 'destructive' }) })}>
+                        <Button variant="ghost" size="icon" onClick={() => setEditing(m)} aria-label={`Edit ${m.name}`}>
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          aria-label={`Discontinue ${m.name}`}
+                          onClick={() =>
+                            discontinue.mutate(m.id, {
+                              onSuccess: () => toast({ title: `${m.name} discontinued` }),
+                              onError: (e) =>
+                                toast({ title: 'Failed', description: errorMessage(e), variant: 'destructive' }),
+                            })
+                          }
+                        >
                           <Trash2 className={cn('h-4 w-4 text-destructive')} />
                         </Button>
                       </div>
@@ -173,7 +273,13 @@ export function MedicationManager({ patientId, canEdit }: { patientId: string; c
             <DialogTitle>{editing === 'new' ? 'Add medication' : 'Edit medication'}</DialogTitle>
             <DialogDescription>Times are in the patient&apos;s local timezone.</DialogDescription>
           </DialogHeader>
-          {editing !== null && <MedicationForm patientId={patientId} med={editing === 'new' ? undefined : editing} onDone={() => setEditing(null)} />}
+          {editing !== null && (
+            <MedicationForm
+              patientId={patientId}
+              med={editing === 'new' ? undefined : editing}
+              onDone={() => setEditing(null)}
+            />
+          )}
         </DialogContent>
       </Dialog>
     </Card>

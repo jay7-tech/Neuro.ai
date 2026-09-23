@@ -19,7 +19,10 @@ export function QueryState<T>({
   if (query.isPending) return <>{skeleton}</>;
   if (query.isError) {
     return (
-      <div role="alert" className="flex items-center justify-between gap-3 rounded-lg border border-destructive/40 bg-destructive/5 p-3 text-sm">
+      <div
+        role="alert"
+        className="flex items-center justify-between gap-3 rounded-lg border border-destructive/40 bg-destructive/5 p-3 text-sm"
+      >
         <span className="flex items-center gap-2 text-destructive">
           <AlertCircle className="h-4 w-4" /> {errorMessage(query.error)}
         </span>
@@ -32,7 +35,15 @@ export function QueryState<T>({
   return <>{children(query.data)}</>;
 }
 
-export function EmptyState({ icon: Icon, title, children }: { icon?: React.ElementType; title: string; children?: React.ReactNode }) {
+export function EmptyState({
+  icon: Icon,
+  title,
+  children,
+}: {
+  icon?: React.ElementType;
+  title: string;
+  children?: React.ReactNode;
+}) {
   return (
     <div className="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed p-8 text-center text-muted-foreground">
       {Icon && <Icon className="h-8 w-8" />}

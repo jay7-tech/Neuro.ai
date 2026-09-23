@@ -23,7 +23,13 @@ export function generateInviteCode(): string {
 export async function listTeam(db: Executor, actor: Actor, patientId: string) {
   await requireAccess(db, actor, patientId, 'team:read');
   return db
-    .select({ userId: users.id, name: users.name, email: users.email, role: careTeamMembers.role, since: careTeamMembers.createdAt })
+    .select({
+      userId: users.id,
+      name: users.name,
+      email: users.email,
+      role: careTeamMembers.role,
+      since: careTeamMembers.createdAt,
+    })
     .from(careTeamMembers)
     .innerJoin(users, eq(users.id, careTeamMembers.userId))
     .where(eq(careTeamMembers.patientId, patientId))
@@ -41,7 +47,13 @@ export async function createInvite(db: Database, actor: Actor, patientId: string
       .insert(invitations)
       .values({ patientId, role, codeHash: hashToken(code), createdBy: actor.user.id, expiresAt })
       .returning({ id: invitations.id });
-    await audit(tx, actor, { patientId, action: 'invite.created', entity: 'invitation', entityId: inv.id, metadata: { role } });
+    await audit(tx, actor, {
+      patientId,
+      action: 'invite.created',
+      entity: 'invitation',
+      entityId: inv.id,
+      metadata: { role },
+    });
   });
   // The plaintext code is returned exactly once and never stored.
   return { code: `${code.slice(0, 4)}-${code.slice(4)}`, role, expiresAt };
@@ -74,10 +86,19 @@ export async function acceptInvite(db: Database, actor: Actor, code: string) {
       .update(invitations)
       .set({ acceptedAt: new Date(), acceptedBy: actor.user.id })
       .where(eq(invitations.id, inv.id));
-    await audit(tx, actor, { patientId: inv.patientId, action: 'team.joined', entity: 'care_team', entityId: actor.user.id, metadata: { role: inv.role } });
+    await audit(tx, actor, {
+      patientId: inv.patientId,
+      action: 'team.joined',
+      entity: 'care_team',
+      entityId: actor.user.id,
+      metadata: { role: inv.role },
+    });
     await publish(tx, inv.patientId, 'team.changed');
 
-    const [p] = await tx.select({ id: patients.id, displayName: patients.displayName }).from(patients).where(eq(patients.id, inv.patientId));
+    const [p] = await tx
+      .select({ id: patients.id, displayName: patients.displayName })
+      .from(patients)
+      .where(eq(patients.id, inv.patientId));
     return { patient: p, role: inv.role };
   });
 }
@@ -105,7 +126,9 @@ export async function removeMember(db: Database, actor: Actor, patientId: string
       if (n <= 1 && !p?.userId) throw conflict('This patient must keep at least one caregiver');
     }
 
-    await tx.delete(careTeamMembers).where(and(eq(careTeamMembers.patientId, patientId), eq(careTeamMembers.userId, userId)));
+    await tx
+      .delete(careTeamMembers)
+      .where(and(eq(careTeamMembers.patientId, patientId), eq(careTeamMembers.userId, userId)));
     await audit(tx, actor, { patientId, action: 'team.member_removed', entity: 'care_team', entityId: userId });
     await publish(tx, patientId, 'team.changed');
   });

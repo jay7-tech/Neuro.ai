@@ -13,7 +13,10 @@ function Kpi({ icon: Icon, label, value }: { icon: React.ElementType; label: str
   return (
     <div className="flex items-center gap-3 rounded-xl border bg-card p-4">
       <Icon className="h-8 w-8 text-primary" />
-      <div><p className="text-sm text-muted-foreground">{label}</p><p className="text-2xl font-bold">{value}</p></div>
+      <div>
+        <p className="text-sm text-muted-foreground">{label}</p>
+        <p className="text-2xl font-bold">{value}</p>
+      </div>
     </div>
   );
 }
@@ -27,7 +30,10 @@ export default function CaregiverOverview() {
 
   return (
     <>
-      <PageHeader title={`${patient.displayName} today`} description="Live view — updates as the patient and team act." />
+      <PageHeader
+        title={`${patient.displayName} today`}
+        description="Live view — updates as the patient and team act."
+      />
       <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
         <Kpi icon={Pill} label="Doses taken" value={doses.data ? `${taken} / ${doses.data.doses.length}` : '…'} />
         <Kpi icon={CalendarCheck} label="Plan done" value={plan.data ? `${done} / ${plan.data.items.length}` : '…'} />

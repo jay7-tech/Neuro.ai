@@ -25,13 +25,21 @@ export function MoodCheckIn({ patientId }: { patientId: string }) {
 
   const pick = (score: number) => {
     setChosen(score);
-    record.mutate({ score }, { onSuccess: () => toast({ title: 'Thank you for sharing', description: 'Your care team can see how you are feeling.' }) });
+    record.mutate(
+      { score },
+      {
+        onSuccess: () =>
+          toast({ title: 'Thank you for sharing', description: 'Your care team can see how you are feeling.' }),
+      },
+    );
   };
 
   return (
     <Card className="rounded-2xl shadow-xl">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-2xl"><Smile /> How are you feeling?</CardTitle>
+        <CardTitle className="flex items-center gap-2 text-2xl">
+          <Smile /> How are you feeling?
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-5 gap-2" role="radiogroup" aria-label="Mood">
@@ -44,7 +52,10 @@ export function MoodCheckIn({ patientId }: { patientId: string }) {
               aria-label={f.label}
               onClick={() => pick(f.score)}
               disabled={record.isPending}
-              className={cn('flex flex-col items-center gap-1 rounded-xl border-2 p-2 text-4xl transition hover:bg-muted', chosen === f.score ? 'border-primary bg-primary/10' : 'border-transparent')}
+              className={cn(
+                'flex flex-col items-center gap-1 rounded-xl border-2 p-2 text-4xl transition hover:bg-muted',
+                chosen === f.score ? 'border-primary bg-primary/10' : 'border-transparent',
+              )}
             >
               {f.emoji}
               <span className="text-xs text-muted-foreground">{f.label}</span>
@@ -63,8 +74,12 @@ export function MoodChart({ patientId, days = 30 }: { patientId: string; days?: 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2"><Smile /> Mood</CardTitle>
-        <CardDescription>Daily average of self-reported mood (1–5) over {days} days, compared against the patient&apos;s own baseline.</CardDescription>
+        <CardTitle className="flex items-center gap-2">
+          <Smile /> Mood
+        </CardTitle>
+        <CardDescription>
+          Daily average of self-reported mood (1–5) over {days} days, compared against the patient&apos;s own baseline.
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <QueryState query={q}>
@@ -77,13 +92,19 @@ export function MoodChart({ patientId, days = 30 }: { patientId: string; days?: 
                     <TrendingDown className="h-4 w-4" />
                     <AlertTitle>Noticeable drop in mood</AlertTitle>
                     <AlertDescription>
-                      Last 3 days average {m.decline.recentMean} vs. {m.decline.baselineMean} over the previous two weeks (z = {m.decline.zScore}).
+                      Last 3 days average {m.decline.recentMean} vs. {m.decline.baselineMean} over the previous two
+                      weeks (z = {m.decline.zScore}).
                     </AlertDescription>
                   </Alert>
                 )}
                 <div className="flex gap-6 text-sm">
-                  <span className="flex items-center gap-1"><Icon className="h-4 w-4" /> Trend: <b className="capitalize">{m.trend.direction}</b></span>
-                  <span>{m.trend.slopePerDay > 0 ? '+' : ''}{m.trend.slopePerDay} / day</span>
+                  <span className="flex items-center gap-1">
+                    <Icon className="h-4 w-4" /> Trend: <b className="capitalize">{m.trend.direction}</b>
+                  </span>
+                  <span>
+                    {m.trend.slopePerDay > 0 ? '+' : ''}
+                    {m.trend.slopePerDay} / day
+                  </span>
                 </div>
                 <div className="h-[240px]">
                   <ResponsiveContainer width="100%" height="100%">
@@ -97,9 +118,29 @@ export function MoodChart({ patientId, days = 30 }: { patientId: string; days?: 
                       <CartesianGrid strokeDasharray="3 3" vertical={false} className="stroke-border" />
                       <XAxis dataKey="date" tickFormatter={(d: string) => d.slice(5)} fontSize={12} tickLine={false} />
                       <YAxis domain={[1, 5]} ticks={[1, 2, 3, 4, 5]} fontSize={12} tickLine={false} />
-                      <Tooltip contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 8 }} />
-                      {m.decline.status !== 'insufficient_data' && <ReferenceLine y={m.decline.baselineMean} strokeDasharray="4 4" className="stroke-muted-foreground" label={{ value: 'baseline', fontSize: 11, position: 'insideTopRight' }} />}
-                      <Area type="monotone" dataKey="average" stroke="hsl(var(--primary))" strokeWidth={2} fill="url(#moodFill)" name="Mood" />
+                      <Tooltip
+                        contentStyle={{
+                          background: 'hsl(var(--card))',
+                          border: '1px solid hsl(var(--border))',
+                          borderRadius: 8,
+                        }}
+                      />
+                      {m.decline.status !== 'insufficient_data' && (
+                        <ReferenceLine
+                          y={m.decline.baselineMean}
+                          strokeDasharray="4 4"
+                          className="stroke-muted-foreground"
+                          label={{ value: 'baseline', fontSize: 11, position: 'insideTopRight' }}
+                        />
+                      )}
+                      <Area
+                        type="monotone"
+                        dataKey="average"
+                        stroke="hsl(var(--primary))"
+                        strokeWidth={2}
+                        fill="url(#moodFill)"
+                        name="Mood"
+                      />
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>

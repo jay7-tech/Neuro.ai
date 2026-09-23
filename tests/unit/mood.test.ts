@@ -16,7 +16,10 @@ describe('statistics helpers', () => {
 
 describe('detectDecline', () => {
   it('flags a clear drop against the personal baseline', () => {
-    const r = detectDecline(series((d) => (d <= 2 ? 2 : d % 2 ? 4 : 5)), NOW);
+    const r = detectDecline(
+      series((d) => (d <= 2 ? 2 : d % 2 ? 4 : 5)),
+      NOW,
+    );
     expect(r.status).toBe('decline');
     if (r.status !== 'insufficient_data') {
       expect(r.drop).toBeGreaterThanOrEqual(1);
@@ -25,15 +28,28 @@ describe('detectDecline', () => {
   });
 
   it('does not flag normal day-to-day variation', () => {
-    expect(detectDecline(series((d) => (d % 3 === 0 ? 3 : 4)), NOW).status).toBe('ok');
+    expect(
+      detectDecline(
+        series((d) => (d % 3 === 0 ? 3 : 4)),
+        NOW,
+      ).status,
+    ).toBe('ok');
   });
 
   it('does not flag someone whose baseline is simply low', () => {
-    expect(detectDecline(series(() => 2), NOW).status).toBe('ok');
+    expect(
+      detectDecline(
+        series(() => 2),
+        NOW,
+      ).status,
+    ).toBe('ok');
   });
 
   it('requires enough data in both windows', () => {
-    const r = detectDecline(series(() => 4, 4), NOW);
+    const r = detectDecline(
+      series(() => 4, 4),
+      NOW,
+    );
     expect(r.status).toBe('insufficient_data');
   });
 });

@@ -19,7 +19,15 @@ const config = [
     rules: {
       '@typescript-eslint/no-restricted-imports': [
         'error',
-        { patterns: [{ group: ['@/server/*', '!@/server/realtime/events'], message: 'Client code may only use `import type` from server modules.', allowTypeImports: true }] },
+        {
+          patterns: [
+            {
+              group: ['@/server/*', '!@/server/realtime/events'],
+              message: 'Client code may only use `import type` from server modules.',
+              allowTypeImports: true,
+            },
+          ],
+        },
       ],
     },
   },

@@ -35,18 +35,38 @@ export function missedDoseJob(graceMinutes: number, lookbackHours = 24): Job {
       const recorded = await db
         .select()
         .from(doseEvents)
-        .where(and(inArray(doseEvents.medicationId, meds.map((m) => m.id)), gte(doseEvents.scheduledFor, from), lt(doseEvents.scheduledFor, to)));
+        .where(
+          and(
+            inArray(
+              doseEvents.medicationId,
+              meds.map((m) => m.id),
+            ),
+            gte(doseEvents.scheduledFor, from),
+            lt(doseEvents.scheduledFor, to),
+          ),
+        );
 
       let missed = 0;
       for (const p of pts) {
         const own = meds.filter((m) => m.patientId === p.id);
         const expected = expandOccurrences(own.map(toSchedule), from, to, p.tz);
-        const doses = resolveDoses(expected, recorded.filter((r) => r.patientId === p.id), now, graceMinutes);
+        const doses = resolveDoses(
+          expected,
+          recorded.filter((r) => r.patientId === p.id),
+          now,
+          graceMinutes,
+        );
         for (const d of doses.filter((x) => x.state === 'missed')) {
           const med = own.find((m) => m.id === d.medicationId)!;
           const [inserted] = await db
             .insert(doseEvents)
-            .values({ medicationId: d.medicationId, patientId: p.id, scheduledFor: d.scheduledFor, status: 'missed', recordedAt: now })
+            .values({
+              medicationId: d.medicationId,
+              patientId: p.id,
+              scheduledFor: d.scheduledFor,
+              status: 'missed',
+              recordedAt: now,
+            })
             .onConflictDoNothing()
             .returning({ id: doseEvents.id });
           if (!inserted) continue;
@@ -57,7 +77,12 @@ export function missedDoseJob(graceMinutes: number, lookbackHours = 24): Job {
             severity: 'warning',
             title: `${p.name} missed ${med.name} (${d.localTime})`,
             dedupeKey: `missed_dose:${d.medicationId}:${d.scheduledFor.toISOString()}`,
-            detail: { medicationId: med.id, medication: med.name, dosage: med.dosage, scheduledFor: d.scheduledFor.toISOString() },
+            detail: {
+              medicationId: med.id,
+              medication: med.name,
+              dosage: med.dosage,
+              scheduledFor: d.scheduledFor.toISOString(),
+            },
           });
         }
       }

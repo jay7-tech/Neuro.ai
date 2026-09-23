@@ -20,7 +20,13 @@ export async function reportLocation(
   return db.transaction(async (tx) => {
     // Lock the patient row so concurrent pings from one device are evaluated in order.
     const [p] = await tx
-      .select({ homeLat: patients.homeLat, homeLng: patients.homeLng, radius: patients.geofenceRadiusM, tz: patients.timezone, name: patients.displayName })
+      .select({
+        homeLat: patients.homeLat,
+        homeLng: patients.homeLng,
+        radius: patients.geofenceRadiusM,
+        tz: patients.timezone,
+        name: patients.displayName,
+      })
       .from(patients)
       .where(eq(patients.id, patientId))
       .for('update');
@@ -48,7 +54,8 @@ export async function reportLocation(
       })
       .returning();
 
-    const prevClass: PingClassification = prev?.inside === true ? 'inside' : prev?.inside === false ? 'outside' : 'uncertain';
+    const prevClass: PingClassification =
+      prev?.inside === true ? 'inside' : prev?.inside === false ? 'outside' : 'uncertain';
     let alertRaised = false;
     if (hasFence && isGeofenceBreach([result.classification, prevClass])) {
       const alert = await raiseAlert(tx, {

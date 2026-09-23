@@ -16,7 +16,11 @@ import { api, errorMessage } from '@/lib/api-client';
 import { LoginInput, RegisterInput } from '@/lib/contracts';
 import type { SessionUser } from '@/server/auth/session';
 
-const HOME: Record<SessionUser['role'], string> = { patient: '/patient', caregiver: '/caregiver', clinician: '/doctor' };
+const HOME: Record<SessionUser['role'], string> = {
+  patient: '/patient',
+  caregiver: '/caregiver',
+  clinician: '/doctor',
+};
 
 function useAfterAuth() {
   const router = useRouter();
@@ -64,30 +68,50 @@ export function LoginForm() {
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
-            <FormField control={form.control} name="email" render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl><Input type="email" autoComplete="email" className="h-12 text-base" {...field} /></FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
-            <FormField control={form.control} name="password" render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl><Input type="password" autoComplete="current-password" className="h-12 text-base" {...field} /></FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input type="email" autoComplete="email" className="h-12 text-base" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input type="password" autoComplete="current-password" className="h-12 text-base" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <Button type="submit" size="lg" className="h-12 w-full text-base" disabled={form.formState.isSubmitting}>
               {form.formState.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Sign in
             </Button>
           </form>
         </Form>
         <div className="mt-6 rounded-lg border bg-muted/40 p-3 text-sm">
-          <p className="mb-2 font-medium">Demo accounts (password <code>neuro-demo-2026</code>)</p>
+          <p className="mb-2 font-medium">
+            Demo accounts (password <code>neuro-demo-2026</code>)
+          </p>
           <div className="flex flex-wrap gap-2">
             {DEMO.map(([label, email]) => (
-              <Button key={email} type="button" variant="outline" size="sm" onClick={() => form.reset({ email, password: 'neuro-demo-2026' })}>
+              <Button
+                key={email}
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => form.reset({ email, password: 'neuro-demo-2026' })}
+              >
                 {label}
               </Button>
             ))}
@@ -95,7 +119,10 @@ export function LoginForm() {
         </div>
       </CardContent>
       <CardFooter className="justify-center text-sm text-muted-foreground">
-        New here?&nbsp;<Link href="/register" className="font-medium text-primary hover:underline">Create an account</Link>
+        New here?&nbsp;
+        <Link href="/register" className="font-medium text-primary hover:underline">
+          Create an account
+        </Link>
       </CardFooter>
     </Card>
   );
@@ -110,7 +137,10 @@ const ROLES = [
 export function RegisterForm() {
   const done = useAfterAuth();
   const [error, setError] = useState<string | null>(null);
-  const form = useForm<RegisterInput>({ resolver: zodResolver(RegisterInput), defaultValues: { name: '', email: '', password: '', role: 'caregiver' } });
+  const form = useForm<RegisterInput>({
+    resolver: zodResolver(RegisterInput),
+    defaultValues: { name: '', email: '', password: '', role: 'caregiver' },
+  });
 
   const onSubmit = form.handleSubmit(async (values) => {
     setError(null);
@@ -136,46 +166,71 @@ export function RegisterForm() {
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
-            <FormField control={form.control} name="role" render={({ field }) => (
-              <FormItem>
-                <FormLabel>I am a…</FormLabel>
-                <FormControl>
-                  <RadioGroup value={field.value} onValueChange={field.onChange} className="grid gap-2">
-                    {ROLES.map((r) => (
-                      <label key={r.value} className="flex cursor-pointer items-center gap-3 rounded-lg border p-3 has-[:checked]:border-primary has-[:checked]:bg-primary/5">
-                        <RadioGroupItem value={r.value} />
-                        <span>
-                          <span className="font-medium">{r.label}</span>
-                          <span className="block text-sm text-muted-foreground">{r.hint}</span>
-                        </span>
-                      </label>
-                    ))}
-                  </RadioGroup>
-                </FormControl>
-              </FormItem>
-            )} />
-            <FormField control={form.control} name="name" render={({ field }) => (
-              <FormItem>
-                <FormLabel>Full name</FormLabel>
-                <FormControl><Input autoComplete="name" {...field} /></FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
-            <FormField control={form.control} name="email" render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl><Input type="email" autoComplete="email" {...field} /></FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
-            <FormField control={form.control} name="password" render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl><Input type="password" autoComplete="new-password" {...field} /></FormControl>
-                <FormDescription>At least 10 characters, with a number.</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )} />
+            <FormField
+              control={form.control}
+              name="role"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>I am a…</FormLabel>
+                  <FormControl>
+                    <RadioGroup value={field.value} onValueChange={field.onChange} className="grid gap-2">
+                      {ROLES.map((r) => (
+                        <label
+                          key={r.value}
+                          className="flex cursor-pointer items-center gap-3 rounded-lg border p-3 has-[:checked]:border-primary has-[:checked]:bg-primary/5"
+                        >
+                          <RadioGroupItem value={r.value} />
+                          <span>
+                            <span className="font-medium">{r.label}</span>
+                            <span className="block text-sm text-muted-foreground">{r.hint}</span>
+                          </span>
+                        </label>
+                      ))}
+                    </RadioGroup>
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Full name</FormLabel>
+                  <FormControl>
+                    <Input autoComplete="name" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input type="email" autoComplete="email" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input type="password" autoComplete="new-password" {...field} />
+                  </FormControl>
+                  <FormDescription>At least 10 characters, with a number.</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <Button type="submit" size="lg" className="w-full" disabled={form.formState.isSubmitting}>
               {form.formState.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Create account
             </Button>
@@ -183,7 +238,10 @@ export function RegisterForm() {
         </Form>
       </CardContent>
       <CardFooter className="justify-center text-sm text-muted-foreground">
-        Already have an account?&nbsp;<Link href="/login" className="font-medium text-primary hover:underline">Sign in</Link>
+        Already have an account?&nbsp;
+        <Link href="/login" className="font-medium text-primary hover:underline">
+          Sign in
+        </Link>
       </CardFooter>
     </Card>
   );

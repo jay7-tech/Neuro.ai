@@ -14,7 +14,11 @@ const code = (e: unknown) => (e instanceof AppError ? e.code : e);
 
 describe('auth', () => {
   it('registers a patient with their own record and a working session', async () => {
-    const { user, token } = await register(db(), { name: 'Asha', email: 'Asha@Example.com', password: 'correct-horse-1', role: 'patient' }, { ttlDays: 30 });
+    const { user, token } = await register(
+      db(),
+      { name: 'Asha', email: 'Asha@Example.com', password: 'correct-horse-1', role: 'patient' },
+      { ttlDays: 30 },
+    );
     const session = await validateSession(db(), token, 30);
     expect(session?.user.id).toBe(user.id);
 
@@ -26,17 +30,35 @@ describe('auth', () => {
   });
 
   it('treats emails case-insensitively and rejects duplicates', async () => {
-    await register(db(), { name: 'A', email: 'dup@example.com', password: 'correct-horse-1', role: 'caregiver' }, { ttlDays: 30 });
-    await expect(register(db(), { name: 'B', email: 'DUP@example.com', password: 'correct-horse-1', role: 'caregiver' }, { ttlDays: 30 })).rejects.toSatisfy(
-      (e) => code(e) === 'CONFLICT',
+    await register(
+      db(),
+      { name: 'A', email: 'dup@example.com', password: 'correct-horse-1', role: 'caregiver' },
+      { ttlDays: 30 },
     );
-    await expect(login(db(), { email: 'Dup@Example.com', password: 'correct-horse-1' }, { ttlDays: 30 })).resolves.toBeTruthy();
+    await expect(
+      register(
+        db(),
+        { name: 'B', email: 'DUP@example.com', password: 'correct-horse-1', role: 'caregiver' },
+        { ttlDays: 30 },
+      ),
+    ).rejects.toSatisfy((e) => code(e) === 'CONFLICT');
+    await expect(
+      login(db(), { email: 'Dup@Example.com', password: 'correct-horse-1' }, { ttlDays: 30 }),
+    ).resolves.toBeTruthy();
   });
 
   it('gives the same error for wrong password and unknown email', async () => {
-    await register(db(), { name: 'A', email: 'a@example.com', password: 'correct-horse-1', role: 'caregiver' }, { ttlDays: 30 });
-    const e1 = await login(db(), { email: 'a@example.com', password: 'wrong-password-1' }, { ttlDays: 30 }).catch((e) => e);
-    const e2 = await login(db(), { email: 'nobody@example.com', password: 'wrong-password-1' }, { ttlDays: 30 }).catch((e) => e);
+    await register(
+      db(),
+      { name: 'A', email: 'a@example.com', password: 'correct-horse-1', role: 'caregiver' },
+      { ttlDays: 30 },
+    );
+    const e1 = await login(db(), { email: 'a@example.com', password: 'wrong-password-1' }, { ttlDays: 30 }).catch(
+      (e) => e,
+    );
+    const e2 = await login(db(), { email: 'nobody@example.com', password: 'wrong-password-1' }, { ttlDays: 30 }).catch(
+      (e) => e,
+    );
     expect(e1.message).toBe(e2.message);
   });
 
@@ -58,14 +80,28 @@ describe('relationship-based access control', () => {
     const patientUser = await makeUser('patient');
     const p = await makePatient([[patientUser, 'patient']]);
     await expect(
-      createMedication(db(), patientUser, p.id, { name: 'X', dosage: '1', instructions: null, times: ['09:00'], daysOfWeek: [1], startDate: '2026-09-01', endDate: null }),
+      createMedication(db(), patientUser, p.id, {
+        name: 'X',
+        dosage: '1',
+        instructions: null,
+        times: ['09:00'],
+        daysOfWeek: [1],
+        startDate: '2026-09-01',
+        endDate: null,
+      }),
     ).rejects.toSatisfy((e) => code(e) === 'FORBIDDEN');
   });
 
   it('hides clinical summary from the patient view', async () => {
     const pu = await makeUser('patient');
     const cg = await makeUser('caregiver');
-    const p = await makePatient([[pu, 'patient'], [cg, 'caregiver']], { medicalSummary: 'MCI' });
+    const p = await makePatient(
+      [
+        [pu, 'patient'],
+        [cg, 'caregiver'],
+      ],
+      { medicalSummary: 'MCI' },
+    );
     expect((await getPatient(db(), pu, p.id)).medicalSummary).toBeNull();
     expect((await getPatient(db(), cg, p.id)).medicalSummary).toBe('MCI');
   });

@@ -81,7 +81,11 @@ export async function updateAlertStatus(
       .set(
         status === 'acknowledged'
           ? { status, acknowledgedBy: actor.user.id, acknowledgedAt: new Date() }
-          : { status, acknowledgedBy: sql`coalesce(${alerts.acknowledgedBy}, ${actor.user.id})`, acknowledgedAt: sql`coalesce(${alerts.acknowledgedAt}, now())` },
+          : {
+              status,
+              acknowledgedBy: sql`coalesce(${alerts.acknowledgedBy}, ${actor.user.id})`,
+              acknowledgedAt: sql`coalesce(${alerts.acknowledgedAt}, now())`,
+            },
       )
       .where(eq(alerts.id, alertId))
       .returning();

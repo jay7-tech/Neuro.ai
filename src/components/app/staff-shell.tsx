@@ -65,7 +65,11 @@ export function StaffShell({ user, nav, children }: { user: SessionUser; nav: Na
 
   const live = usePatientEvents(patient?.id, (e) => {
     if (e.type === 'alert.created') {
-      toast({ title: 'New alert', description: `There is a new alert for ${patient?.displayName}.`, variant: 'destructive' });
+      toast({
+        title: 'New alert',
+        description: `There is a new alert for ${patient?.displayName}.`,
+        variant: 'destructive',
+      });
     }
   });
 
@@ -79,7 +83,12 @@ export function StaffShell({ user, nav, children }: { user: SessionUser; nav: Na
         </div>
         <nav className="flex-1 space-y-1 px-3">
           {nav.map((item) => (
-            <NavLink key={item.href} item={item} active={pathname === item.href} disabled={item.needsPatient && !patient} />
+            <NavLink
+              key={item.href}
+              item={item}
+              active={pathname === item.href}
+              disabled={item.needsPatient && !patient}
+            />
           ))}
         </nav>
         <p className="px-5 py-4 text-xs text-muted-foreground">{roleLabel} workspace</p>
@@ -118,7 +127,13 @@ export function StaffShell({ user, nav, children }: { user: SessionUser; nav: Na
 
         <nav className="flex gap-1 overflow-x-auto border-b px-2 py-2 md:hidden">
           {nav.map((item) => (
-            <NavLink key={item.href} item={item} active={pathname === item.href} disabled={item.needsPatient && !patient} compact />
+            <NavLink
+              key={item.href}
+              item={item}
+              active={pathname === item.href}
+              disabled={item.needsPatient && !patient}
+              compact
+            />
           ))}
         </nav>
 
@@ -139,7 +154,17 @@ export function StaffShell({ user, nav, children }: { user: SessionUser; nav: Na
   );
 }
 
-function NavLink({ item, active, disabled, compact }: { item: NavItem; active: boolean; disabled?: boolean; compact?: boolean }) {
+function NavLink({
+  item,
+  active,
+  disabled,
+  compact,
+}: {
+  item: NavItem;
+  active: boolean;
+  disabled?: boolean;
+  compact?: boolean;
+}) {
   const Icon = item.icon;
   const cls = cn(
     'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
@@ -154,7 +179,15 @@ function NavLink({ item, active, disabled, compact }: { item: NavItem; active: b
   );
 }
 
-export function PageHeader({ title, description, actions }: { title: string; description?: string; actions?: React.ReactNode }) {
+export function PageHeader({
+  title,
+  description,
+  actions,
+}: {
+  title: string;
+  description?: string;
+  actions?: React.ReactNode;
+}) {
   return (
     <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
       <div>

@@ -96,7 +96,10 @@ export const MedicationInput = z
     startDate: ymd,
     endDate: ymd.optional().nullable(),
   })
-  .refine((m) => !m.endDate || m.endDate >= m.startDate, { message: 'End date is before start date', path: ['endDate'] });
+  .refine((m) => !m.endDate || m.endDate >= m.startDate, {
+    message: 'End date is before start date',
+    path: ['endDate'],
+  });
 export type MedicationInput = z.infer<typeof MedicationInput>;
 
 export const RecordDoseInput = z.object({

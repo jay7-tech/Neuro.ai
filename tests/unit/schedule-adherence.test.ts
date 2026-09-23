@@ -46,7 +46,12 @@ describe('expandOccurrences', () => {
 });
 
 describe('resolveDoses', () => {
-  const occ = expandOccurrences([med({ times: ['08:30'] })], at('2026-09-22T18:30:00Z'), at('2026-09-23T18:30:00Z'), TZ);
+  const occ = expandOccurrences(
+    [med({ times: ['08:30'] })],
+    at('2026-09-22T18:30:00Z'),
+    at('2026-09-23T18:30:00Z'),
+    TZ,
+  );
   const slot = occ[0].at; // 03:00Z
   const rec = (status: RecordedDose['status'], minutesAfter: number): RecordedDose => ({
     medicationId: 'm1',
@@ -69,7 +74,11 @@ describe('resolveDoses', () => {
 });
 
 describe('buildAdherenceReport', () => {
-  const dose = (date: string, state: Parameters<typeof buildAdherenceReport>[0][number]['state'], medicationId = 'm1') => ({
+  const dose = (
+    date: string,
+    state: Parameters<typeof buildAdherenceReport>[0][number]['state'],
+    medicationId = 'm1',
+  ) => ({
     medicationId,
     scheduledFor: new Date(`${date}T03:00:00Z`),
     localDate: date,
@@ -79,7 +88,12 @@ describe('buildAdherenceReport', () => {
   });
 
   it('computes rates over settled doses only', () => {
-    const r = buildAdherenceReport([dose('2026-09-20', 'taken'), dose('2026-09-21', 'taken_late'), dose('2026-09-22', 'missed'), dose('2026-09-23', 'upcoming')]);
+    const r = buildAdherenceReport([
+      dose('2026-09-20', 'taken'),
+      dose('2026-09-21', 'taken_late'),
+      dose('2026-09-22', 'missed'),
+      dose('2026-09-23', 'upcoming'),
+    ]);
     expect(r.adherenceRate).toBe(0.667);
     expect(r.onTimeRate).toBe(0.333);
     expect(r.counts).toMatchObject({ taken: 1, taken_late: 1, missed: 1, upcoming: 1 });

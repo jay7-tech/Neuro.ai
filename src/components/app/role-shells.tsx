@@ -1,6 +1,16 @@
 'use client';
 
-import { Activity, ClipboardList, FileText, HeartPulse, LayoutDashboard, MessageSquare, ShieldAlert, Stethoscope, Users } from 'lucide-react';
+import {
+  Activity,
+  ClipboardList,
+  FileText,
+  HeartPulse,
+  LayoutDashboard,
+  MessageSquare,
+  ShieldAlert,
+  Stethoscope,
+  Users,
+} from 'lucide-react';
 import type { SessionUser } from '@/server/auth/session';
 import { StaffShell, type NavItem } from './staff-shell';
 
@@ -23,9 +33,17 @@ const CLINICIAN_NAV: NavItem[] = [
 // Nav items hold component references, which can't cross the server→client boundary,
 // so each role gets a small client wrapper that owns its navigation.
 export function CaregiverShell({ user, children }: { user: SessionUser; children: React.ReactNode }) {
-  return <StaffShell user={user} nav={CAREGIVER_NAV}>{children}</StaffShell>;
+  return (
+    <StaffShell user={user} nav={CAREGIVER_NAV}>
+      {children}
+    </StaffShell>
+  );
 }
 
 export function ClinicianShell({ user, children }: { user: SessionUser; children: React.ReactNode }) {
-  return <StaffShell user={user} nav={CLINICIAN_NAV}>{children}</StaffShell>;
+  return (
+    <StaffShell user={user} nav={CLINICIAN_NAV}>
+      {children}
+    </StaffShell>
+  );
 }

@@ -101,7 +101,13 @@ export async function configureGeofence(
       .set({ homeLat: input.homeLat, homeLng: input.homeLng, geofenceRadiusM: input.radiusM })
       .where(eq(patients.id, patientId))
       .returning({ homeLat: patients.homeLat, homeLng: patients.homeLng, radiusM: patients.geofenceRadiusM });
-    await audit(tx, actor, { patientId, action: 'geofence.configured', entity: 'patient', entityId: patientId, metadata: input });
+    await audit(tx, actor, {
+      patientId,
+      action: 'geofence.configured',
+      entity: 'patient',
+      entityId: patientId,
+      metadata: input,
+    });
     return p;
   });
 }

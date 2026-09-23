@@ -38,14 +38,29 @@ export async function listMedications(db: Executor, actor: Actor, patientId: str
 export async function createMedication(db: Database, actor: Actor, patientId: string, input: MedicationInput) {
   await requireAccess(db, actor, patientId, 'medication:write');
   return db.transaction(async (tx) => {
-    const [m] = await tx.insert(medications).values({ ...input, patientId }).returning();
-    await audit(tx, actor, { patientId, action: 'medication.created', entity: 'medication', entityId: m.id, metadata: { name: m.name } });
+    const [m] = await tx
+      .insert(medications)
+      .values({ ...input, patientId })
+      .returning();
+    await audit(tx, actor, {
+      patientId,
+      action: 'medication.created',
+      entity: 'medication',
+      entityId: m.id,
+      metadata: { name: m.name },
+    });
     await publish(tx, patientId, 'medication.changed', m.id);
     return m;
   });
 }
 
-export async function updateMedication(db: Database, actor: Actor, patientId: string, id: string, input: MedicationInput) {
+export async function updateMedication(
+  db: Database,
+  actor: Actor,
+  patientId: string,
+  id: string,
+  input: MedicationInput,
+) {
   await requireAccess(db, actor, patientId, 'medication:write');
   return db.transaction(async (tx) => {
     const [m] = await tx
@@ -54,7 +69,13 @@ export async function updateMedication(db: Database, actor: Actor, patientId: st
       .where(and(eq(medications.id, id), eq(medications.patientId, patientId)))
       .returning();
     if (!m) throw notFound('Medication');
-    await audit(tx, actor, { patientId, action: 'medication.updated', entity: 'medication', entityId: id, metadata: { fields: Object.keys(input) } });
+    await audit(tx, actor, {
+      patientId,
+      action: 'medication.updated',
+      entity: 'medication',
+      entityId: id,
+      metadata: { fields: Object.keys(input) },
+    });
     await publish(tx, patientId, 'medication.changed', id);
     return m;
   });
@@ -77,7 +98,14 @@ export async function discontinueMedication(db: Database, actor: Actor, patientI
 }
 
 /** Expected doses and their resolved states for a local-date window. */
-async function resolvedWindow(db: Executor, patientId: string, fromDate: string, toDateExclusive: string, now: Date, graceMinutes: number) {
+async function resolvedWindow(
+  db: Executor,
+  patientId: string,
+  fromDate: string,
+  toDateExclusive: string,
+  now: Date,
+  graceMinutes: number,
+) {
   const tz = await patientTz(db, patientId);
   const meds = await db.select().from(medications).where(eq(medications.patientId, patientId));
   const from = zonedToUtc(fromDate, '00:00', tz);
@@ -86,11 +114,19 @@ async function resolvedWindow(db: Executor, patientId: string, fromDate: string,
   const recorded = await db
     .select()
     .from(doseEvents)
-    .where(and(eq(doseEvents.patientId, patientId), gte(doseEvents.scheduledFor, from), lt(doseEvents.scheduledFor, to)));
+    .where(
+      and(eq(doseEvents.patientId, patientId), gte(doseEvents.scheduledFor, from), lt(doseEvents.scheduledFor, to)),
+    );
   return { tz, meds, doses: resolveDoses(expected, recorded, now, graceMinutes) };
 }
 
-export async function todaysDoses(db: Executor, actor: Actor, patientId: string, graceMinutes: number, now = new Date()) {
+export async function todaysDoses(
+  db: Executor,
+  actor: Actor,
+  patientId: string,
+  graceMinutes: number,
+  now = new Date(),
+) {
   await requireAccess(db, actor, patientId, 'medication:read');
   const tz = await patientTz(db, patientId);
   const today = localDate(now, tz);
@@ -110,11 +146,25 @@ export async function todaysDoses(db: Executor, actor: Actor, patientId: string,
   };
 }
 
-export async function adherence(db: Executor, actor: Actor, patientId: string, days: number, graceMinutes: number, now = new Date()) {
+export async function adherence(
+  db: Executor,
+  actor: Actor,
+  patientId: string,
+  days: number,
+  graceMinutes: number,
+  now = new Date(),
+) {
   await requireAccess(db, actor, patientId, 'medication:read');
   const tz = await patientTz(db, patientId);
   const today = localDate(now, tz);
-  const { meds, doses } = await resolvedWindow(db, patientId, addDays(today, -(days - 1)), addDays(today, 1), now, graceMinutes);
+  const { meds, doses } = await resolvedWindow(
+    db,
+    patientId,
+    addDays(today, -(days - 1)),
+    addDays(today, 1),
+    now,
+    graceMinutes,
+  );
   const report = buildAdherenceReport(doses);
   const names = Object.fromEntries(meds.map((m) => [m.id, m.name]));
   return {
@@ -124,7 +174,11 @@ export async function adherence(db: Executor, actor: Actor, patientId: string, d
     streakDays: report.streakDays,
     counts: report.counts,
     daily: report.daily,
-    byMedication: Object.entries(report.byMedication).map(([id, v]) => ({ medicationId: id, name: names[id] ?? 'Unknown', ...v })),
+    byMedication: Object.entries(report.byMedication).map(([id, v]) => ({
+      medicationId: id,
+      name: names[id] ?? 'Unknown',
+      ...v,
+    })),
   };
 }
 
@@ -150,7 +204,12 @@ export async function recordDose(
     if (!m) throw notFound('Medication');
     const tz = await patientTz(tx, patientId);
 
-    const window = expandOccurrences([toSchedule(m)], new Date(at.getTime() - 60_000), new Date(at.getTime() + 60_000), tz);
+    const window = expandOccurrences(
+      [toSchedule(m)],
+      new Date(at.getTime() - 60_000),
+      new Date(at.getTime() + 60_000),
+      tz,
+    );
     if (!window.some((o) => o.at.getTime() === at.getTime())) {
       throw badRequest('scheduledFor is not a scheduled dose time for this medication');
     }
@@ -164,7 +223,13 @@ export async function recordDose(
         set: { status: input.status, recordedAt: new Date(), recordedBy: actor.user.id },
       })
       .returning();
-    await audit(tx, actor, { patientId, action: `dose.${input.status}`, entity: 'dose_event', entityId: row.id, metadata: { medication: m.name } });
+    await audit(tx, actor, {
+      patientId,
+      action: `dose.${input.status}`,
+      entity: 'dose_event',
+      entityId: row.id,
+      metadata: { medication: m.name },
+    });
     await publish(tx, patientId, 'dose.recorded', row.id);
     return row;
   });

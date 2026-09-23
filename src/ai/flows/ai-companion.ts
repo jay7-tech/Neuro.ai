@@ -21,7 +21,9 @@ export async function answerQuestion(question: string, ctx: CompanionContext): P
   const ai = getAi();
   if (ai) {
     try {
-      const { output } = await withTimeout(ai.generate({ prompt: buildCompanionPrompt(question, ctx), output: { schema: Output } }));
+      const { output } = await withTimeout(
+        ai.generate({ prompt: buildCompanionPrompt(question, ctx), output: { schema: Output } }),
+      );
       if (output?.answer) return { answer: output.answer, source: 'llm', suggestSos };
     } catch (err) {
       logger.warn({ err }, 'companion LLM call failed; using rule-based fallback');

@@ -46,7 +46,15 @@ export async function planForDay(db: Executor, actor: Actor, patientId: string, 
     ? await db
         .select()
         .from(taskCompletions)
-        .where(and(inArray(taskCompletions.taskId, tasks.map((t) => t.id)), eq(taskCompletions.onDate, day)))
+        .where(
+          and(
+            inArray(
+              taskCompletions.taskId,
+              tasks.map((t) => t.id),
+            ),
+            eq(taskCompletions.onDate, day),
+          ),
+        )
     : [];
   const doneById = new Map(done.map((d) => [d.taskId, d.completedAt]));
 
@@ -66,7 +74,10 @@ export async function planForDay(db: Executor, actor: Actor, patientId: string, 
 export async function createTask(db: Database, actor: Actor, patientId: string, input: Task) {
   await requireAccess(db, actor, patientId, 'task:write');
   return db.transaction(async (tx) => {
-    const [t] = await tx.insert(careTasks).values({ ...input, patientId }).returning();
+    const [t] = await tx
+      .insert(careTasks)
+      .values({ ...input, patientId })
+      .returning();
     await audit(tx, actor, { patientId, action: 'task.created', entity: 'care_task', entityId: t.id });
     await publish(tx, patientId, 'task.changed', t.id);
     return t;
@@ -117,10 +128,16 @@ export async function setTaskCompletion(
   if (day > today || day < addDays(today, -1)) throw badRequest('Tasks can only be completed for today or yesterday');
 
   await db.transaction(async (tx) => {
-    const [t] = await tx.select({ id: careTasks.id }).from(careTasks).where(and(eq(careTasks.id, id), eq(careTasks.patientId, patientId)));
+    const [t] = await tx
+      .select({ id: careTasks.id })
+      .from(careTasks)
+      .where(and(eq(careTasks.id, id), eq(careTasks.patientId, patientId)));
     if (!t) throw notFound('Task');
     if (input.completed) {
-      await tx.insert(taskCompletions).values({ taskId: id, onDate: day, completedBy: actor.user.id }).onConflictDoNothing();
+      await tx
+        .insert(taskCompletions)
+        .values({ taskId: id, onDate: day, completedBy: actor.user.id })
+        .onConflictDoNothing();
     } else {
       await tx.delete(taskCompletions).where(and(eq(taskCompletions.taskId, id), eq(taskCompletions.onDate, day)));
     }

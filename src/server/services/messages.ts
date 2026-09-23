@@ -6,7 +6,12 @@ import { publish } from '../realtime/bus';
 import { requireAccess } from './access';
 
 /** Keyset pagination on created_at: stable under concurrent inserts, unlike OFFSET. */
-export async function listMessages(db: Executor, actor: Actor, patientId: string, q: { limit: number; before?: string }) {
+export async function listMessages(
+  db: Executor,
+  actor: Actor,
+  patientId: string,
+  q: { limit: number; before?: string },
+) {
   await requireAccess(db, actor, patientId, 'message:read');
   const rows = await db
     .select({
@@ -19,7 +24,10 @@ export async function listMessages(db: Executor, actor: Actor, patientId: string
     })
     .from(messages)
     .innerJoin(users, eq(users.id, messages.senderId))
-    .leftJoin(careTeamMembers, and(eq(careTeamMembers.userId, messages.senderId), eq(careTeamMembers.patientId, messages.patientId)))
+    .leftJoin(
+      careTeamMembers,
+      and(eq(careTeamMembers.userId, messages.senderId), eq(careTeamMembers.patientId, messages.patientId)),
+    )
     .where(and(eq(messages.patientId, patientId), q.before ? lt(messages.createdAt, new Date(q.before)) : undefined))
     .orderBy(desc(messages.createdAt))
     .limit(q.limit + 1);

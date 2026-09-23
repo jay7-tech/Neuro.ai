@@ -167,7 +167,10 @@ export const medications = pgTable(
     /** Local wall-clock times, "HH:MM". */
     times: text('times').array().notNull(),
     /** 0 = Sunday … 6 = Saturday. */
-    daysOfWeek: smallint('days_of_week').array().notNull().default(sql`'{0,1,2,3,4,5,6}'::smallint[]`),
+    daysOfWeek: smallint('days_of_week')
+      .array()
+      .notNull()
+      .default(sql`'{0,1,2,3,4,5,6}'::smallint[]`),
     startDate: date('start_date').notNull(),
     endDate: date('end_date'),
     active: boolean('active').notNull().default(true),
@@ -215,7 +218,10 @@ export const careTasks = pgTable(
     title: text('title').notNull(),
     time: text('time').notNull(), // "HH:MM" local
     category: taskCategory('category').notNull().default('routine'),
-    daysOfWeek: smallint('days_of_week').array().notNull().default(sql`'{0,1,2,3,4,5,6}'::smallint[]`),
+    daysOfWeek: smallint('days_of_week')
+      .array()
+      .notNull()
+      .default(sql`'{0,1,2,3,4,5,6}'::smallint[]`),
     active: boolean('active').notNull().default(true),
     ...timestamps,
   },
@@ -337,7 +343,9 @@ export const alerts = pgTable(
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [
-    uniqueIndex('alerts_open_dedupe_uq').on(t.patientId, t.dedupeKey).where(sql`${t.status} = 'open'`),
+    uniqueIndex('alerts_open_dedupe_uq')
+      .on(t.patientId, t.dedupeKey)
+      .where(sql`${t.status} = 'open'`),
     index('alerts_patient_status_idx').on(t.patientId, t.status, t.createdAt),
   ],
 );

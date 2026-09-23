@@ -32,22 +32,45 @@ export default function CarePlanPage() {
           <TabsTrigger value="music">Music</TabsTrigger>
           <TabsTrigger value="profile">Profile</TabsTrigger>
         </TabsList>
-        <TabsContent value="meds" className="mt-4"><MedicationManager patientId={patient.id} canEdit /></TabsContent>
-        <TabsContent value="routine" className="mt-4"><TaskManager patientId={patient.id} /></TabsContent>
-        <TabsContent value="chat" className="mt-4"><ChatPanel patientId={patient.id} meId={meId} /></TabsContent>
-        <TabsContent value="notes" className="mt-4"><NotesPanel patientId={patient.id} canWrite={false} meId={meId} /></TabsContent>
-        <TabsContent value="family" className="mt-4"><ReminiscenceManager patientId={patient.id} kind="family" /></TabsContent>
-        <TabsContent value="memories" className="mt-4"><ReminiscenceManager patientId={patient.id} kind="memories" /></TabsContent>
-        <TabsContent value="music" className="mt-4"><ReminiscenceManager patientId={patient.id} kind="playlist" /></TabsContent>
+        <TabsContent value="meds" className="mt-4">
+          <MedicationManager patientId={patient.id} canEdit />
+        </TabsContent>
+        <TabsContent value="routine" className="mt-4">
+          <TaskManager patientId={patient.id} />
+        </TabsContent>
+        <TabsContent value="chat" className="mt-4">
+          <ChatPanel patientId={patient.id} meId={meId} />
+        </TabsContent>
+        <TabsContent value="notes" className="mt-4">
+          <NotesPanel patientId={patient.id} canWrite={false} meId={meId} />
+        </TabsContent>
+        <TabsContent value="family" className="mt-4">
+          <ReminiscenceManager patientId={patient.id} kind="family" />
+        </TabsContent>
+        <TabsContent value="memories" className="mt-4">
+          <ReminiscenceManager patientId={patient.id} kind="memories" />
+        </TabsContent>
+        <TabsContent value="music" className="mt-4">
+          <ReminiscenceManager patientId={patient.id} kind="playlist" />
+        </TabsContent>
         <TabsContent value="profile" className="mt-4">
           <Card>
-            <CardHeader><CardTitle>Patient profile</CardTitle></CardHeader>
+            <CardHeader>
+              <CardTitle>Patient profile</CardTitle>
+            </CardHeader>
             <CardContent>
               <QueryState query={detail}>
                 {(p) => (
                   <PatientForm
                     patientId={p.id}
-                    initial={{ displayName: p.displayName, dateOfBirth: p.dateOfBirth, address: p.address, medicalSummary: p.medicalSummary, timezone: p.timezone, bloodGroup: p.bloodGroup as never }}
+                    initial={{
+                      displayName: p.displayName,
+                      dateOfBirth: p.dateOfBirth,
+                      address: p.address,
+                      medicalSummary: p.medicalSummary,
+                      timezone: p.timezone,
+                      bloodGroup: p.bloodGroup as never,
+                    }}
                   />
                 )}
               </QueryState>

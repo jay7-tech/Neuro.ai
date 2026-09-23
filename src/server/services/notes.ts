@@ -51,7 +51,13 @@ export async function updateNote(db: Database, actor: Actor, patientId: string, 
   return db.transaction(async (tx) => {
     const before = await ownNote(tx, actor, patientId, id);
     const [n] = await tx.update(clinicalNotes).set({ body }).where(eq(clinicalNotes.id, id)).returning();
-    await audit(tx, actor, { patientId, action: 'note.updated', entity: 'clinical_note', entityId: id, metadata: { previousLength: before.body.length } });
+    await audit(tx, actor, {
+      patientId,
+      action: 'note.updated',
+      entity: 'clinical_note',
+      entityId: id,
+      metadata: { previousLength: before.body.length },
+    });
     await publish(tx, patientId, 'note.changed', id);
     return n;
   });

@@ -37,7 +37,9 @@ export default function PatientHome() {
   return (
     <div className="space-y-8">
       <section>
-        <h1 className="text-4xl font-bold md:text-5xl">{now?.greeting ?? 'Hello'}, {name.split(' ')[0]}</h1>
+        <h1 className="text-4xl font-bold md:text-5xl">
+          {now?.greeting ?? 'Hello'}, {name.split(' ')[0]}
+        </h1>
         <p className="mt-2 min-h-8 text-2xl text-muted-foreground">{now && `Today is ${now.today}.`}</p>
       </section>
 
@@ -51,7 +53,11 @@ export default function PatientHome() {
           <MoodCheckIn patientId={patientId} />
           <nav className="grid grid-cols-2 gap-3" aria-label="Activities">
             {TOOLS.map(({ href, label, icon: Icon }) => (
-              <Link key={href} href={href} className="flex flex-col items-center gap-2 rounded-2xl border bg-card p-5 text-center text-lg font-semibold shadow-sm transition hover:border-primary hover:shadow-md">
+              <Link
+                key={href}
+                href={href}
+                className="flex flex-col items-center gap-2 rounded-2xl border bg-card p-5 text-center text-lg font-semibold shadow-sm transition hover:border-primary hover:shadow-md"
+              >
                 <Icon className="h-9 w-9 text-primary" /> {label}
               </Link>
             ))}

@@ -19,9 +19,16 @@ export default function GamesPage() {
       <p className="mt-2 text-xl text-muted-foreground">The level adjusts to you automatically.</p>
       <div className="mt-8 grid gap-6 sm:grid-cols-2">
         {GAMES.map(({ href, title, text, icon: Icon }) => (
-          <Link key={href} href={`/patient/games/${href}`} className="flex items-center gap-5 rounded-2xl border bg-card p-6 shadow-sm transition hover:border-primary hover:shadow-md">
+          <Link
+            key={href}
+            href={`/patient/games/${href}`}
+            className="flex items-center gap-5 rounded-2xl border bg-card p-6 shadow-sm transition hover:border-primary hover:shadow-md"
+          >
             <Icon className="h-12 w-12 shrink-0 text-primary" />
-            <span><span className="block text-2xl font-bold">{title}</span><span className="text-lg text-muted-foreground">{text}</span></span>
+            <span>
+              <span className="block text-2xl font-bold">{title}</span>
+              <span className="text-lg text-muted-foreground">{text}</span>
+            </span>
           </Link>
         ))}
       </div>

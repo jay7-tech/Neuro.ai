@@ -8,10 +8,18 @@ import { localDate } from '../domain/time';
 import { publish } from '../realtime/bus';
 import { requireAccess } from './access';
 
-export async function recordMood(db: Database, actor: Actor, patientId: string, input: { score: number; note: string | null }) {
+export async function recordMood(
+  db: Database,
+  actor: Actor,
+  patientId: string,
+  input: { score: number; note: string | null },
+) {
   await requireAccess(db, actor, patientId, 'mood:write');
   return db.transaction(async (tx) => {
-    const [row] = await tx.insert(moodEntries).values({ patientId, ...input, recordedBy: actor.user.id }).returning();
+    const [row] = await tx
+      .insert(moodEntries)
+      .values({ patientId, ...input, recordedBy: actor.user.id })
+      .returning();
     await publish(tx, patientId, 'mood.recorded', row.id);
     return row;
   });

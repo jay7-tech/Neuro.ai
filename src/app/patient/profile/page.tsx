@@ -15,11 +15,19 @@ export default function ProfilePage() {
       <QueryState query={patient}>
         {(p) => (
           <Card className="rounded-2xl">
-            <CardHeader><CardTitle className="text-3xl">{p.displayName}</CardTitle></CardHeader>
+            <CardHeader>
+              <CardTitle className="text-3xl">{p.displayName}</CardTitle>
+            </CardHeader>
             <CardContent className="grid gap-3 text-lg sm:grid-cols-2">
-              <p><span className="text-muted-foreground">Born:</span> {p.dateOfBirth ?? '—'}</p>
-              <p><span className="text-muted-foreground">Blood group:</span> {p.bloodGroup ?? '—'}</p>
-              <p className="sm:col-span-2"><span className="text-muted-foreground">Address:</span> {p.address ?? '—'}</p>
+              <p>
+                <span className="text-muted-foreground">Born:</span> {p.dateOfBirth ?? '—'}
+              </p>
+              <p>
+                <span className="text-muted-foreground">Blood group:</span> {p.bloodGroup ?? '—'}
+              </p>
+              <p className="sm:col-span-2">
+                <span className="text-muted-foreground">Address:</span> {p.address ?? '—'}
+              </p>
             </CardContent>
           </Card>
         )}

@@ -31,13 +31,17 @@ export function DayPlan({ patientId, variant = 'staff' }: { patientId: string; v
   return (
     <Card className={cn(big && 'rounded-2xl shadow-xl')}>
       <CardHeader>
-        <CardTitle className={cn('flex items-center gap-2', big && 'text-2xl')}><CalendarCheck /> {big ? 'My day' : "Today's plan"}</CardTitle>
+        <CardTitle className={cn('flex items-center gap-2', big && 'text-2xl')}>
+          <CalendarCheck /> {big ? 'My day' : "Today's plan"}
+        </CardTitle>
         <QueryState query={plan} skeleton={null}>
           {(d) => {
             const done = d.items.filter((i) => i.completed).length;
             return (
               <CardDescription className="space-y-2">
-                <span>{done} of {d.items.length} done</span>
+                <span>
+                  {done} of {d.items.length} done
+                </span>
                 <Progress value={d.items.length ? (done / d.items.length) * 100 : 0} aria-label="Plan progress" />
               </CardDescription>
             );
@@ -53,7 +57,13 @@ export function DayPlan({ patientId, variant = 'staff' }: { patientId: string; v
               <ul className="space-y-2">
                 {d.items.map((i) => (
                   <li key={i.id}>
-                    <label className={cn('flex cursor-pointer items-center gap-3 rounded-xl border p-3 transition-colors', i.completed && 'bg-muted/60', big && 'p-4 text-lg')}>
+                    <label
+                      className={cn(
+                        'flex cursor-pointer items-center gap-3 rounded-xl border p-3 transition-colors',
+                        i.completed && 'bg-muted/60',
+                        big && 'p-4 text-lg',
+                      )}
+                    >
                       <Checkbox
                         checked={i.completed}
                         onCheckedChange={(c) => complete.mutate({ taskId: i.id, completed: c === true })}
@@ -61,8 +71,14 @@ export function DayPlan({ patientId, variant = 'staff' }: { patientId: string; v
                         aria-label={`Mark ${i.title} as done`}
                       />
                       <span className="w-14 font-mono text-muted-foreground">{i.time}</span>
-                      <span className={cn('flex-1', i.completed && 'text-muted-foreground line-through')}>{i.title}</span>
-                      {!big && <Badge variant="outline" className="capitalize">{i.category}</Badge>}
+                      <span className={cn('flex-1', i.completed && 'text-muted-foreground line-through')}>
+                        {i.title}
+                      </span>
+                      {!big && (
+                        <Badge variant="outline" className="capitalize">
+                          {i.category}
+                        </Badge>
+                      )}
                     </label>
                   </li>
                 ))}
@@ -99,25 +115,49 @@ function TaskForm({ patientId, task, onDone }: { patientId: string; task?: Task;
 
   return (
     <form onSubmit={submit} className="space-y-4">
-      <div className="space-y-2"><Label htmlFor="t-title">Activity</Label><Input id="t-title" value={title} onChange={(e) => setTitle(e.target.value)} /></div>
+      <div className="space-y-2">
+        <Label htmlFor="t-title">Activity</Label>
+        <Input id="t-title" value={title} onChange={(e) => setTitle(e.target.value)} />
+      </div>
       <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2"><Label htmlFor="t-time">Time</Label><Input id="t-time" type="time" value={time} onChange={(e) => setTime(e.target.value)} /></div>
+        <div className="space-y-2">
+          <Label htmlFor="t-time">Time</Label>
+          <Input id="t-time" type="time" value={time} onChange={(e) => setTime(e.target.value)} />
+        </div>
         <div className="space-y-2">
           <Label>Category</Label>
           <Select value={category} onValueChange={(v) => setCategory(v as typeof category)}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
-            <SelectContent>{CATEGORIES.map((c) => <SelectItem key={c} value={c} className="capitalize">{c}</SelectItem>)}</SelectContent>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {CATEGORIES.map((c) => (
+                <SelectItem key={c} value={c} className="capitalize">
+                  {c}
+                </SelectItem>
+              ))}
+            </SelectContent>
           </Select>
         </div>
       </div>
       <div className="flex flex-wrap gap-1">
         {WEEKDAYS.map((d, i) => (
-          <Button key={d} type="button" size="sm" variant={days.includes(i) ? 'default' : 'outline'} aria-pressed={days.includes(i)}
-            onClick={() => setDays(days.includes(i) ? days.filter((x) => x !== i) : [...days, i])}>{d}</Button>
+          <Button
+            key={d}
+            type="button"
+            size="sm"
+            variant={days.includes(i) ? 'default' : 'outline'}
+            aria-pressed={days.includes(i)}
+            onClick={() => setDays(days.includes(i) ? days.filter((x) => x !== i) : [...days, i])}
+          >
+            {d}
+          </Button>
         ))}
       </div>
       {error && <p className="text-sm text-destructive">{error}</p>}
-      <Button type="submit" disabled={save.isPending}>{save.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Save</Button>
+      <Button type="submit" disabled={save.isPending}>
+        {save.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Save
+      </Button>
     </form>
   );
 }
@@ -134,29 +174,54 @@ export function TaskManager({ patientId }: { patientId: string }) {
           <CardTitle>Routine</CardTitle>
           <CardDescription>A consistent routine reduces anxiety. Tasks repeat on the selected days.</CardDescription>
         </div>
-        <Button onClick={() => setEditing('new')}><Plus className="mr-2 h-4 w-4" /> Add</Button>
+        <Button onClick={() => setEditing('new')}>
+          <Plus className="mr-2 h-4 w-4" /> Add
+        </Button>
       </CardHeader>
       <CardContent>
         <QueryState query={tasks}>
-          {(list) => list.length === 0 ? <EmptyState title="No routine yet" /> : (
-            <ul className="divide-y">
-              {list.map((t) => (
-                <li key={t.id} className="flex items-center gap-3 py-2">
-                  <span className="w-14 font-mono text-sm">{t.time}</span>
-                  <span className="flex-1">{t.title}</span>
-                  <span className="hidden text-xs text-muted-foreground sm:inline">{t.daysOfWeek.length === 7 ? 'Daily' : t.daysOfWeek.map((d) => WEEKDAYS[d]).join(' ')}</span>
-                  <Button variant="ghost" size="icon" onClick={() => setEditing(t)} aria-label={`Edit ${t.title}`}><Pencil className="h-4 w-4" /></Button>
-                  <Button variant="ghost" size="icon" onClick={() => del.mutate(t.id)} aria-label={`Delete ${t.title}`}><Trash2 className="h-4 w-4 text-destructive" /></Button>
-                </li>
-              ))}
-            </ul>
-          )}
+          {(list) =>
+            list.length === 0 ? (
+              <EmptyState title="No routine yet" />
+            ) : (
+              <ul className="divide-y">
+                {list.map((t) => (
+                  <li key={t.id} className="flex items-center gap-3 py-2">
+                    <span className="w-14 font-mono text-sm">{t.time}</span>
+                    <span className="flex-1">{t.title}</span>
+                    <span className="hidden text-xs text-muted-foreground sm:inline">
+                      {t.daysOfWeek.length === 7 ? 'Daily' : t.daysOfWeek.map((d) => WEEKDAYS[d]).join(' ')}
+                    </span>
+                    <Button variant="ghost" size="icon" onClick={() => setEditing(t)} aria-label={`Edit ${t.title}`}>
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => del.mutate(t.id)}
+                      aria-label={`Delete ${t.title}`}
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </li>
+                ))}
+              </ul>
+            )
+          }
         </QueryState>
       </CardContent>
       <Dialog open={editing !== null} onOpenChange={(o) => !o && setEditing(null)}>
         <DialogContent>
-          <DialogHeader><DialogTitle>{editing === 'new' ? 'Add to routine' : 'Edit task'}</DialogTitle></DialogHeader>
-          {editing !== null && <TaskForm patientId={patientId} task={editing === 'new' ? undefined : editing} onDone={() => setEditing(null)} />}
+          <DialogHeader>
+            <DialogTitle>{editing === 'new' ? 'Add to routine' : 'Edit task'}</DialogTitle>
+          </DialogHeader>
+          {editing !== null && (
+            <TaskForm
+              patientId={patientId}
+              task={editing === 'new' ? undefined : editing}
+              onDone={() => setEditing(null)}
+            />
+          )}
         </DialogContent>
       </Dialog>
     </Card>

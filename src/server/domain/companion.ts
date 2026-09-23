@@ -24,7 +24,19 @@ export function detectDistress(text: string): boolean {
   return DISTRESS.test(text);
 }
 
-const RELATIONS = ['wife', 'husband', 'son', 'daughter', 'brother', 'sister', 'grandson', 'granddaughter', 'friend', 'mother', 'father'];
+const RELATIONS = [
+  'wife',
+  'husband',
+  'son',
+  'daughter',
+  'brother',
+  'sister',
+  'grandson',
+  'granddaughter',
+  'friend',
+  'mother',
+  'father',
+];
 
 export function ruleBasedAnswer(question: string, ctx: CompanionContext): string {
   const q = question.toLowerCase();
@@ -57,7 +69,8 @@ export function ruleBasedAnswer(question: string, ctx: CompanionContext): string
   if (/\b(who|name)\b.*\b(caregiver|doctor|nurse)\b/.test(q)) {
     const want = /doctor|nurse/.test(q) ? 'clinician' : 'caregiver';
     const people = ctx.careTeam.filter((m) => m.role === want);
-    if (people.length) return `Your ${want === 'clinician' ? 'doctor' : 'caregiver'} is ${people.map((p) => p.name).join(' and ')}.`;
+    if (people.length)
+      return `Your ${want === 'clinician' ? 'doctor' : 'caregiver'} is ${people.map((p) => p.name).join(' and ')}.`;
   }
   if (/\b(who am i|my name)\b/.test(q)) return `Your name is ${ctx.patientName}.`;
   return `I'm here with you, ${first}. You can ask me about today's plan, your medicine, or your family.`;

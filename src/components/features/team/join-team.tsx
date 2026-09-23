@@ -36,7 +36,8 @@ export function JoinTeamForm({ onJoined }: { onJoined?: () => void }) {
         maxLength={9}
       />
       <Button type="submit" disabled={code.replace(/-/g, '').length !== 8 || accept.isPending}>
-        {accept.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <KeyRound className="mr-2 h-4 w-4" />} Join
+        {accept.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <KeyRound className="mr-2 h-4 w-4" />}{' '}
+        Join
       </Button>
     </form>
   );

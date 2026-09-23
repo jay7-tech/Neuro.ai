@@ -16,7 +16,15 @@ import { errorMessage } from '@/lib/api-client';
 type Values = z.input<typeof CreatePatientInput>;
 
 /** Create (caregiver onboarding) or edit a patient profile. */
-export function PatientForm({ patientId, initial, onSaved }: { patientId?: string; initial?: Partial<Values>; onSaved?: () => void }) {
+export function PatientForm({
+  patientId,
+  initial,
+  onSaved,
+}: {
+  patientId?: string;
+  initial?: Partial<Values>;
+  onSaved?: () => void;
+}) {
   const { toast } = useToast();
   const create = useCreatePatient();
   const update = useUpdatePatient(patientId ?? '');
@@ -41,24 +49,75 @@ export function PatientForm({ patientId, initial, onSaved }: { patientId?: strin
   return (
     <Form {...form}>
       <form onSubmit={onSubmit} className="grid gap-4 sm:grid-cols-2">
-        <FormField control={form.control} name="displayName" render={({ field }) => (
-          <FormItem className="sm:col-span-2"><FormLabel>Full name</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
-        )} />
-        <FormField control={form.control} name="dateOfBirth" render={({ field }) => (
-          <FormItem><FormLabel>Date of birth</FormLabel><FormControl><Input type="date" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
-        )} />
-        <FormField control={form.control} name="timezone" render={({ field }) => (
-          <FormItem><FormLabel>Timezone</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
-        )} />
-        <FormField control={form.control} name="address" render={({ field }) => (
-          <FormItem className="sm:col-span-2"><FormLabel>Address</FormLabel><FormControl><Input {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
-        )} />
-        <FormField control={form.control} name="medicalSummary" render={({ field }) => (
-          <FormItem className="sm:col-span-2"><FormLabel>Medical summary</FormLabel><FormControl><Textarea rows={3} {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
-        )} />
+        <FormField
+          control={form.control}
+          name="displayName"
+          render={({ field }) => (
+            <FormItem className="sm:col-span-2">
+              <FormLabel>Full name</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="dateOfBirth"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Date of birth</FormLabel>
+              <FormControl>
+                <Input type="date" {...field} value={field.value ?? ''} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="timezone"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Timezone</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="address"
+          render={({ field }) => (
+            <FormItem className="sm:col-span-2">
+              <FormLabel>Address</FormLabel>
+              <FormControl>
+                <Input {...field} value={field.value ?? ''} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="medicalSummary"
+          render={({ field }) => (
+            <FormItem className="sm:col-span-2">
+              <FormLabel>Medical summary</FormLabel>
+              <FormControl>
+                <Textarea rows={3} {...field} value={field.value ?? ''} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <div className="sm:col-span-2">
           <Button type="submit" disabled={form.formState.isSubmitting}>
-            {form.formState.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} {patientId ? 'Save changes' : 'Add patient'}
+            {form.formState.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}{' '}
+            {patientId ? 'Save changes' : 'Add patient'}
           </Button>
         </div>
       </form>

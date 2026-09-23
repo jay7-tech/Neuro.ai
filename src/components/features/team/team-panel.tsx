@@ -47,16 +47,28 @@ export function TeamPanel({ patientId, myRole, myUserId }: { patientId: string; 
             {(members) => (
               <Table>
                 <TableHeader>
-                  <TableRow><TableHead>Name</TableHead><TableHead>Role</TableHead><TableHead>Since</TableHead><TableHead /></TableRow>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Role</TableHead>
+                    <TableHead>Since</TableHead>
+                    <TableHead />
+                  </TableRow>
                 </TableHeader>
                 <TableBody>
                   {members.map((m) => (
                     <TableRow key={m.userId}>
                       <TableCell>
-                        <p className="font-medium">{m.name}{m.userId === myUserId && ' (you)'}</p>
+                        <p className="font-medium">
+                          {m.name}
+                          {m.userId === myUserId && ' (you)'}
+                        </p>
                         <p className="text-xs text-muted-foreground">{m.email}</p>
                       </TableCell>
-                      <TableCell><Badge variant="secondary" className="capitalize">{m.role}</Badge></TableCell>
+                      <TableCell>
+                        <Badge variant="secondary" className="capitalize">
+                          {m.role}
+                        </Badge>
+                      </TableCell>
                       <TableCell className="text-sm text-muted-foreground">{day(m.since)}</TableCell>
                       <TableCell className="text-right">
                         {m.role !== 'patient' && (myRole === 'caregiver' || m.userId === myUserId) && (
@@ -64,7 +76,16 @@ export function TeamPanel({ patientId, myRole, myUserId }: { patientId: string; 
                             variant="ghost"
                             size="icon"
                             aria-label={`Remove ${m.name}`}
-                            onClick={() => remove.mutate(m.userId, { onError: (e) => toast({ title: 'Could not remove', description: errorMessage(e), variant: 'destructive' }) })}
+                            onClick={() =>
+                              remove.mutate(m.userId, {
+                                onError: (e) =>
+                                  toast({
+                                    title: 'Could not remove',
+                                    description: errorMessage(e),
+                                    variant: 'destructive',
+                                  }),
+                              })
+                            }
                           >
                             <UserMinus className="h-4 w-4" />
                           </Button>
@@ -88,7 +109,11 @@ export function TeamPanel({ patientId, myRole, myUserId }: { patientId: string; 
           <div className="flex flex-wrap gap-2">
             {CAN_INVITE[myRole].map((role) => (
               <Button key={role} variant="outline" onClick={() => createInvite(role)} disabled={invite.isPending}>
-                {invite.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UserPlus className="mr-2 h-4 w-4" />}
+                {invite.isPending ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <UserPlus className="mr-2 h-4 w-4" />
+                )}
                 Invite a {role}
               </Button>
             ))}

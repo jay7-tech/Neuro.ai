@@ -24,7 +24,10 @@ const req = (path: string, init: { method?: string; body?: unknown; cookie?: str
   });
 
 async function signUp(role: 'patient' | 'caregiver', email: string) {
-  const res = await registerRoute(req('/api/v1/auth/register', { method: 'POST', body: { name: 'Test', email, password: 'correct-horse-1', role } }), ctx());
+  const res = await registerRoute(
+    req('/api/v1/auth/register', { method: 'POST', body: { name: 'Test', email, password: 'correct-horse-1', role } }),
+    ctx(),
+  );
   expect(res.status).toBe(201);
   const cookie = res.headers.get('set-cookie')!.split(';')[0];
   return cookie;
@@ -41,7 +44,10 @@ describe('HTTP layer', () => {
 
   it('sets an httpOnly SameSite session cookie on register and accepts it afterwards', async () => {
     const res = await registerRoute(
-      req('/api/v1/auth/register', { method: 'POST', body: { name: 'Pat', email: 'pat@example.com', password: 'correct-horse-1', role: 'patient' } }),
+      req('/api/v1/auth/register', {
+        method: 'POST',
+        body: { name: 'Pat', email: 'pat@example.com', password: 'correct-horse-1', role: 'patient' },
+      }),
       ctx(),
     );
     const setCookie = res.headers.get('set-cookie')!;
@@ -67,9 +73,25 @@ describe('HTTP layer', () => {
     const cookie = await signUp('patient', 'csrf@example.com');
     const me = await (await meRoute(req('/api/v1/auth/me', { cookie }), ctx())).json();
     const patientId = me.data.patients[0].id;
-    const res = await moodRoute(req(`/api/v1/patients/${patientId}/mood`, { method: 'POST', cookie, origin: 'https://evil.example', body: { score: 4 } }), ctx({ patientId }));
+    const res = await moodRoute(
+      req(`/api/v1/patients/${patientId}/mood`, {
+        method: 'POST',
+        cookie,
+        origin: 'https://evil.example',
+        body: { score: 4 },
+      }),
+      ctx({ patientId }),
+    );
     expect(res.status).toBe(403);
-    const ok = await moodRoute(req(`/api/v1/patients/${patientId}/mood`, { method: 'POST', cookie, origin: 'http://localhost:9002', body: { score: 4 } }), ctx({ patientId }));
+    const ok = await moodRoute(
+      req(`/api/v1/patients/${patientId}/mood`, {
+        method: 'POST',
+        cookie,
+        origin: 'http://localhost:9002',
+        body: { score: 4 },
+      }),
+      ctx({ patientId }),
+    );
     expect(ok.status).toBe(201);
   });
 
@@ -77,8 +99,12 @@ describe('HTTP layer', () => {
     const a = await signUp('patient', 'a@example.com');
     const b = await signUp('patient', 'b@example.com');
     const aPatient = (await (await meRoute(req('/api/v1/auth/me', { cookie: a }), ctx())).json()).data.patients[0].id;
-    expect((await patientRoute(req(`/api/v1/patients/${aPatient}`, { cookie: b }), ctx({ patientId: aPatient }))).status).toBe(404);
-    expect((await patientRoute(req('/api/v1/patients/not-a-uuid', { cookie: b }), ctx({ patientId: 'not-a-uuid' }))).status).toBe(422);
+    expect(
+      (await patientRoute(req(`/api/v1/patients/${aPatient}`, { cookie: b }), ctx({ patientId: aPatient }))).status,
+    ).toBe(404);
+    expect(
+      (await patientRoute(req('/api/v1/patients/not-a-uuid', { cookie: b }), ctx({ patientId: 'not-a-uuid' }))).status,
+    ).toBe(422);
   });
 
   it('rate-limits credential endpoints', async () => {

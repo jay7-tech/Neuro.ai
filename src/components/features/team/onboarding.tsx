@@ -11,7 +11,8 @@ export function Onboarding({ role, onDone }: { role: 'patient' | 'caregiver' | '
         <CardHeader>
           <CardTitle>Join an existing care team</CardTitle>
           <CardDescription>
-            Ask the patient or their caregiver for an invite code from their <em>Care team</em> page. Codes work once and expire after 72 hours.
+            Ask the patient or their caregiver for an invite code from their <em>Care team</em> page. Codes work once
+            and expire after 72 hours.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -22,7 +23,9 @@ export function Onboarding({ role, onDone }: { role: 'patient' | 'caregiver' | '
         <Card className="rounded-2xl">
           <CardHeader>
             <CardTitle>Add someone you care for</CardTitle>
-            <CardDescription>For a loved one who won&apos;t use the app themselves. You can invite family and their doctor afterwards.</CardDescription>
+            <CardDescription>
+              For a loved one who won&apos;t use the app themselves. You can invite family and their doctor afterwards.
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <PatientForm onSaved={onDone} />

@@ -8,6 +8,7 @@ const Query = z.object({ includeInactive: z.enum(['true', 'false']).default('fal
 export const GET = handler({ params: PatientParams, query: Query }, ({ db, actor, params, query }) =>
   listMedications(db, actor, params.patientId, query.includeInactive === 'true'),
 );
-export const POST = handler({ params: PatientParams, body: MedicationInput, status: 201 }, ({ db, actor, params, body }) =>
-  createMedication(db, actor, params.patientId, body),
+export const POST = handler(
+  { params: PatientParams, body: MedicationInput, status: 201 },
+  ({ db, actor, params, body }) => createMedication(db, actor, params.patientId, body),
 );

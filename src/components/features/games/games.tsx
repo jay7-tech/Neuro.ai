@@ -1,7 +1,25 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Anchor, Apple, Bell, Bike, Bird, Book, Brain, Car, Cat, Cloud, Dog, Fish, Flag, Heart, Sailboat, Smile, Star } from 'lucide-react';
+import {
+  Anchor,
+  Apple,
+  Bell,
+  Bike,
+  Bird,
+  Book,
+  Brain,
+  Car,
+  Cat,
+  Cloud,
+  Dog,
+  Fish,
+  Flag,
+  Heart,
+  Sailboat,
+  Smile,
+  Star,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -27,11 +45,14 @@ export function MemoryMatch({ level, onFinish }: GameProps) {
     if (open.length !== 2) return;
     const [a, b] = open;
     const same = deck[a].icon === deck[b].icon;
-    const t = setTimeout(() => {
-      if (same) setMatched((m) => new Set([...m, deck[a].icon]));
-      else setMistakes((x) => x + 1);
-      setOpen([]);
-    }, same ? 400 : 1100);
+    const t = setTimeout(
+      () => {
+        if (same) setMatched((m) => new Set([...m, deck[a].icon]));
+        else setMistakes((x) => x + 1);
+        setOpen([]);
+      },
+      same ? 400 : 1100,
+    );
     return () => clearTimeout(t);
   }, [open, deck]);
 
@@ -47,15 +68,24 @@ export function MemoryMatch({ level, onFinish }: GameProps) {
 
   return (
     <div className="space-y-4">
-      <p className="text-center text-lg font-semibold">Pairs found: {matched.size} / {pairs} · Misses: {mistakes}</p>
+      <p className="text-center text-lg font-semibold">
+        Pairs found: {matched.size} / {pairs} · Misses: {mistakes}
+      </p>
       <div className="mx-auto grid max-w-xl grid-cols-4 gap-3">
         {deck.map((c, i) => {
           const shown = open.includes(i) || matched.has(c.icon);
           const Icon = ICONS[c.icon];
           return (
-            <button key={c.id} onClick={() => flip(i)} aria-label={shown ? 'Revealed card' : 'Hidden card'}
-              className={cn('flex aspect-square items-center justify-center rounded-xl border-2 text-primary shadow transition-all',
-                shown ? 'bg-card' : 'bg-primary/20 hover:bg-primary/30', matched.has(c.icon) && 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40')}>
+            <button
+              key={c.id}
+              onClick={() => flip(i)}
+              aria-label={shown ? 'Revealed card' : 'Hidden card'}
+              className={cn(
+                'flex aspect-square items-center justify-center rounded-xl border-2 text-primary shadow transition-all',
+                shown ? 'bg-card' : 'bg-primary/20 hover:bg-primary/30',
+                matched.has(c.icon) && 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40',
+              )}
+            >
               {shown ? <Icon className="h-1/2 w-1/2" /> : <Brain className="h-1/3 w-1/3 opacity-60" />}
             </button>
           );
@@ -68,8 +98,14 @@ export function MemoryMatch({ level, onFinish }: GameProps) {
 /* ------------------------------- Colour match ------------------------------ */
 
 const COLORS = [
-  { name: 'Red', hex: '#ef4444' }, { name: 'Blue', hex: '#3b82f6' }, { name: 'Green', hex: '#22c55e' }, { name: 'Yellow', hex: '#eab308' },
-  { name: 'Orange', hex: '#f97316' }, { name: 'Purple', hex: '#8b5cf6' }, { name: 'Pink', hex: '#ec4899' }, { name: 'Brown', hex: '#92400e' },
+  { name: 'Red', hex: '#ef4444' },
+  { name: 'Blue', hex: '#3b82f6' },
+  { name: 'Green', hex: '#22c55e' },
+  { name: 'Yellow', hex: '#eab308' },
+  { name: 'Orange', hex: '#f97316' },
+  { name: 'Purple', hex: '#8b5cf6' },
+  { name: 'Pink', hex: '#ec4899' },
+  { name: 'Brown', hex: '#92400e' },
 ];
 const COLOR_ROUNDS = 8;
 const OPTIONS: Record<Level, number> = { easy: 3, medium: 4, hard: 6 };
@@ -86,7 +122,11 @@ export function ColorMatch({ level, onFinish }: GameProps) {
     const opts = shuffle(COLORS).slice(0, OPTIONS[level]);
     const t = opts[Math.floor(Math.random() * opts.length)];
     const others = COLORS.filter((c) => c.name !== t.name);
-    return { target: t, options: opts, ink: level === 'easy' ? '#111827' : others[Math.floor(Math.random() * others.length)].hex };
+    return {
+      target: t,
+      options: opts,
+      ink: level === 'easy' ? '#111827' : others[Math.floor(Math.random() * others.length)].hex,
+    };
     // `round` is intentionally a dependency: each new round re-randomises the puzzle.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [round, level]);
@@ -108,16 +148,27 @@ export function ColorMatch({ level, onFinish }: GameProps) {
 
   return (
     <div className="mx-auto max-w-md space-y-4">
-      <p className="text-center text-lg font-semibold">Round {round + 1} / {COLOR_ROUNDS} · Score {score}</p>
+      <p className="text-center text-lg font-semibold">
+        Round {round + 1} / {COLOR_ROUNDS} · Score {score}
+      </p>
       <Card className="p-8 text-center">
-        <p className="text-5xl font-extrabold" style={{ color: ink }}>{target.name}</p>
+        <p className="text-5xl font-extrabold" style={{ color: ink }}>
+          {target.name}
+        </p>
         <p className="mt-2 text-muted-foreground">Tap the colour this word names</p>
       </Card>
       <div className={cn('grid gap-3', options.length > 4 ? 'grid-cols-3' : 'grid-cols-2')}>
         {options.map((c) => (
-          <button key={c.name} onClick={() => pick(c.name)} aria-label={c.name}
-            className={cn('h-24 rounded-xl shadow transition-transform hover:scale-105', wrong === c.name && 'opacity-40 ring-4 ring-destructive')}
-            style={{ backgroundColor: c.hex }} />
+          <button
+            key={c.name}
+            onClick={() => pick(c.name)}
+            aria-label={c.name}
+            className={cn(
+              'h-24 rounded-xl shadow transition-transform hover:scale-105',
+              wrong === c.name && 'opacity-40 ring-4 ring-destructive',
+            )}
+            style={{ backgroundColor: c.hex }}
+          />
         ))}
       </div>
     </div>
@@ -136,9 +187,12 @@ export function SequenceMemory({ level, onFinish }: GameProps) {
   const [phase, setPhase] = useState<'show' | 'answer' | 'feedback'>('show');
   const [answer, setAnswer] = useState('');
   const [lastCorrect, setLastCorrect] = useState<boolean | null>(null);
-  // `round` is intentionally a dependency: each new round draws a new sequence.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const seq = useMemo(() => Array.from({ length: SEQ_LEN[level] }, () => Math.floor(Math.random() * 10)), [round, level]);
+  const seq = useMemo(
+    () => Array.from({ length: SEQ_LEN[level] }, () => Math.floor(Math.random() * 10)),
+    // `round` is intentionally a dependency: each new round draws a new sequence.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [round, level],
+  );
 
   useEffect(() => {
     if (phase !== 'show') return;
@@ -165,17 +219,40 @@ export function SequenceMemory({ level, onFinish }: GameProps) {
 
   return (
     <div className="mx-auto max-w-md space-y-4 text-center">
-      <p className="text-lg font-semibold">Round {round + 1} / {SEQ_ROUNDS} · Score {score}</p>
+      <p className="text-lg font-semibold">
+        Round {round + 1} / {SEQ_ROUNDS} · Score {score}
+      </p>
       <Card className="flex min-h-40 items-center justify-center gap-2 p-6">
-        {phase === 'show' && seq.map((n, i) => (
-          <span key={i} className="flex h-16 w-12 items-center justify-center rounded-lg bg-primary text-3xl font-bold text-primary-foreground opacity-0 animate-in fade-in fill-mode-forwards" style={{ animationDelay: `${i * 800}ms`, animationDuration: '400ms' }}>{n}</span>
-        ))}
+        {phase === 'show' &&
+          seq.map((n, i) => (
+            <span
+              key={i}
+              className="flex h-16 w-12 items-center justify-center rounded-lg bg-primary text-3xl font-bold text-primary-foreground opacity-0 animate-in fade-in fill-mode-forwards"
+              style={{ animationDelay: `${i * 800}ms`, animationDuration: '400ms' }}
+            >
+              {n}
+            </span>
+          ))}
         {phase === 'answer' && <p className="text-xl">What were the numbers?</p>}
-        {phase === 'feedback' && <p className={cn('text-2xl font-bold', lastCorrect ? 'text-emerald-600' : 'text-destructive')}>{lastCorrect ? 'Correct!' : `It was ${seq.join(' ')}`}</p>}
+        {phase === 'feedback' && (
+          <p className={cn('text-2xl font-bold', lastCorrect ? 'text-emerald-600' : 'text-destructive')}>
+            {lastCorrect ? 'Correct!' : `It was ${seq.join(' ')}`}
+          </p>
+        )}
       </Card>
       <form onSubmit={submit} className="flex gap-2">
-        <Input value={answer} onChange={(e) => setAnswer(e.target.value)} inputMode="numeric" disabled={phase !== 'answer'} className="h-14 text-center text-2xl tracking-[0.4em]" aria-label="Sequence" autoFocus />
-        <Button type="submit" size="lg" className="h-14" disabled={phase !== 'answer' || !answer}>Check</Button>
+        <Input
+          value={answer}
+          onChange={(e) => setAnswer(e.target.value)}
+          inputMode="numeric"
+          disabled={phase !== 'answer'}
+          className="h-14 text-center text-2xl tracking-[0.4em]"
+          aria-label="Sequence"
+          autoFocus
+        />
+        <Button type="submit" size="lg" className="h-14" disabled={phase !== 'answer' || !answer}>
+          Check
+        </Button>
       </form>
     </div>
   );
@@ -186,7 +263,18 @@ export function SequenceMemory({ level, onFinish }: GameProps) {
 const WORDS: Record<Level, string[]> = {
   easy: ['TEA', 'CAT', 'SUN', 'BOOK', 'MILK', 'RAIN', 'BIRD', 'SHOE', 'TREE', 'FISH'],
   medium: ['APPLE', 'BEACH', 'CHAIR', 'MUSIC', 'OCEAN', 'LEMON', 'GARDEN', 'TEMPLE', 'MANGO', 'SMILE'],
-  hard: ['KITCHEN', 'BLANKET', 'PICTURE', 'HOLIDAY', 'MORNING', 'WEDDING', 'BICYCLE', 'COTTAGE', 'FESTIVAL', 'BREAKFAST'],
+  hard: [
+    'KITCHEN',
+    'BLANKET',
+    'PICTURE',
+    'HOLIDAY',
+    'MORNING',
+    'WEDDING',
+    'BICYCLE',
+    'COTTAGE',
+    'FESTIVAL',
+    'BREAKFAST',
+  ],
 };
 const WORD_ROUNDS = 5;
 
@@ -229,19 +317,47 @@ export function WordScramble({ level, onFinish }: GameProps) {
 
   return (
     <div className="mx-auto max-w-md space-y-4 text-center">
-      <p className="text-lg font-semibold">Word {i + 1} / {WORD_ROUNDS} · Score {score}</p>
+      <p className="text-lg font-semibold">
+        Word {i + 1} / {WORD_ROUNDS} · Score {score}
+      </p>
       <Card className="p-8">
         <p className="text-4xl font-extrabold tracking-[0.3em] text-primary">{letters}</p>
-        {hint && <p className="mt-3 text-muted-foreground">Starts with <b>{word[0]}</b>, {word.length} letters</p>}
+        {hint && (
+          <p className="mt-3 text-muted-foreground">
+            Starts with <b>{word[0]}</b>, {word.length} letters
+          </p>
+        )}
         {wrong && <p className="mt-3 text-destructive">Not quite — try again!</p>}
       </Card>
       <form onSubmit={submit} className="flex gap-2">
-        <Input value={guess} onChange={(e) => { setGuess(e.target.value); setWrong(false); }} className="h-14 text-center text-2xl uppercase" aria-label="Your answer" autoFocus />
-        <Button type="submit" size="lg" className="h-14" disabled={!guess.trim()}>Check</Button>
+        <Input
+          value={guess}
+          onChange={(e) => {
+            setGuess(e.target.value);
+            setWrong(false);
+          }}
+          className="h-14 text-center text-2xl uppercase"
+          aria-label="Your answer"
+          autoFocus
+        />
+        <Button type="submit" size="lg" className="h-14" disabled={!guess.trim()}>
+          Check
+        </Button>
       </form>
       <div className="flex justify-center gap-2">
-        <Button variant="ghost" onClick={() => setHint(true)} disabled={hint}>Hint</Button>
-        <Button variant="ghost" onClick={() => { const m = mistakes + 1; setMistakes(m); advance(score, m); }}>Skip</Button>
+        <Button variant="ghost" onClick={() => setHint(true)} disabled={hint}>
+          Hint
+        </Button>
+        <Button
+          variant="ghost"
+          onClick={() => {
+            const m = mistakes + 1;
+            setMistakes(m);
+            advance(score, m);
+          }}
+        >
+          Skip
+        </Button>
       </div>
     </div>
   );

@@ -34,7 +34,12 @@ export async function register(db: Database, input: RegisterInput, meta: Session
       await tx.insert(careTeamMembers).values({ patientId: patient.id, userId: user.id, role: 'patient' });
     }
 
-    await audit(tx, null, { action: 'user.registered', entity: 'user', entityId: user.id, metadata: { role: user.role } });
+    await audit(tx, null, {
+      action: 'user.registered',
+      entity: 'user',
+      entityId: user.id,
+      metadata: { role: user.role },
+    });
     const session = await createSession(tx, user.id, meta);
     return { user: user satisfies SessionUser, ...session };
   });

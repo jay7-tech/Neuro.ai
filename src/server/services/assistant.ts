@@ -13,8 +13,16 @@ import { listResource } from './reminiscence';
 import { listTeam } from './team';
 import { planForDay } from './tasks';
 
-export async function buildCompanionContext(db: Database, actor: Actor, patientId: string, graceMinutes: number): Promise<CompanionContext> {
-  const [p] = await db.select({ name: patients.displayName, tz: patients.timezone }).from(patients).where(eq(patients.id, patientId));
+export async function buildCompanionContext(
+  db: Database,
+  actor: Actor,
+  patientId: string,
+  graceMinutes: number,
+): Promise<CompanionContext> {
+  const [p] = await db
+    .select({ name: patients.displayName, tz: patients.timezone })
+    .from(patients)
+    .where(eq(patients.id, patientId));
   if (!p) throw notFound('Patient');
 
   const [doses, plan, family, team] = await Promise.all([
@@ -40,7 +48,13 @@ export async function buildCompanionContext(db: Database, actor: Actor, patientI
   };
 }
 
-export async function askCompanion(db: Database, actor: Actor, patientId: string, question: string, graceMinutes: number) {
+export async function askCompanion(
+  db: Database,
+  actor: Actor,
+  patientId: string,
+  question: string,
+  graceMinutes: number,
+) {
   await requireAccess(db, actor, patientId, 'patient:read');
   const ctx = await buildCompanionContext(db, actor, patientId, graceMinutes);
   return answerQuestion(question, ctx);
@@ -55,7 +69,9 @@ export async function checkMedicine(db: Database, actor: Actor, patientId: strin
   await requireAccess(db, actor, patientId, 'medication:read');
   const [identified, meds] = await Promise.all([identifyMedicine(photoDataUri), listMedications(db, actor, patientId)]);
   const match = bestMatch(identified.medicineName, meds);
-  const expired = identified.expiryDate ? identified.expiryDate < new Date().toISOString().slice(0, identified.expiryDate.length) : false;
+  const expired = identified.expiryDate
+    ? identified.expiryDate < new Date().toISOString().slice(0, identified.expiryDate.length)
+    : false;
 
   let verdict: 'matches_prescription' | 'not_prescribed' | 'uncertain';
   if (identified.confidence < 0.5) verdict = 'uncertain';
@@ -65,6 +81,14 @@ export async function checkMedicine(db: Database, actor: Actor, patientId: strin
     identified,
     verdict,
     expired,
-    matchedMedication: match ? { id: match.item.id, name: match.item.name, dosage: match.item.dosage, times: match.item.times, similarity: Math.round(match.score * 100) / 100 } : null,
+    matchedMedication: match
+      ? {
+          id: match.item.id,
+          name: match.item.name,
+          dosage: match.item.dosage,
+          times: match.item.times,
+          similarity: Math.round(match.score * 100) / 100,
+        }
+      : null,
   };
 }

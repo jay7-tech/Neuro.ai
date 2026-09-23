@@ -30,7 +30,12 @@ async function request<T>(method: string, path: string, body?: unknown, signal?:
     if (res.status === 401 && typeof window !== 'undefined' && !path.startsWith('/auth/')) {
       window.location.href = `/login?next=${encodeURIComponent(window.location.pathname)}`;
     }
-    throw new ApiError(res.status, err?.code ?? 'UNKNOWN', err?.message ?? `Request failed (${res.status})`, err?.details);
+    throw new ApiError(
+      res.status,
+      err?.code ?? 'UNKNOWN',
+      err?.message ?? `Request failed (${res.status})`,
+      err?.details,
+    );
   }
   return json.data as T;
 }

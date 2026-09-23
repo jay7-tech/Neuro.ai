@@ -10,5 +10,9 @@ export default async function PatientLayout({ children }: { children: React.Reac
   if (user.role !== 'patient') redirect(homePathFor(user.role));
   const record = await ownPatientRecord(getDb(), user.id);
   if (!record) redirect('/login');
-  return <PatientShell user={user} patientId={record.id}>{children}</PatientShell>;
+  return (
+    <PatientShell user={user} patientId={record.id}>
+      {children}
+    </PatientShell>
+  );
 }

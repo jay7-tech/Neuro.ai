@@ -26,8 +26,12 @@ export function LocationCard({ patientId, canConfigure }: { patientId: string; c
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2"><MapPin /> Location &amp; safe zone</CardTitle>
-        <CardDescription>A wandering alert is raised after two consecutive readings confidently outside the safe zone.</CardDescription>
+        <CardTitle className="flex items-center gap-2">
+          <MapPin /> Location &amp; safe zone
+        </CardTitle>
+        <CardDescription>
+          A wandering alert is raised after two consecutive readings confidently outside the safe zone.
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <QueryState query={q}>
@@ -38,9 +42,15 @@ export function LocationCard({ patientId, canConfigure }: { patientId: string; c
                   <div className="flex flex-wrap items-center gap-3 text-sm">
                     {loc.latest.insideGeofence === true && <Badge className="bg-emerald-600">Inside safe zone</Badge>}
                     {loc.latest.insideGeofence === false && <Badge variant="destructive">Outside safe zone</Badge>}
-                    {loc.latest.insideGeofence === null && <Badge variant="secondary">Uncertain (low GPS accuracy)</Badge>}
-                    {loc.latest.distanceFromHomeM !== null && <span>{Math.round(loc.latest.distanceFromHomeM)} m from home</span>}
-                    <span className="text-muted-foreground">±{Math.round(loc.latest.accuracyM)} m · {ago(loc.latest.recordedAt)}</span>
+                    {loc.latest.insideGeofence === null && (
+                      <Badge variant="secondary">Uncertain (low GPS accuracy)</Badge>
+                    )}
+                    {loc.latest.distanceFromHomeM !== null && (
+                      <span>{Math.round(loc.latest.distanceFromHomeM)} m from home</span>
+                    )}
+                    <span className="text-muted-foreground">
+                      ±{Math.round(loc.latest.accuracyM)} m · {ago(loc.latest.recordedAt)}
+                    </span>
                   </div>
                   <MapEmbed lat={loc.latest.lat} lng={loc.latest.lng} />
                 </>
@@ -78,7 +88,10 @@ function GeofenceForm({
     e.preventDefault();
     save.mutate(
       { homeLat: Number(lat), homeLng: Number(lng), radiusM: Number(radius) },
-      { onSuccess: () => toast({ title: 'Safe zone saved' }), onError: (err) => toast({ title: 'Invalid safe zone', description: errorMessage(err), variant: 'destructive' }) },
+      {
+        onSuccess: () => toast({ title: 'Safe zone saved' }),
+        onError: (err) => toast({ title: 'Invalid safe zone', description: errorMessage(err), variant: 'destructive' }),
+      },
     );
   };
 
@@ -89,7 +102,10 @@ function GeofenceForm({
     try {
       await ping.mutateAsync(away);
       await ping.mutateAsync(away);
-      toast({ title: 'Test readings sent', description: 'Two readings outside the zone — a wandering alert should appear.' });
+      toast({
+        title: 'Test readings sent',
+        description: 'Two readings outside the zone — a wandering alert should appear.',
+      });
     } catch (err) {
       toast({ title: 'Test failed', description: errorMessage(err), variant: 'destructive' });
     }
@@ -97,21 +113,50 @@ function GeofenceForm({
 
   return (
     <form onSubmit={submit} className="space-y-3 rounded-lg border p-4">
-      <p className="flex items-center gap-2 font-medium"><Home className="h-4 w-4" /> Home &amp; safe-zone radius</p>
+      <p className="flex items-center gap-2 font-medium">
+        <Home className="h-4 w-4" /> Home &amp; safe-zone radius
+      </p>
       <div className="grid gap-3 sm:grid-cols-3">
-        <div className="space-y-1"><Label htmlFor="gf-lat">Latitude</Label><Input id="gf-lat" inputMode="decimal" value={lat} onChange={(e) => setLat(e.target.value)} /></div>
-        <div className="space-y-1"><Label htmlFor="gf-lng">Longitude</Label><Input id="gf-lng" inputMode="decimal" value={lng} onChange={(e) => setLng(e.target.value)} /></div>
-        <div className="space-y-1"><Label htmlFor="gf-r">Radius (m)</Label><Input id="gf-r" type="number" min={50} max={20000} value={radius} onChange={(e) => setRadius(e.target.value)} /></div>
+        <div className="space-y-1">
+          <Label htmlFor="gf-lat">Latitude</Label>
+          <Input id="gf-lat" inputMode="decimal" value={lat} onChange={(e) => setLat(e.target.value)} />
+        </div>
+        <div className="space-y-1">
+          <Label htmlFor="gf-lng">Longitude</Label>
+          <Input id="gf-lng" inputMode="decimal" value={lng} onChange={(e) => setLng(e.target.value)} />
+        </div>
+        <div className="space-y-1">
+          <Label htmlFor="gf-r">Radius (m)</Label>
+          <Input
+            id="gf-r"
+            type="number"
+            min={50}
+            max={20000}
+            value={radius}
+            onChange={(e) => setRadius(e.target.value)}
+          />
+        </div>
       </div>
       <div className="flex flex-wrap gap-2">
-        <Button type="submit" disabled={save.isPending}>{save.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Save</Button>
+        <Button type="submit" disabled={save.isPending}>
+          {save.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Save
+        </Button>
         {last && (
-          <Button type="button" variant="outline" onClick={() => { setLat(String(last.lat)); setLng(String(last.lng)); }}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              setLat(String(last.lat));
+              setLng(String(last.lng));
+            }}
+          >
             <LocateFixed className="mr-2 h-4 w-4" /> Use last known position
           </Button>
         )}
         {current?.homeLat != null && (
-          <Button type="button" variant="ghost" onClick={simulateAway} disabled={ping.isPending}>Test the alert</Button>
+          <Button type="button" variant="ghost" onClick={simulateAway} disabled={ping.isPending}>
+            Test the alert
+          </Button>
         )}
       </div>
     </form>
@@ -149,10 +194,17 @@ export function LocationSharing({ patientId }: { patientId: string }) {
       (pos) => {
         if (Date.now() - lastSent.current < MIN_INTERVAL_MS) return;
         lastSent.current = Date.now();
-        report.mutate({ lat: pos.coords.latitude, lng: pos.coords.longitude, accuracyM: Math.min(pos.coords.accuracy, 10_000) });
+        report.mutate({
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+          accuracyM: Math.min(pos.coords.accuracy, 10_000),
+        });
         setStatus(`Shared ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`);
       },
-      (err) => setStatus(err.code === err.PERMISSION_DENIED ? 'Location permission was denied.' : 'Could not get your location.'),
+      (err) =>
+        setStatus(
+          err.code === err.PERMISSION_DENIED ? 'Location permission was denied.' : 'Could not get your location.',
+        ),
       { enableHighAccuracy: true, maximumAge: 60_000, timeout: 30_000 },
     );
     return () => navigator.geolocation.clearWatch(id);
@@ -172,7 +224,9 @@ export function LocationSharing({ patientId }: { patientId: string }) {
   return (
     <div className="flex items-center justify-between gap-4 rounded-xl border p-4">
       <div>
-        <Label htmlFor="share-loc" className="text-base font-semibold">Share my location with my care team</Label>
+        <Label htmlFor="share-loc" className="text-base font-semibold">
+          Share my location with my care team
+        </Label>
         <p className="text-sm text-muted-foreground">{status ?? (on ? 'Waiting for your position…' : 'Off')}</p>
       </div>
       <Switch id="share-loc" checked={on} onCheckedChange={toggle} />
