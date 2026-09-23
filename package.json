@@ -7,7 +7,7 @@
     "dev:worker": "tsx watch --env-file=.env src/worker/index.ts",
     "build": "next build && npm run build:scripts",
     "build:scripts": "esbuild src/worker/index.ts --bundle --platform=node --target=node20 --packages=external --alias:@=./src --outfile=dist/worker.js && esbuild src/server/db/migrate.ts --bundle --platform=node --target=node20 --packages=external --alias:@=./src --outfile=dist/migrate.js && esbuild src/server/db/seed.ts --bundle --platform=node --target=node20 --packages=external --alias:@=./src --outfile=dist/seed.js",
-    "start": "next start -p ${PORT:-9002}",
+    "start": "next start -p 9002",
     "start:worker": "node dist/worker.js",
     "lint": "next lint --max-warnings=0",
     "typecheck": "tsc --noEmit",
