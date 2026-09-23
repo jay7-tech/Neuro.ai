@@ -14,7 +14,12 @@ type Turn = { role: 'user' | 'assistant'; text: string; suggestSos?: boolean };
 
 const SUGGESTIONS = ['What day is it?', "What's my next medicine?", 'What is my son’s name?', "What's next today?"];
 
-type SpeechRecognitionLike = { lang: string; onresult: (e: { results: { 0: { transcript: string } }[] }) => void; onend: () => void; start: () => void };
+type SpeechRecognitionLike = {
+  lang: string;
+  onresult: (e: { results: { 0: { transcript: string } }[] }) => void;
+  onend: () => void;
+  start: () => void;
+};
 
 function speak(text: string) {
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
@@ -30,14 +35,20 @@ export function Companion({ patientId, onSos }: { patientId: string; onSos?: () 
   const [text, setText] = useState('');
   const [listening, setListening] = useState(false);
   const [readAloud, setReadAloud] = useState(true);
-  const endRef = useRef<HTMLDivElement>(null);
+  const scroller = useRef<HTMLDivElement>(null);
   // Browser-only API: resolved after mount so server and client markup match.
   const recognitionCtor = useClientValue(() => {
-    const w = window as unknown as { SpeechRecognition?: new () => SpeechRecognitionLike; webkitSpeechRecognition?: new () => SpeechRecognitionLike };
+    const w = window as unknown as {
+      SpeechRecognition?: new () => SpeechRecognitionLike;
+      webkitSpeechRecognition?: new () => SpeechRecognitionLike;
+    };
     return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null;
   });
 
-  useEffect(() => endRef.current?.scrollIntoView({ block: 'end' }), [turns]);
+  useEffect(() => {
+    const el = scroller.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [turns]);
 
   const send = (question: string) => {
     const q = question.trim();
@@ -49,7 +60,8 @@ export function Companion({ patientId, onSos }: { patientId: string; onSos?: () 
         setTurns((t) => [...t, { role: 'assistant', text: r.answer, suggestSos: r.suggestSos }]);
         if (readAloud) speak(r.answer);
       },
-      onError: (e) => setTurns((t) => [...t, { role: 'assistant', text: `Sorry, I couldn't answer just now. (${errorMessage(e)})` }]),
+      onError: (e) =>
+        setTurns((t) => [...t, { role: 'assistant', text: `Sorry, I couldn't answer just now. (${errorMessage(e)})` }]),
     });
   };
 
@@ -66,38 +78,85 @@ export function Companion({ patientId, onSos }: { patientId: string; onSos?: () 
   return (
     <Card className="rounded-2xl shadow-xl">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-2xl"><Bot /> Ask me anything</CardTitle>
+        <CardTitle className="flex items-center gap-2 text-2xl">
+          <Bot /> Ask me anything
+        </CardTitle>
         <CardDescription>I know your plan for today, your medicine and your family.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
-        <div className="max-h-80 min-h-[8rem] space-y-3 overflow-y-auto rounded-xl border bg-background p-3" aria-live="polite">
+        <div
+          ref={scroller}
+          className="max-h-80 min-h-[8rem] space-y-3 overflow-y-auto rounded-xl border bg-background p-3"
+          aria-live="polite"
+        >
           {turns.length === 0 && (
             <div className="flex flex-wrap gap-2">
-              {SUGGESTIONS.map((s) => <Button key={s} variant="secondary" onClick={() => send(s)}>{s}</Button>)}
+              {SUGGESTIONS.map((s) => (
+                <Button key={s} variant="secondary" onClick={() => send(s)}>
+                  {s}
+                </Button>
+              ))}
             </div>
           )}
           {turns.map((t, i) => (
             <div key={i} className={cn('flex flex-col', t.role === 'user' ? 'items-end' : 'items-start')}>
-              <div className={cn('max-w-[85%] rounded-2xl px-4 py-2 text-lg', t.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted')}>{t.text}</div>
+              <div
+                className={cn(
+                  'max-w-[85%] rounded-2xl px-4 py-2 text-lg',
+                  t.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted',
+                )}
+              >
+                {t.text}
+              </div>
               {t.suggestSos && onSos && (
-                <Button variant="destructive" size="lg" className="mt-2" onClick={onSos}><Siren className="mr-2 h-5 w-5" /> Call for help</Button>
+                <Button variant="destructive" size="lg" className="mt-2" onClick={onSos}>
+                  <Siren className="mr-2 h-5 w-5" /> Call for help
+                </Button>
               )}
             </div>
           ))}
           {ask.isPending && <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />}
-          <div ref={endRef} />
         </div>
-        <form onSubmit={(e) => { e.preventDefault(); send(text); }} className="flex gap-2">
-          <Input value={text} onChange={(e) => setText(e.target.value)} placeholder="Type your question…" className="h-12 text-base" aria-label="Your question" maxLength={500} />
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            send(text);
+          }}
+          className="flex gap-2"
+        >
+          <Input
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="Type your question…"
+            className="h-12 text-base"
+            aria-label="Your question"
+            maxLength={500}
+          />
           {recognitionCtor && (
-            <Button type="button" size="icon" variant={listening ? 'destructive' : 'outline'} className="h-12 w-12" onClick={listen} aria-label="Speak your question">
+            <Button
+              type="button"
+              size="icon"
+              variant={listening ? 'destructive' : 'outline'}
+              className="h-12 w-12"
+              onClick={listen}
+              aria-label="Speak your question"
+            >
               <Mic className="h-5 w-5" />
             </Button>
           )}
-          <Button type="submit" size="icon" className="h-12 w-12" disabled={!text.trim() || ask.isPending} aria-label="Ask"><SendHorizonal className="h-5 w-5" /></Button>
+          <Button
+            type="submit"
+            size="icon"
+            className="h-12 w-12"
+            disabled={!text.trim() || ask.isPending}
+            aria-label="Ask"
+          >
+            <SendHorizonal className="h-5 w-5" />
+          </Button>
         </form>
         <label className="flex items-center gap-2 text-sm text-muted-foreground">
-          <input type="checkbox" checked={readAloud} onChange={(e) => setReadAloud(e.target.checked)} /> <Volume2 className="h-4 w-4" /> Read answers aloud
+          <input type="checkbox" checked={readAloud} onChange={(e) => setReadAloud(e.target.checked)} />{' '}
+          <Volume2 className="h-4 w-4" /> Read answers aloud
         </label>
       </CardContent>
     </Card>
