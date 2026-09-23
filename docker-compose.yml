@@ -1,0 +1,53 @@
+# Full stack: `docker compose up --build`, then open http://localhost:3000
+# Demo data: `docker compose --profile demo run --rm seed`
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: neuro
+      POSTGRES_PASSWORD: neuro
+      POSTGRES_DB: neuro
+    ports: ['5432:5432']
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U neuro -d neuro']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  migrate:
+    build: { context: ., target: worker }
+    command: ['node', 'dist/migrate.js']
+    environment: &env
+      DATABASE_URL: postgres://neuro:neuro@db:5432/neuro
+      APP_URL: http://localhost:3000
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+    depends_on:
+      db: { condition: service_healthy }
+
+  web:
+    build: { context: ., target: web }
+    environment: *env
+    ports: ['3000:3000']
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+
+  worker:
+    build: { context: ., target: worker }
+    environment: *env
+    restart: unless-stopped
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+
+  seed:
+    profiles: [demo]
+    build: { context: ., target: worker }
+    command: ['node', 'dist/seed.js']
+    environment:
+      <<: *env
+      ALLOW_DEMO_SEED: 'true'
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+
+volumes:
+  pgdata:

@@ -1,5 +1,6 @@
 /**
- * Demo data: `npm run db:seed`. Wipes and recreates everything — refuses to run in production.
+ * Demo data: `npm run db:seed`. Wipes and recreates everything — refuses to run in production
+ * unless ALLOW_DEMO_SEED=true.
  *
  * Generates three weeks of realistic history (dose adherence with a few misses and
  * late doses, a mood series with a recent dip, game sessions with improving scores)
@@ -30,7 +31,9 @@ function rng(seed: number) {
 }
 
 async function main() {
-  if (process.env.NODE_ENV === 'production') throw new Error('Refusing to seed a production database');
+  if (process.env.NODE_ENV === 'production' && process.env.ALLOW_DEMO_SEED !== 'true') {
+    throw new Error('Refusing to seed a production database (set ALLOW_DEMO_SEED=true for a demo deployment)');
+  }
   const db = getDb();
   const rand = rng(42);
   const now = new Date();
@@ -62,7 +65,8 @@ async function main() {
         dateOfBirth: '1948-03-14',
         bloodGroup: 'O+',
         address: '12 Lavelle Road, Bengaluru 560001',
-        medicalSummary: 'Mild cognitive impairment (MoCA 22/30, Jan 2026). Hypertension, controlled. Allergic to penicillin.',
+        medicalSummary:
+          'Mild cognitive impairment (MoCA 22/30, Jan 2026). Hypertension, controlled. Allergic to penicillin.',
         timezone: TZ,
         homeLat: HOME.lat,
         homeLng: HOME.lng,
@@ -95,11 +99,46 @@ async function main() {
   const meds = await db
     .insert(s.medications)
     .values([
-      { patientId: p1.id, name: 'Donepezil (Aricept)', dosage: '5 mg tablet', instructions: 'At bedtime', times: ['21:00'], startDate: start },
-      { patientId: p1.id, name: 'Memantine (Namenda)', dosage: '10 mg tablet', instructions: 'With breakfast and dinner', times: ['08:30', '19:30'], startDate: start },
-      { patientId: p1.id, name: 'Amlodipine', dosage: '5 mg tablet', instructions: 'Morning, with water', times: ['08:30'], startDate: start },
-      { patientId: p2.id, name: 'Rivastigmine patch', dosage: '4.6 mg/24h', instructions: 'Change patch every morning', times: ['09:00'], startDate: start },
-      { patientId: p2.id, name: 'Metformin', dosage: '500 mg tablet', instructions: 'With lunch and dinner', times: ['13:00', '20:00'], startDate: start },
+      {
+        patientId: p1.id,
+        name: 'Donepezil (Aricept)',
+        dosage: '5 mg tablet',
+        instructions: 'At bedtime',
+        times: ['21:00'],
+        startDate: start,
+      },
+      {
+        patientId: p1.id,
+        name: 'Memantine (Namenda)',
+        dosage: '10 mg tablet',
+        instructions: 'With breakfast and dinner',
+        times: ['08:30', '19:30'],
+        startDate: start,
+      },
+      {
+        patientId: p1.id,
+        name: 'Amlodipine',
+        dosage: '5 mg tablet',
+        instructions: 'Morning, with water',
+        times: ['08:30'],
+        startDate: start,
+      },
+      {
+        patientId: p2.id,
+        name: 'Rivastigmine patch',
+        dosage: '4.6 mg/24h',
+        instructions: 'Change patch every morning',
+        times: ['09:00'],
+        startDate: start,
+      },
+      {
+        patientId: p2.id,
+        name: 'Metformin',
+        dosage: '500 mg tablet',
+        instructions: 'With lunch and dinner',
+        times: ['13:00', '20:00'],
+        startDate: start,
+      },
     ])
     .returning();
 
@@ -108,7 +147,14 @@ async function main() {
   for (const p of [p1, p2]) {
     const own = meds.filter((m) => m.patientId === p.id);
     const occ = expandOccurrences(
-      own.map((m) => ({ id: m.id, times: m.times, daysOfWeek: m.daysOfWeek, startDate: m.startDate, endDate: m.endDate, active: m.active })),
+      own.map((m) => ({
+        id: m.id,
+        times: m.times,
+        daysOfWeek: m.daysOfWeek,
+        startDate: m.startDate,
+        endDate: m.endDate,
+        active: m.active,
+      })),
       zonedToUtc(start, '00:00', TZ),
       new Date(now.getTime() - 2 * 3_600_000),
       TZ,
@@ -149,7 +195,13 @@ async function main() {
       const at = new Date(zonedToUtc(addDays(today, -d), '00:00', TZ).getTime() + hour * 3_600_000);
       if (at > now) continue;
       const score = Math.max(1, Math.min(5, Math.round(base + (rand() - 0.5) * 1.4)));
-      moods.push({ patientId: p1.id, score, recordedAt: at, recordedBy: john.id, note: d <= 2 && hour === 18 ? 'Felt confused this evening' : null });
+      moods.push({
+        patientId: p1.id,
+        score,
+        recordedAt: at,
+        recordedBy: john.id,
+        note: d <= 2 && hour === 18 ? 'Felt confused this evening' : null,
+      });
     }
   }
   await db.insert(s.moodEntries).values(moods);
@@ -163,34 +215,110 @@ async function main() {
     const maxScore = game === 'sequence_memory' ? 10 : 8;
     const skill = 0.55 + (20 - d) * 0.018 + (rand() - 0.5) * 0.15;
     const score = Math.max(0, Math.min(maxScore, Math.round(maxScore * skill)));
-    const input = { game, difficulty: level, score, maxScore, mistakes: Math.round((1 - skill) * 6), durationMs: Math.round((50 + rand() * 60) * 1000) } as const;
-    games.push({ ...input, patientId: p1.id, performance: performance(input), createdAt: new Date(now.getTime() - d * 86_400_000) });
+    const input = {
+      game,
+      difficulty: level,
+      score,
+      maxScore,
+      mistakes: Math.round((1 - skill) * 6),
+      durationMs: Math.round((50 + rand() * 60) * 1000),
+    } as const;
+    games.push({
+      ...input,
+      patientId: p1.id,
+      performance: performance(input),
+      createdAt: new Date(now.getTime() - d * 86_400_000),
+    });
   }
   await db.insert(s.gameSessions).values(games);
 
   await db.insert(s.familyMembers).values([
-    { patientId: p1.id, name: 'Jane Doe', relation: 'Wife', phone: '+91 98450 00001', photoUrl: 'https://placehold.co/400x400/E0E7FF/4A69C4?text=Wife', message: 'Through thick and thin, for fifty-two years. I love you more every day.' },
-    { patientId: p1.id, name: 'Peter Doe', relation: 'Son', phone: '+91 98450 00002', photoUrl: 'https://placehold.co/400x400/E0E7FF/4A69C4?text=Son', message: 'Dad, you taught me everything I know about being strong and kind.' },
-    { patientId: p1.id, name: 'Mary Doe', relation: 'Daughter', phone: '+91 98450 00003', photoUrl: 'https://placehold.co/400x400/E0E7FF/4A69C4?text=Daughter', message: 'Remember our fishing trips at Kabini? Those are my favourite memories.' },
+    {
+      patientId: p1.id,
+      name: 'Jane Doe',
+      relation: 'Wife',
+      phone: '+91 98450 00001',
+      photoUrl: 'https://placehold.co/400x400/E0E7FF/4A69C4?text=Wife',
+      message: 'Through thick and thin, for fifty-two years. I love you more every day.',
+    },
+    {
+      patientId: p1.id,
+      name: 'Peter Doe',
+      relation: 'Son',
+      phone: '+91 98450 00002',
+      photoUrl: 'https://placehold.co/400x400/E0E7FF/4A69C4?text=Son',
+      message: 'Dad, you taught me everything I know about being strong and kind.',
+    },
+    {
+      patientId: p1.id,
+      name: 'Mary Doe',
+      relation: 'Daughter',
+      phone: '+91 98450 00003',
+      photoUrl: 'https://placehold.co/400x400/E0E7FF/4A69C4?text=Daughter',
+      message: 'Remember our fishing trips at Kabini? Those are my favourite memories.',
+    },
     { patientId: p2.id, name: 'Arjun Rao', relation: 'Son', phone: '+91 98450 00010' },
   ]);
 
   await db.insert(s.memories).values([
-    { patientId: p1.id, title: 'Family trip to Goa', description: 'The whole family at Calangute beach. Peter built a sandcastle taller than Mary.', photoUrl: 'https://placehold.co/600x400/E0E7FF/4A69C4?text=Goa+1994', occurredOn: '1994-12-26', createdBy: jane.id },
-    { patientId: p1.id, title: 'Your 70th birthday', description: 'Everyone came home. You gave a speech that made Jane cry.', photoUrl: 'https://placehold.co/600x400/E0E7FF/4A69C4?text=70th+Birthday', occurredOn: '2018-03-14', createdBy: jane.id },
-    { patientId: p1.id, title: 'Retirement from HAL', description: '34 years as an aeronautical engineer. The team gave you a model of the Tejas.', photoUrl: 'https://placehold.co/600x400/E0E7FF/4A69C4?text=Retirement', occurredOn: '2008-06-30', createdBy: jane.id },
+    {
+      patientId: p1.id,
+      title: 'Family trip to Goa',
+      description: 'The whole family at Calangute beach. Peter built a sandcastle taller than Mary.',
+      photoUrl: 'https://placehold.co/600x400/E0E7FF/4A69C4?text=Goa+1994',
+      occurredOn: '1994-12-26',
+      createdBy: jane.id,
+    },
+    {
+      patientId: p1.id,
+      title: 'Your 70th birthday',
+      description: 'Everyone came home. You gave a speech that made Jane cry.',
+      photoUrl: 'https://placehold.co/600x400/E0E7FF/4A69C4?text=70th+Birthday',
+      occurredOn: '2018-03-14',
+      createdBy: jane.id,
+    },
+    {
+      patientId: p1.id,
+      title: 'Retirement from HAL',
+      description: '34 years as an aeronautical engineer. The team gave you a model of the Tejas.',
+      photoUrl: 'https://placehold.co/600x400/E0E7FF/4A69C4?text=Retirement',
+      occurredOn: '2008-06-30',
+      createdBy: jane.id,
+    },
   ]);
 
   await db.insert(s.playlistTracks).values([
-    { patientId: p1.id, title: 'Moonlight Sonata (1st movement)', artist: 'Beethoven', url: 'https://upload.wikimedia.org/wikipedia/commons/e/eb/Beethoven_Moonlight_1st_movement.ogg', position: 0 },
-    { patientId: p1.id, title: 'Gymnopédie No. 1', artist: 'Erik Satie', url: 'https://upload.wikimedia.org/wikipedia/commons/c/c1/Gymnopedie_No._1..ogg', position: 1 },
+    {
+      patientId: p1.id,
+      title: 'Moonlight Sonata (1st movement)',
+      artist: 'Beethoven',
+      url: 'https://upload.wikimedia.org/wikipedia/commons/e/eb/Beethoven_Moonlight_1st_movement.ogg',
+      position: 0,
+    },
+    {
+      patientId: p1.id,
+      title: 'Gymnopédie No. 1',
+      artist: 'Erik Satie',
+      url: 'https://upload.wikimedia.org/wikipedia/commons/c/c1/Gymnopedie_No._1..ogg',
+      position: 1,
+    },
   ]);
 
   const msgBase = now.getTime() - 5 * 3_600_000;
   await db.insert(s.messages).values([
-    { patientId: p1.id, senderId: jane.id, body: 'Good morning John! Remember we have the crossword at 10:30.', createdAt: new Date(msgBase) },
+    {
+      patientId: p1.id,
+      senderId: jane.id,
+      body: 'Good morning John! Remember we have the crossword at 10:30.',
+      createdAt: new Date(msgBase),
+    },
     { patientId: p1.id, senderId: john.id, body: 'Yes! I will be ready.', createdAt: new Date(msgBase + 20 * 60_000) },
-    { patientId: p1.id, senderId: emily.id, body: 'Hi John, Jane — I have reviewed this week’s mood log. Let’s talk at Tuesday’s visit.', createdAt: new Date(msgBase + 3 * 3_600_000) },
+    {
+      patientId: p1.id,
+      senderId: emily.id,
+      body: 'Hi John, Jane — I have reviewed this week’s mood log. Let’s talk at Tuesday’s visit.',
+      createdAt: new Date(msgBase + 3 * 3_600_000),
+    },
   ]);
 
   await db.insert(s.clinicalNotes).values([
@@ -215,7 +343,14 @@ async function main() {
   await db.insert(s.locationPings).values(pings);
 
   logger.info(
-    { users: 4, patients: 2, doseEvents: events.length, moodEntries: moods.length, gameSessions: games.length, password: DEMO_PASSWORD },
+    {
+      users: 4,
+      patients: 2,
+      doseEvents: events.length,
+      moodEntries: moods.length,
+      gameSessions: games.length,
+      password: DEMO_PASSWORD,
+    },
     'seed complete — log in as john@ / jane@ / emily@ / arjun@demo.neuro.ai',
   );
 }
