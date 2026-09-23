@@ -8,7 +8,9 @@ services:
       POSTGRES_PASSWORD: neuro
       POSTGRES_DB: neuro
     ports: ['5432:5432']
-    volumes: [pgdata:/var/lib/postgresql/data]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/postgres-init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U neuro -d neuro']
       interval: 5s
