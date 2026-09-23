@@ -47,3 +47,7 @@ firestore-debug.log
 
 # build output
 /dist
+
+# e2e artifacts
+/test-results
+/playwright-report

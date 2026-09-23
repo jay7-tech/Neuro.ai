@@ -14,6 +14,8 @@ const EnvSchema = z.object({
   GEMINI_API_KEY: z.preprocess((v) => (v === '' ? undefined : v), z.string().min(1).optional()),
   /** Missed-dose grace period before a scheduled dose is considered missed. */
   DOSE_GRACE_MINUTES: z.coerce.number().int().positive().default(60),
+  /** Multiplies every rate-limit bucket. Keep at 1 in production. */
+  RATE_LIMIT_MULTIPLIER: z.coerce.number().positive().default(1),
 });
 
 export type Env = z.infer<typeof EnvSchema>;

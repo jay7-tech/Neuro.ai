@@ -130,8 +130,10 @@ export function handler<
       userId = session?.user.id;
 
       if (config.rateLimit !== false) {
-        const rule =
-          typeof config.rateLimit === 'object' ? config.rateLimit : RATE_LIMITS[config.rateLimit ?? 'api'];
+        const base = typeof config.rateLimit === 'object' ? config.rateLimit : RATE_LIMITS[config.rateLimit ?? 'api'];
+        // Scales every bucket, e.g. for load/e2e tests that log in many times from one IP.
+        const k = env().RATE_LIMIT_MULTIPLIER;
+        const rule = { capacity: base.capacity * k, refillPerSec: base.refillPerSec * k };
         const bucket = typeof config.rateLimit === 'string' ? config.rateLimit : 'api';
         const key = `${bucket}:${session?.user.id ?? ip ?? 'anon'}`;
         const result = rateLimiter().take(key, rule);
