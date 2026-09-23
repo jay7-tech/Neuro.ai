@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Dumbbell, HeartPulse } from 'lucide-react';
 import Image from 'next/image';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
-import images from '@/lib/placeholder-images.json';
+import images from './exercise-images.json';
 
 const exercises = [
   {

@@ -135,6 +135,7 @@ src/
     domain/             pure business logic — no I/O, fully unit-tested
     services/           use-cases: authorization, transactions, audit, events
     auth/ authz/        sessions and the permission policy
+    ai/                 Genkit flows (companion, medicine check, tips)
     http/               request pipeline, rate limiting, OpenAPI
     realtime/           LISTEN/NOTIFY bus
     jobs/               background jobs and the advisory-lock runner

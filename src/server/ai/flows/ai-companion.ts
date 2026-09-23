@@ -1,5 +1,5 @@
 import { z } from 'genkit';
-import { getAi, withTimeout } from '@/ai/genkit';
+import { getAi, withTimeout } from '@/server/ai/genkit';
 import { logger } from '@/server/logger';
 import {
   buildCompanionPrompt,
