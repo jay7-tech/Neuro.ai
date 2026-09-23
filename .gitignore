@@ -51,3 +51,6 @@ firestore-debug.log
 # e2e artifacts
 /test-results
 /playwright-report
+
+# git bundles used to transfer history
+*.bundle
