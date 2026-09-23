@@ -5,7 +5,7 @@ import { closeDb, getDb } from '@/server/db/client';
 import { users, patients, careTeamMembers, type CareRole, type UserRole } from '@/server/db/schema';
 import type { Actor } from '@/server/http/handler';
 
-process.env.DATABASE_URL = process.env.TEST_DATABASE_URL ?? 'postgres://neuro:neuro@localhost:5432/neuro_test';
+process.env.DATABASE_URL = process.env.TEST_DATABASE_URL ?? 'postgres://neuro:neuro@localhost:5433/neuro_test';
 process.env.BCRYPT_COST = '4';
 process.env.APP_URL = 'http://localhost:9002';
 

@@ -7,7 +7,8 @@ services:
       POSTGRES_USER: neuro
       POSTGRES_PASSWORD: neuro
       POSTGRES_DB: neuro
-    ports: ['5432:5432']
+    # Host port 5433 so it doesn't clash with a Postgres already installed on 5432.
+    ports: ['${DB_PORT:-5433}:5432']
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./docker/postgres-init.sql:/docker-entrypoint-initdb.d/init.sql:ro

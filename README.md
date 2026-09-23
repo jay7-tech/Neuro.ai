@@ -77,7 +77,7 @@ Open http://localhost:3000.
 
 ### Option B — Local development
 
-You need Node 20.11+ and PostgreSQL 16. The easiest way to get Postgres is `docker compose up db`.
+You need Node 20.11+ and PostgreSQL 16. The easiest way to get Postgres is `docker compose up -d db`, which listens on **port 5433** so it won't clash with a Postgres you already have on 5432. If you use your own Postgres instead, change `DATABASE_URL` in `.env` and `.env.local`.
 
 ```bash
 npm install
