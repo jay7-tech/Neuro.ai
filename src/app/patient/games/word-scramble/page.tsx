@@ -1,22 +1,14 @@
+'use client';
 
-import { AppHeader } from "@/components/app/header";
-import { WordScrambleGame } from "@/components/patient/word-scramble-game";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
+import { usePatientContext } from '@/components/app/patient-shell';
+import { GameShell } from '@/components/features/games/game-shell';
+import { WordScramble } from '@/components/features/games/games';
 
-export default function WordScramblePage() {
-    return (
-        <div className="min-h-screen bg-background">
-            <AppHeader role="Patient" />
-            <main className="container mx-auto">
-                <div className="p-4 md:p-8">
-                     <Link href="/patient/games" passHref>
-                        <Button variant="outline" className="mb-6"><ArrowLeft className="mr-2 h-4 w-4" /> Back to Games</Button>
-                    </Link>
-                    <WordScrambleGame />
-                </div>
-            </main>
-        </div>
-    )
+export default function Page() {
+  const { patientId } = usePatientContext();
+  return (
+    <GameShell patientId={patientId} game="word_scramble" title="Word puzzle" instructions="Rearrange the letters to make a word.">
+      {(props) => <WordScramble {...props} />}
+    </GameShell>
+  );
 }

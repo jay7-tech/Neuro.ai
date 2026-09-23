@@ -1,72 +1,30 @@
+import Link from 'next/link';
+import { Brain, Hash, Palette, Shuffle } from 'lucide-react';
+import { BackLink } from '@/components/app/patient-shell';
 
-import { AppHeader } from "@/components/app/header";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Brain, Palette, Puzzle, Pencil, ListOrdered } from "lucide-react";
-import Link from "next/link";
+export const metadata = { title: 'Brain games' };
 
-const games = [
-    {
-        name: "Memory Match",
-        description: "Find all the matching pairs of cards.",
-        href: "/patient/games/memory-match",
-        icon: <Puzzle className="h-12 w-12 text-primary" />
-    },
-    {
-        name: "Color Match",
-        description: "Match the color name to the correct box.",
-        href: "/patient/games/color-match",
-        icon: <Palette className="h-12 w-12 text-primary" />
-    },
-    {
-        name: "Word Scramble",
-        description: "Unscramble the letters to form a word.",
-        href: "/patient/games/word-scramble",
-        icon: <Pencil className="h-12 w-12 text-primary" />
-    },
-    {
-        name: "Sequence Memory",
-        description: "Remember and repeat the sequence of numbers.",
-        href: "/patient/games/sequence-memory",
-        icon: <ListOrdered className="h-12 w-12 text-primary" />
-    }
-]
+const GAMES = [
+  { href: 'memory-match', title: 'Memory match', text: 'Find the matching pairs of pictures.', icon: Brain },
+  { href: 'color-match', title: 'Colour match', text: 'Tap the colour the word names.', icon: Palette },
+  { href: 'sequence-memory', title: 'Number memory', text: 'Remember a short sequence of numbers.', icon: Hash },
+  { href: 'word-scramble', title: 'Word puzzle', text: 'Unscramble everyday words.', icon: Shuffle },
+];
 
 export default function GamesPage() {
-    return (
-        <div className="min-h-screen bg-background">
-            <AppHeader role="Patient" />
-            <main className="container mx-auto">
-                <div className="p-4 md:p-8">
-                    <div className="flex justify-between items-center mb-6">
-                        <div className="text-center md:text-left">
-                             <h1 className="text-4xl font-bold font-headline flex items-center gap-3"><Brain /> Cognitive Games</h1>
-                            <p className="text-lg text-muted-foreground">Choose a game to play and exercise your mind.</p>
-                        </div>
-                        <Link href="/patient" passHref>
-                            <Button variant="outline"><ArrowLeft className="mr-2 h-4 w-4" /> Back to Dashboard</Button>
-                        </Link>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {games.map((game) => (
-                            <Link href={game.href} passHref key={game.name}>
-                                <Card className="h-full hover:shadow-xl hover:border-primary/50 transition-all cursor-pointer flex flex-col">
-                                    <CardHeader className="flex flex-row items-center gap-4">
-                                        {game.icon}
-                                        <div>
-                                            <CardTitle className="text-2xl">{game.name}</CardTitle>
-                                        </div>
-                                    </CardHeader>
-                                    <CardContent className="flex-grow">
-                                        <p className="text-muted-foreground">{game.description}</p>
-                                    </CardContent>
-                                </Card>
-                            </Link>
-                        ))}
-                    </div>
-                </div>
-            </main>
-        </div>
-    )
+  return (
+    <div>
+      <BackLink />
+      <h1 className="text-4xl font-bold">Brain games</h1>
+      <p className="mt-2 text-xl text-muted-foreground">The level adjusts to you automatically.</p>
+      <div className="mt-8 grid gap-6 sm:grid-cols-2">
+        {GAMES.map(({ href, title, text, icon: Icon }) => (
+          <Link key={href} href={`/patient/games/${href}`} className="flex items-center gap-5 rounded-2xl border bg-card p-6 shadow-sm transition hover:border-primary hover:shadow-md">
+            <Icon className="h-12 w-12 shrink-0 text-primary" />
+            <span><span className="block text-2xl font-bold">{title}</span><span className="text-lg text-muted-foreground">{text}</span></span>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
 }

@@ -1,22 +1,14 @@
+'use client';
 
-import { AppHeader } from "@/components/app/header";
-import { SequenceMemoryGame } from "@/components/patient/sequence-memory-game";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
+import { usePatientContext } from '@/components/app/patient-shell';
+import { GameShell } from '@/components/features/games/game-shell';
+import { SequenceMemory } from '@/components/features/games/games';
 
-export default function SequenceMemoryPage() {
-    return (
-        <div className="min-h-screen bg-background">
-            <AppHeader role="Patient" />
-            <main className="container mx-auto">
-                <div className="p-4 md:p-8">
-                     <Link href="/patient/games" passHref>
-                        <Button variant="outline" className="mb-6"><ArrowLeft className="mr-2 h-4 w-4" /> Back to Games</Button>
-                    </Link>
-                    <SequenceMemoryGame />
-                </div>
-            </main>
-        </div>
-    )
+export default function Page() {
+  const { patientId } = usePatientContext();
+  return (
+    <GameShell patientId={patientId} game="sequence_memory" title="Number memory" instructions="Watch the numbers, then type them in order.">
+      {(props) => <SequenceMemory {...props} />}
+    </GameShell>
+  );
 }

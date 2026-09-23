@@ -1,24 +1,16 @@
+'use client';
 
-import { AppHeader } from "@/components/app/header";
-import { FamilyTreeView } from "@/components/shared/family-tree-view";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
+import { BackLink, usePatientContext } from '@/components/app/patient-shell';
+import { FamilyGallery } from '@/components/features/reminiscence/reminiscence';
 
-export default function FamilyTreePage() {
-    return (
-        <div className="min-h-screen bg-background">
-            <AppHeader role="Patient" />
-            <main className="container mx-auto">
-                <div className="p-4 md:p-8">
-                    <Link href="/patient" passHref>
-                        <Button variant="outline" className="mb-6"><ArrowLeft className="mr-2 h-4 w-4" /> Back to Dashboard</Button>
-                    </Link>
-                    <FamilyTreeView />
-                </div>
-            </main>
-        </div>
-    )
+export default function Page() {
+  const { patientId } = usePatientContext();
+  return (
+    <div>
+      <BackLink />
+      <h1 className="text-4xl font-bold">My family</h1>
+      <p className="mb-8 mt-2 text-xl text-muted-foreground">The people who love you.</p>
+      <FamilyGallery patientId={patientId} />
+    </div>
+  );
 }
-
-    
