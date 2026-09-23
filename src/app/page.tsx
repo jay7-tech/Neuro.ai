@@ -1,117 +1,97 @@
+import Link from 'next/link';
+import { redirect } from 'next/navigation';
+import { Bell, Brain, CalendarCheck, HeartHandshake, MapPin, MessagesSquare, Pill, ShieldCheck, Stethoscope } from 'lucide-react';
+import { getCurrentUser, homePathFor } from '@/server/auth/current';
+import { Button } from '@/components/ui/button';
+import { Logo } from '@/components/app/logo';
 
-'use client';
+const ROLES = [
+  {
+    icon: HeartHandshake,
+    title: 'For patients',
+    points: ['Large, calm daily plan and medicine reminders', 'A companion that answers from their own facts', 'Memory lane, family tree, music and brain games', 'One-tap help button'],
+  },
+  {
+    icon: Bell,
+    title: 'For caregivers',
+    points: ['Live alerts for missed doses, wandering and mood dips', 'Medication schedules with adherence tracking', 'Safe-zone geofence with GPS-noise filtering', 'Invite family and doctors with one-time codes'],
+  },
+  {
+    icon: Stethoscope,
+    title: 'For clinicians',
+    points: ['30-day summary with automatic risk flags', 'Adherence, mood trend and cognitive-game performance', 'Timestamped clinical notes shared with the team', 'Full audit trail of every change'],
+  },
+];
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useToast } from '@/hooks/use-toast';
-import { ArrowRight, Lock } from 'lucide-react';
+const FEATURES = [
+  { icon: Pill, label: 'Adherence engine', text: 'Timezone-aware schedules, grace windows, streaks and late-dose detection.' },
+  { icon: MapPin, label: 'Geofencing', text: 'Haversine distance with accuracy-aware, debounced breach detection.' },
+  { icon: Brain, label: 'Adaptive games', text: 'Deterministic difficulty policy with asymmetric promote/demote thresholds.' },
+  { icon: MessagesSquare, label: 'Realtime', text: 'Postgres LISTEN/NOTIFY fanned out over Server-Sent Events.' },
+  { icon: CalendarCheck, label: 'Background jobs', text: 'Missed-dose and mood-decline scans with advisory-lock leader election.' },
+  { icon: ShieldCheck, label: 'Security', text: 'Hashed session tokens, relationship-based access control, CSRF and rate limits.' },
+];
 
-const AppIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-16 w-16 text-primary">
-        <path d="M12 2a10 10 0 0 0-10 10c0 5 4.5 9 10 9s10-4 10-9A10 10 0 0 0 12 2Z"/>
-        <path d="M12 12a5 5 0 0 0-5 5"/>
-        <path d="M12 7a5 5 0 0 1 5 5"/>
-    </svg>
-)
-
-export default function Home() {
-  const router = useRouter();
-  const { toast } = useToast();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(true); // Start with loading true to check session
-
-  useEffect(() => {
-    // Check if the user is already logged in
-    const isLoggedIn = localStorage.getItem('isLoggedIn');
-    if (isLoggedIn === 'true') {
-      router.replace('/selection');
-    } else {
-      setLoading(false); // Only allow interaction if not logged in
-    }
-  }, [router]);
-
-
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    if (!email || !password) {
-        toast({
-            title: "All fields are required",
-            description: "Please enter your email and password.",
-            variant: "destructive",
-        });
-        setLoading(false);
-        return;
-    }
-
-    // This is a mock authentication/routing logic.
-    // In a real app, you would have a proper backend authentication.
-    setTimeout(() => {
-        toast({ title: "Login Successful", description: "Redirecting to role selection..." });
-        localStorage.setItem('isLoggedIn', 'true'); // Save login state
-        router.push('/selection');
-    }, 1000);
-  };
-
-  if (loading) {
-    return (
-        <div className="flex items-center justify-center min-h-screen bg-background">
-            <p>Loading...</p>
-        </div>
-    );
-  }
+export default async function Home() {
+  const user = await getCurrentUser();
+  if (user) redirect(homePathFor(user.role));
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-background p-4">
-      <main className="container flex items-center justify-center">
-        <Card className="w-full max-w-md mx-auto shadow-2xl rounded-2xl overflow-hidden border-primary/20">
-          <CardHeader className="text-center p-8 bg-card">
-             <div className="flex justify-center items-center mb-4">
-               <AppIcon />
-             </div>
-            <CardTitle className="text-4xl font-extrabold tracking-tight lg:text-5xl">Welcome to Neuro-AI</CardTitle>
-            <CardDescription className="text-lg text-muted-foreground pt-2">Sign in to continue.</CardDescription>
-          </CardHeader>
-          <CardContent className="p-8 bg-secondary/30">
-            <form onSubmit={handleLogin} className="space-y-6">
-                <div className="space-y-2">
-                    <Label htmlFor="email" className="text-base">Email Address</Label>
-                    <Input 
-                        id="email"
-                        type="email"
-                        placeholder="patient@example.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        disabled={loading}
-                        className="h-12 text-base"
-                    />
+    <div className="min-h-screen">
+      <header className="container flex h-16 items-center justify-between">
+        <Logo />
+        <nav className="flex items-center gap-2">
+          <Button asChild variant="ghost"><Link href="/api-docs">API</Link></Button>
+          <Button asChild variant="ghost"><Link href="/login">Sign in</Link></Button>
+          <Button asChild><Link href="/register">Get started</Link></Button>
+        </nav>
+      </header>
+
+      <main>
+        <section className="container py-16 text-center md:py-24">
+          <h1 className="mx-auto max-w-3xl text-4xl font-extrabold tracking-tight md:text-6xl">One care circle for people living with dementia</h1>
+          <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground">
+            Neuro-AI connects the patient, their family caregivers and their doctor around the same live picture of medication, routine, mood and safety.
+          </p>
+          <div className="mt-8 flex justify-center gap-3">
+            <Button asChild size="lg"><Link href="/register">Create a care team</Link></Button>
+            <Button asChild size="lg" variant="outline"><Link href="/login">Try the demo</Link></Button>
+          </div>
+        </section>
+
+        <section className="container grid gap-6 pb-16 md:grid-cols-3">
+          {ROLES.map(({ icon: Icon, title, points }) => (
+            <div key={title} className="rounded-2xl border bg-card p-6 shadow-sm">
+              <Icon className="h-8 w-8 text-primary" />
+              <h2 className="mt-4 text-xl font-semibold">{title}</h2>
+              <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+                {points.map((p) => <li key={p}>• {p}</li>)}
+              </ul>
+            </div>
+          ))}
+        </section>
+
+        <section className="border-t bg-muted/30 py-16">
+          <div className="container">
+            <h2 className="text-center text-2xl font-bold">Under the hood</h2>
+            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {FEATURES.map(({ icon: Icon, label, text }) => (
+                <div key={label} className="flex gap-3 rounded-xl bg-card p-4">
+                  <Icon className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+                  <div>
+                    <p className="font-medium">{label}</p>
+                    <p className="text-sm text-muted-foreground">{text}</p>
+                  </div>
                 </div>
-                 <div className="space-y-2">
-                    <Label htmlFor="password" className="text-base">Password</Label>
-                    <Input 
-                        id="password"
-                        type="password"
-                        placeholder="********"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        disabled={loading}
-                        className="h-12 text-base"
-                    />
-                </div>
-                <Button type="submit" size="lg" className="w-full h-12 text-lg" disabled={loading}>
-                    {loading ? 'Signing in...' : 'Continue'}
-                    {!loading && <ArrowRight className="ml-2 h-5 w-5" />}
-                </Button>
-            </form>
-          </CardContent>
-        </Card>
+              ))}
+            </div>
+          </div>
+        </section>
       </main>
+
+      <footer className="container py-8 text-center text-sm text-muted-foreground">
+        Neuro-AI is a portfolio project and not a certified medical device.
+      </footer>
     </div>
   );
 }

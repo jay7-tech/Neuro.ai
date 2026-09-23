@@ -4,6 +4,7 @@
 
 @layer base {
   :root {
+    --font-sans: 'Inter Variable';
     --background: 210 40% 98%; /* Very light blue */
     --foreground: 220 15% 25%; /* Dark grayish-blue */
     --card: 0 0% 100%;
