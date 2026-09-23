@@ -1,0 +1,21 @@
+/** Hierarchical query keys: invalidating ['patient', id] refreshes everything for that patient. */
+export const qk = {
+  me: ['me'] as const,
+  patient: (id: string) => ['patient', id] as const,
+  doses: (id: string) => ['patient', id, 'doses'] as const,
+  adherence: (id: string, days: number) => ['patient', id, 'adherence', days] as const,
+  medications: (id: string) => ['patient', id, 'medications'] as const,
+  plan: (id: string) => ['patient', id, 'plan'] as const,
+  tasks: (id: string) => ['patient', id, 'tasks'] as const,
+  mood: (id: string, days: number) => ['patient', id, 'mood', days] as const,
+  games: (id: string) => ['patient', id, 'games'] as const,
+  nextLevel: (id: string, game: string) => ['patient', id, 'games', 'next', game] as const,
+  notes: (id: string) => ['patient', id, 'notes'] as const,
+  messages: (id: string) => ['patient', id, 'messages'] as const,
+  alerts: (id: string, status: string) => ['patient', id, 'alerts', status] as const,
+  location: (id: string) => ['patient', id, 'location'] as const,
+  team: (id: string) => ['patient', id, 'team'] as const,
+  insights: (id: string) => ['patient', id, 'insights'] as const,
+  audit: (id: string) => ['patient', id, 'audit'] as const,
+  resource: (id: string, r: 'family' | 'memories' | 'playlist') => ['patient', id, r] as const,
+};
