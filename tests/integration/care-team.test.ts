@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { db, makePatient, makeUser, useDatabase } from './setup';
+import { db, makePatient, makeUser, setupTestDatabase } from './setup';
 import { login, register } from '@/server/services/auth';
 import { validateSession } from '@/server/auth/session';
 import { acceptInvite, createInvite, listTeam, removeMember } from '@/server/services/team';
@@ -8,7 +8,7 @@ import { createMedication } from '@/server/services/medications';
 import { AppError } from '@/server/errors';
 import { auditLogs } from '@/server/db/schema';
 
-useDatabase();
+setupTestDatabase();
 
 const code = (e: unknown) => (e instanceof AppError ? e.code : e);
 

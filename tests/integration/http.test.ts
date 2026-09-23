@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { NextRequest } from 'next/server';
-import { useDatabase } from './setup';
+import { setupTestDatabase } from './setup';
 import { POST as registerRoute } from '@/app/api/v1/auth/register/route';
 import { POST as loginRoute } from '@/app/api/v1/auth/login/route';
 import { GET as meRoute } from '@/app/api/v1/auth/me/route';
@@ -9,7 +9,7 @@ import { POST as moodRoute } from '@/app/api/v1/patients/[patientId]/mood/route'
 import { GET as healthRoute } from '@/app/api/health/route';
 import { buildOpenApiDocument } from '@/server/http/openapi';
 
-useDatabase();
+setupTestDatabase();
 
 const ctx = (params: Record<string, string> = {}) => ({ params: Promise.resolve(params) });
 const req = (path: string, init: { method?: string; body?: unknown; cookie?: string; origin?: string } = {}) =>

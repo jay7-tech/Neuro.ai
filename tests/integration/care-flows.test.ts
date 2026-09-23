@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { and, eq } from 'drizzle-orm';
 import { Client } from 'pg';
-import { db, makePatient, makeUser, useDatabase } from './setup';
+import { db, makePatient, makeUser, setupTestDatabase } from './setup';
 import { createMedication, recordDose, todaysDoses, adherence } from '@/server/services/medications';
 import { listAlerts, raiseAlert, updateAlertStatus } from '@/server/services/alerts';
 import { reportLocation } from '@/server/services/location';
@@ -16,7 +16,7 @@ import { alerts, doseEvents } from '@/server/db/schema';
 import { addDays, localDate, zonedToUtc } from '@/server/domain/time';
 import { AppError } from '@/server/errors';
 
-useDatabase();
+setupTestDatabase();
 const TZ = 'Asia/Kolkata';
 const code = (e: unknown) => (e instanceof AppError ? e.code : e);
 

@@ -11,7 +11,7 @@ process.env.APP_URL = 'http://localhost:9002';
 
 export const db = () => getDb();
 
-export function useDatabase() {
+export function setupTestDatabase() {
   beforeAll(async () => {
     await migrate(getDb(), { migrationsFolder: './drizzle' });
   });
