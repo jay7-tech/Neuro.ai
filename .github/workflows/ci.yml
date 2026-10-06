@@ -47,7 +47,7 @@ jobs:
         with: { node-version: '${{ env.NODE_VERSION }}', cache: npm }
       - run: npm ci
       - run: npm run test:coverage
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with: { name: coverage, path: coverage/, retention-days: 7 }
 
   e2e:
@@ -77,7 +77,7 @@ jobs:
           for i in $(seq 1 60); do curl -sf http://localhost:9002/api/health && break; sleep 1; done
       - run: npm run test:e2e
       - if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-report
           retention-days: 7
