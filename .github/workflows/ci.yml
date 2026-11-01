@@ -94,7 +94,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: docker/setup-buildx-action@v3
       - name: Build web image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           {
             context: .,
@@ -105,5 +105,5 @@ jobs:
             cache-to: 'type=gha,mode=max',
           }
       - name: Build worker image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with: { context: ., target: worker, push: false, tags: 'neuro-ai-worker:ci', cache-from: type=gha }
